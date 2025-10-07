@@ -1,7 +1,13 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 
-# WARNING: this is merely for show
-class Test(models.Model):
-    # create a test name field
-    name = models.CharField(max_length=20)
+# Inheriting from existing default admin class
+#adding additional fields
+class User(AbstractUser):
+    # # store "M", show "Male". Django treats input as a dropdown
+    gender = models.CharField(max_length=10, choices=[("M", "Male"), ("F", "Female")])
+    region = models.CharField(max_length=80)
+    street = models.CharField(max_length=120)
+    role = models.CharField(max_length=20, default="CUSTOMER")
+
