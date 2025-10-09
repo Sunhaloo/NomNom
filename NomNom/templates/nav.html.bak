@@ -1,0 +1,5 @@
+{% load static %}
+
+<nav>
+  <img src="{% static 'images/NomNom-Logo.png' %}" alt="Logo" />
+</nav>

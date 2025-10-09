@@ -61,7 +61,7 @@ TEMPLATES = [
         # change the default template location
         # no need to use something like string concatenation or `os.path.join`
         "DIRS": [BASE_DIR / "templates"],
-        # We also want Django to find specific `<application_name>/templates` folder
+        # we also want Django to find specific `<application_name>/templates` folder
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -123,6 +123,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "static/"
+
+# global directory of where the static files are found ( in project )
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

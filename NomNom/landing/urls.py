@@ -7,5 +7,5 @@ app_name = "landing"
 # create inner application routings
 urlpatterns = [
     # our default page
-    path("", views.index, name="index")
+    path("", views.index, name="landing")
 ]

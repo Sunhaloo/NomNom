@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    {% load static %}
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}NomNom{% endblock %}</title>
+    <link href="{% static 'style.css' %}" rel="stylesheet"/>
+    <link href="{% static 'landing/style.css' %}" rel="stylesheet"/>
+  </head>
+  <body>
+    {% include 'nav.html' %}
+    <h1>
+      <span style="color: white;">
+        Hello World From <code>templates/base.html</code>
+      </span>
+    </h1>
+    {% block content %}
+    {% endblock %}
+  </body>
+</html>
+

@@ -1,0 +1,16 @@
+<!-- call our `base.html` file from global templates -->
+{% extends "base.html" %}
+
+
+<!-- tell Django to load the files inside `static` folder -->
+{% load static %}
+
+<!-- modify the tab name for our landing page -->
+{% block title %}
+  Landing Page
+{% endblock %}
+
+<!-- content that will be found inside the `landing.html` page specifically -->
+{% block content %}
+  <h2>Hello World From Landing Page</h2>
+{% endblock %}
