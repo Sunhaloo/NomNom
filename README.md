@@ -128,3 +128,198 @@ python manage.py createsuperuser --username "test" --email "test@email.com"
 # run the Django development server
 python manage.py runserver
 ```
+
+---
+
+# Templates and Render
+
+## Setup Files And Folders
+
+- Head over to the _main_ project file and create these two folders
+
+```bash
+# create the outer templates and static folder
+mkdir templates static
+```
+
+> [!NOTE]
+>
+> - The `templates` directory is going to hold all of our **global** `.html` file that can be called from _any_ application using the `{% extends "page.html" %}`
+> - The `static` directory is going to hold all of our **global** _styling_ for our `templates/*.html` files!
+>
+> But currently Django does not know that we have these two directories outside and still things that we are going to have everything inside our applications.
+>
+> > Hence, we are going to have to modify our `NomNom/settings.py` file!
+
+- Configure Our `NomNom/settings.py` file:
+
+```python
+# < other codes here >
+
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        # change the default template location
+        # no need to use something like string concatenation or `os.path.join`
+        "DIRS": [BASE_DIR / "templates"],
+        # we also want Django to find specific `<application_name>/templates` folder
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]
+
+# < other codes here >
+
+STATIC_URL = "static/"
+
+# global directory of where the static files are found ( in project )
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+```
+
+## Global Templates And Static Files
+
+### Creation Of Templates / HTML Files
+
+Head over into our `templates` _global_ directory and create _some_ HTML files!
+
+- Create our "_test_" `base.html` file:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- tell Django to load the files inside `static` folder -->
+    {% load static %}
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- add a global title -->
+    <title>{% block title %}NomNom{% endblock %}</title>
+    <!-- link the main style sheet found in `static` folder -->
+    <link href="{% static 'style.css' %}" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- include the navigation bar at the top of `base.html` file -->
+    {% include 'navbar.html' %}
+    <!-- this should appear from the global `base.html` file -->
+    <h1>Hello World From Global Templates!!!</h1>
+
+    <!-- make sure that each application can override `.html` file -->
+    {% block content %}
+    <!-- applications overridden contents goes here -->
+    {% endblock %}
+
+    <!-- include the footer at the bottom of `base.html` file -->
+    {% include 'footer.html' %}
+  </body>
+</html>
+```
+
+- Create our "_test_" `navbar.html` file:
+
+```html
+<!-- tell Django to load the files inside `static` folder -->
+{% load static %}
+
+<!-- start of the navigation bar area -->
+<nav>
+  <!-- test the navigation bar -->
+  <h4>This is our navigation bar</h4>
+</nav>
+```
+
+- Create our "_test_" `footer.html` file:
+
+```html
+<!-- tell Django to load the files inside `static` folder -->
+{% load static %}
+
+<!-- start of the footer area -->
+<footer>
+  <!-- test the footer -->
+  <h4>This is our footer bar</h4>
+</footer>
+```
+
+### Creation Of Static / CSS Files
+
+Head over into our `static` _global_ directory and create _some_ CSS files!
+
+- Create our "_test_" `style.css` file:
+
+```css
+html {
+  background-color: black;
+  color: white;
+}
+```
+
+## Landing Page Templates And Static Files
+
+We are now going to setup the "_inner_" `templates` and `static` directories inside our `landing` Django application / folder.
+
+- Head over into our 'landing' Django application and create the directories:
+
+```bash
+# create the 'templates' and 'static' directories
+mkdir -p templates/landing
+mkdir -p static/landing
+```
+
+### Creation Of `landing.html` File
+
+- Head inside the `templates/landing` directory and create the `landing.html` file:
+
+```html
+<!-- call our `base.html` file from global templates -->
+{% extends "base.html" %}
+
+<!-- tell Django to load the files inside `static` folder -->
+{% load static %}
+
+<!-- modify the tab name for our landing page -->
+{% block title %} Landing Page {% endblock %}
+
+<!-- content that will be found inside the `landing.html` page specifically -->
+{% block content %}
+<h2>Hello World From Landing Page</h2>
+{% endblock %}
+```
+
+> [!WARNING] Modify Our `templates/base.html`
+> In order to be able to use the "_inner_" `static/landing/style.css` file.
+> We first need to tell Django that we do have this file there.
+>
+> Hence modify the `templates/base.html` file and add this following line in the `head` tag:
+>
+> ```html
+> <link href="{% static 'landing/style.css' %}" rel="stylesheet" />
+> ```
+
+### Creation Of `style.css` File
+
+- Head inside the `static/landing` directory and create the `style.css` file:
+
+```css
+h2 {
+  color: cyan;
+  text-align: center;
+}
+```
+
+> [!SUCCESS]
+> This should be enough now! Run the development server to test.
+>
+> ```bash
+> python manage.py runserver
+> ```
