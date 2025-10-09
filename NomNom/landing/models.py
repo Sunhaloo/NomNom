@@ -11,3 +11,8 @@ class User(AbstractUser):
     street = models.CharField(max_length=120)
     role = models.CharField(max_length=20, default="CUSTOMER")
 
+#overriding role for users who are staff/superuser
+    def save(self, *args, **kwargs):
+        if self.is_superuser or self.is_staff:
+            self.role = "ADMIN"
+        super().save(*args, **kwargs)
