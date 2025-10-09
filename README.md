@@ -1,130 +1,143 @@
-# S.Sunhaloo
+> [!WARNING]
+> DO NOT PUSH THE FUCKING PYTHON VIRTUAL ENVIRONMENT ITSELF!!!
 
-This is my space, don't fucking touch this!!!
+# Main Branch
 
-> Its for me to test and fuck shit up!
+## Tracking The Commands I Ran ( Myself )
 
----
+- Creating the Python Virtual Environment
 
-# Rudimentary Setup For Work
-
-- Creation of the `landing/views.py` file:
-
-```python
-from django.http import HttpResponse
-
-
-# our very first view
-def index(request):
-    return HttpResponse("Hello World From Index Page")
+```bash
+# create the python virtual environment with the name 'Django'
+python -m venv Django
 ```
 
-- Creation of a "_test table_" inside the `landing/models.py` file
+- Source / Activate the Python Virtual Environment
 
-```python
+```bash
+# UNIX/LINUX Based Systems
+source bin/activate
 
-from django.db import models
-
-
-# WARNING: this is merely for show
-class Test(models.Model):
-    # create a test name field
-    name = models.CharField(max_length=20)
+# On Windows Based Systems --> something along the lines of
+./Scripts/activate
 ```
 
-- Register the application inside the `landing/admin.py` so that the admin page sees our table / model
+- Create **my** TMUX environment ( **you don't need to do this** )
 
-```python
-from django.contrib import admin
-
-# WARNING: testing - import our test model
-from .models import Test
-
-# register the model here
-admin.site.register(Test)
+```bash
+# create my little TMUX world / environment
+tmux new -s django
 ```
 
-- Creation of the `landing/urls.py` file
+### Installing Django On Virtual Environment
+
+- Install 'Django' package using `pip` command
+
+```bash
+# install the latest version of Django
+pip install Django
+```
+
+- Check if 'Django' has been install successfully / correctly
+
+```bash
+# check the version of 'Django' installed
+# running the command below should output something '5.2.6'
+python -m django --version
+```
+
+- Freeze the current dependencies installed
+
+```bash
+pip freeze > requirements.txt
+```
+
+> [!NOTE]
+> To install modules from the `requirements.txt` file, you need to run the following `pip` command:
+>
+> ```bash
+> # install the required dependencies from `requirements.txt` file
+> pip install -r requirements.txt
+> ```
+
+> I suggest you all to install using the `requirements.txt` file as you never know if there might be a version change of Django when we are working!!!
+
+- Start the Django 'NomNom' **main** Project
+
+```bash
+# create the actual Django 'NomNom' project
+# if creation is successfull... change the directory
+django-admin startproject NomNom && cd NomNom
+```
+
+# Create The Main Templates Folder For The Whole Website
+
+- Create a new `templates` directory inside the `NomNom` folder
+
+```bash
+# create main templates directory for the whole 'NomNom' website
+mkdir templates
+```
+
+This is how my directory structure looks like:
+
+```console
+ .
+├──  manage.py
+├──  NomNom
+│   ├──  __init__.py
+│   ├──  asgi.py
+│   ├──  settings.py
+│   ├──  urls.py
+│   └──  wsgi.py
+└──  templates
+```
+
+# Change Some Of The Settings
+
+I am now into the "_other_" 'NomNom' folder and opening the `NomNom/settings.py` file!
+
+## Change Where Main Templates Are Located At
+
+- Let Django know / Provide the path to our _main_ `templates` folder
 
 ```python
-from django.urls import path
-from . import views
-
-# define the application name to avoid Django making confusion down the line
-app_name = "landing"
-
-# create inner application routings
-urlpatterns = [
-    # our default page
-    path("", views.index, name="index")
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        # change the default template location
+        # no need to use something like string concatenation or `os.path.join`
+        "DIRS": [BASE_DIR / "templates"],
+        # We also want Django to find specific `<application_name>/templates` folder
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
 ]
 ```
 
-## Going Back To NomNom Project Folder
+## Change The Time Zone
 
-- Add the following line to the `INSTALLED_APPS` Python list inside `settings.py` file
+Running my `timedatectl` command; I get the following output:
+
+```console
+               Local time: Wed 2025-10-01 16:55:03 +04
+           Universal time: Wed 2025-10-01 12:55:03 UTC
+                 RTC time: Wed 2025-10-01 12:55:03
+                Time zone: Indian/Mauritius (+04, +0400)
+System clock synchronized: yes
+              NTP service: active
+          RTC in local TZ: no
+```
+
+Therefore we going to change the `TIME_ZONE` variable from 'UTC' to 'Indian/Mauritius'
 
 ```python
-INSTALLED_APPS = [
-    # add our specific landing page application
-    "landing.apps.LandingConfig",
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
-]
-```
-
-- Link our "_view_" to the whole project
-
-```python
-from django.contrib import admin
-from django.urls import path, include
-
-urlpatterns = [
-    # WARNING: the order of "operations" matter
-    path("landing/", include("landing.urls")),
-    path("admin/", admin.site.urls),
-]
-```
-
-## Running Django Specific Commands
-
-- Make the migrations:
-
-```bash
-# create the plan for Django for the models
-python manage.py makemigrations
-```
-
-- Actually write to the `db.sqlite3` file using the `migrate` command:
-
-```bash
-# create the plan for Django for the models
-python manage.py migrate
-```
-
-## Creation Of Superuser
-
-- Ran the following command to create the `test` superuser with `1234` as passwords
-- Ran the following command to create the `test` superuser
-
-```bash
-python manage.py createsuperuser --username "test" --email "test@email.com"
-
-```
-
-| Username | Email            | Password |
-| -------- | ---------------- | -------- |
-| test     | <test@email.com> | 1234     |
-
-### Run The Django Development Server
-
-- To run the Django development server:
-
-```bash
-# run the Django development server
-python manage.py runserver
+TIME_ZONE = "Indian/Mauritius"
 ```
