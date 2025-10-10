@@ -21,5 +21,6 @@ from django.urls import path, include
 urlpatterns = [
     # WARNING: the order of "operations" matter
     path("", include("landing.urls")),
+    path("login/", include("login.urls")),
     path("admin/", admin.site.urls),
 ]

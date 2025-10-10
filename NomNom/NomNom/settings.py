@@ -33,6 +33,8 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     # add our specific landing page application
     "landing.apps.LandingConfig",
+    # add our specific login page application
+    "login.apps.LoginConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -41,7 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 ]
 
-AUTH_USER_MODEL = 'landing.User'
+AUTH_USER_MODEL = "landing.User"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
