@@ -466,3 +466,26 @@ INSTALLED_APPS = [
 
 > [!INFO]
 > If we want the outer `NomNom/static/style.css` file to take _control_; the order we `link` the stylesheet is **important**!
+
+---
+
+# Creation Of All Of The Other Applications
+
+> [!NOTE]
+> I have now created three more applications:
+>
+> - About Us Application
+> - Contact Application
+> - Cart Application
+>
+> I used the **same** process to be able to _render_ and display the "_webpages_"!
+
+> [!TIP]
+>
+> > A little thing that I found!
+>
+> Let's say that in our `contact/views.py` file inside the `render` function for passing the template **instead** of writing something like `"contact/contact.html"`
+>
+> Instead of that, we wrote something like `"landing/landing.html"`... **No errors** would be found!
+>
+> It will simply go ahead and use that _inner_ specific application template ( _if found_ ) and will **not** cause any trouble.
