@@ -9,6 +9,12 @@
 
     <!-- add a global title -->
     <title>{% block title %}NomNom{% endblock %}</title>
+
+    <!-- add our custom 'inter' font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
     <!-- link the main style sheet found in `static` folder -->
     <link href="{% static 'landing/style.css' %}" rel="stylesheet" />
     <link href="{% static 'about_us/style.css' %}" rel="stylesheet" />
