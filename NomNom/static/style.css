@@ -1,3 +1,7 @@
+/* ------ */
+/* HEADER */
+/* ------ */
+
 .main_header {
   background-color: white;
 }
@@ -56,4 +60,21 @@
   width: 16px;
   height: auto;
   vertical-align: middle;
+}
+
+/* ------ */
+/* FOOTER */
+/* ------ */
+
+.main_footer {
+  background-color: grey;
+}
+
+.main_footer div {
+  border: 2px solid red;
+  flex: 1;
+}
+
+.footer_cpyrights {
+  display: inline-block;
 }
