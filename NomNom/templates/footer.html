@@ -1,24 +1,33 @@
 <!-- tell Django to load the files inside `static` folder -->
 {% load static %}
 
-<!-- start of the footer area -->
+<!-- start of the footer tag -->
 <footer class="main_footer">
-  <div class="footer_logo">
-    <img src="{% static 'images/NomNom-Logo.png' %}"/>
+
+  <!-- create "container" that will contain all the other data -->
+  <!-- refer to 'https://www.theodinproject.com/lessons/foundations-introduction-to-flexbox' -->
+  <div class="footer_content">
+    <div class="footer_logo">
+      <img src="{% static 'images/NomNom-Logo.png' %}"/>
+
+      <div class="footer_social">
+        <a href="https://facebook.com/" target="_blank"><img src="{% static 'images/facebook-icon.png' %}"/></a>
+        <a href="https://linkedin.com/" target="_blank"><img src="{% static 'images/linkedin-icon.png' %}"/></a>
+        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank"><img src="{% static 'images/youtube-icon.png' %}"/></a>
+        <a href="https://instagram.com/s.sunhaloo" target="_blank"><img src="{% static 'images/instagram-icon.png' %}"/></a>
+      </div>
+    </div>
+
+    <div class="footer_contact">
+      <h3>Contact Us</h3>
+      <p>123 Sweet Street, PL</p>
+      <p>+230 57234507</p>
+      <p><a class="footer_contact_email" href="#">nomnom.express@gmail.com</a></p>
+    </div>
+
+    <div class="footer_copyright">
+      <p>© 2025 Nomnom Express. All rights reserved.</p>
+    </div>
   </div>
 
-  <div class="footer_contact">
-    <p>Contacts</p>
-  </div>
-
-  <div class="footer_contact">
-    <a href="https://youtube.com/@s.sunhaloo/streams" target="_blank">
-      nice
-    </a>
-  </div>
-
-
-  <div class="footer_cpyrights">
-    <p>Copyright (c) 2025 Author. All Rights Reserved.</p>
-  </div>
 </footer>
