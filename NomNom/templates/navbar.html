@@ -2,7 +2,16 @@
 {% load static %}
 
 <!-- start of the navigation bar area -->
-<nav>
-  <!-- test the navigation bar -->
-  <h3>This is our navigation bar</h3>
-</nav>
+<header class="main_header">
+  <nav class="header_navbar">
+    <img src="{% static 'images/NomNom-Logo.png' %}"/>
+    <!-- test the navigation bar -->
+    <ul class="navbar_ul">
+      <li><a href="{% url 'landing:landing' %}">Home</a></li>
+      <li>About Us</li>
+      <li><a href="{% url 'login:login' %}">Login</a></li>
+      <li>Contact Us</li>
+      <img src="{% static 'images/Cart-Icon.png' %}"/>
+    </ul>
+  </nav>
+</header>
