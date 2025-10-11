@@ -323,3 +323,146 @@ h2 {
 > ```bash
 > python manage.py runserver
 > ```
+
+---
+
+# Create And Setup New Login Application
+
+- Run the `startapp` sub-command to create the `login` application
+
+```bash
+# with the Python virtual environment started
+# create the `login` application using the `manage.py` file
+python manage.py startapp login
+```
+
+- Create the `templates/login` and `static/login` directories
+
+```bash
+mkdir -p templates/login
+mkdir -p static/login
+```
+
+- Create the `login.html` file inside the `templates` directory:
+
+```html
+<!-- call the `base.html` template file -->
+{% extends 'base.html' %}
+
+<!-- load the `login/static/login/style.css` file -->
+{% load static %}
+
+<!-- change the title of the webpage -->
+{% block title %} NomNom Login {% endblock %}
+
+<!-- the actual content for the login page -->
+{% block content %}
+<h4>Hey You! Are You Good?</h4>
+{% endblock %}
+```
+
+- Create the `style.css` file inside the `static` directory:
+
+```css
+h4 {
+  color: purple;
+}
+```
+
+- Setup the view inside the `views.py` file:
+
+```python
+from django.shortcuts import render
+from django.http import HttpResponse
+
+
+# Create your views here.
+def index(request):
+    # return HttpResponse("Hello World From Login")
+    return render(request, "login/login.html")
+```
+
+- Create a fake 'model' / table inside the `models.py` file:
+
+```python
+from django.db import models
+
+
+# Create your models here.
+class Test(models.Model):
+    test_name = models.CharField(max_length=200)
+```
+
+- Create the inner links by creating a new `urls.py` file:
+
+```python
+from django.urls import path
+from . import views
+
+# define the app name here so that Django does not get confused with URLs
+app_name = "login"
+
+urlpatterns = [
+    # our login path
+    path("", views.index, name="login")
+]
+```
+
+- Register the model to the admin "website" inside `admin.py`:
+
+```python
+from django.contrib import admin
+
+# import our "class" definition / tables from model
+from .models import Test
+
+# Register your models here.
+admin.site.register(Test)
+```
+
+## Inside The Main Project Folder
+
+- Link the `login` app to the whole project in the `urls.py` file:
+
+```python
+urlpatterns = [
+    # WARNING: the order of "operations" matter
+    # add the main landing page for the website
+    path("", include("landing.urls")),
+    # add the login page that will allow the user to handle login of users
+    path("login/", include("login.urls")),
+    path("admin/", admin.site.urls),
+]
+```
+
+- Add the new application to the `INSTALLED_APPS` Python list inside the `settings.py` file:
+
+```python
+INSTALLED_APPS = [
+    # add our specific landing page application
+    "landing.apps.LandingConfig",
+    # add our specific login page application
+    "login.apps.LoginConfig",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+]
+```
+
+---
+
+# Change The Load Order Of Style Sheets
+
+- Modify the `base.html` so that this part below looks like this:
+
+```html
+<link href="{% static 'landing/style.css' %}" rel="stylesheet" />
+<link href="{% static 'login/style.css' %}" rel="stylesheet" />
+<link href="{% static 'style.css' %}" rel="stylesheet" />
+```
+
+> [!INFO]
+> If we want the outer `NomNom/static/style.css` file to take _control_; the order we `link` the stylesheet is **important**!

@@ -20,7 +20,9 @@ from django.urls import path, include
 
 urlpatterns = [
     # WARNING: the order of "operations" matter
+    # add the main landing page for the website
     path("", include("landing.urls")),
+    # add the login page that will allow the user to handle login of users
     path("login/", include("login.urls")),
     path("admin/", admin.site.urls),
 ]
