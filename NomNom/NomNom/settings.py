@@ -33,6 +33,14 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     # add our specific landing page application
     "landing.apps.LandingConfig",
+    # add our specific 'about us' page application
+    "about_us.apps.AboutUsConfig",
+    # add our specific login page application
+    "login.apps.LoginConfig",
+    # add our specific contact page application
+    "contact.apps.ContactConfig",
+    # add our specific cart page application
+    "cart.apps.CartConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -40,6 +48,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
+
+AUTH_USER_MODEL = "landing.User"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -59,7 +69,7 @@ TEMPLATES = [
         # change the default template location
         # no need to use something like string concatenation or `os.path.join`
         "DIRS": [BASE_DIR / "templates"],
-        # We also want Django to find specific `<application_name>/templates` folder
+        # we also want Django to find specific `<application_name>/templates` folder
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -121,6 +131,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "static/"
+
+# global directory of where the static files are found ( in project )
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
