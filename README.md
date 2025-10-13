@@ -502,3 +502,8 @@ INSTALLED_APPS = [
 > Instead of that, we wrote something like `"landing/landing.html"`... **No errors** would be found!
 >
 > It will simply go ahead and use that _inner_ specific application template ( _if found_ ) and will **not** cause any trouble.
+
+---
+
+# Milind's Work
+
