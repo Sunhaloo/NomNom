@@ -1,0 +1,13 @@
+<!-- call the `base.html` template file -->
+{% extends 'base.html' %}
+
+<!-- load the `login/static/login/style.css` file -->
+{% load static %}
+
+<!-- change the title of the webpage -->
+{% block title %} NomNom About Us {% endblock %}
+
+<!-- the actual content for the login page -->
+{% block content %}
+  <h4 class="testing">This is inside the about template</h4>
+{% endblock %}

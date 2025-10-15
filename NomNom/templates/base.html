@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- tell Django to load the files inside `static` folder -->
+    {% load static %}
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- add a global title -->
+    <title>{% block title %}NomNom{% endblock %}</title>
+
+    <!-- add our custom 'inter' font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
+    <!-- link the main style sheet found in `static` folder -->
+    <link href="{% static 'landing/style.css' %}" rel="stylesheet" />
+    <link href="{% static 'about_us/style.css' %}" rel="stylesheet" />
+    <link href="{% static 'login/style.css' %}" rel="stylesheet" />
+    <link href="{% static 'contact/style.css' %}" rel="stylesheet" />
+    <link href="{% static 'style.css' %}" rel="stylesheet" />
+  </head>
+  <body>
+    <!-- include the navigation bar at the top of `base.html` file -->
+    {% include 'navbar.html' %}
+    <!-- this should appear from the global `base.html` file -->
+    <h1>Hello World From Global Templates!!!</h1>
+
+    <!-- make sure that each application can override `.html` file -->
+    {% block content %}
+      <!-- applications overridden contents goes here -->
+    {% endblock %}
+
+    <!-- include the footer at the bottom of `base.html` file -->
+    {% include 'footer.html' %}
+  </body>
+</html>
