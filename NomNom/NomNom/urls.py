@@ -22,4 +22,5 @@ urlpatterns = [
     # WARNING: the order of "operations" matter
     path("landing/", include("landing.urls")),
     path("admin/", admin.site.urls),
+    path("", include("aishaapp.urls")),  # <-- added this line at the end
 ]
