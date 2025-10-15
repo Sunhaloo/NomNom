@@ -20,13 +20,10 @@ from django.urls import path, include
 
 urlpatterns = [
     # WARNING: the order of "operations" matter
-    # add the main landing page for the website
     path("", include("landing.urls")),
-    # add the login page that will allow the user to handle login of users
     path("about_us/", include("about_us.urls")),
     path("login/", include("login.urls")),
     path("contact/", include("contact.urls")),
     path("cart/", include("cart.urls")),
     path("admin/", admin.site.urls),
-    path("", include("aishaapp.urls")),  # <-- added this line at the end
 ]

@@ -18,7 +18,7 @@ body {
   align-items: center;
   background-color: #fff;
   padding: 1rem 3rem;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
@@ -56,12 +56,11 @@ nav a:hover {
 }
 
 .hero img {
-  width: 80%;           /* keeps image smaller */
+  width: 80%; /* keeps image smaller */
   border-radius: 10px;
   display: block;
-  margin: 0 auto;       /* centers image horizontally */
+  margin: 0 auto; /* centers image horizontally */
 }
-
 
 .hero-text {
   position: absolute;
@@ -73,7 +72,6 @@ nav a:hover {
   backdrop-filter: blur(1px);
   text-align: center;
 }
-
 
 .hero-text h2 {
   font-size: 1.2rem;
@@ -125,7 +123,7 @@ nav a:hover {
 
 .item:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
 }
 
 .item img {
@@ -217,47 +215,6 @@ nav a:hover {
   font-size: 1.1rem;
 }
 
-/* Footer */
-footer {
-  background-color: #fff;
-  text-align: center;
-  padding: 3rem 10%;
-  margin-top: 3rem;
-}
-
-.footer-content {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 2rem;
-}
-
-.footer-left {
-  text-align: left;
-}
-
-.footer-logo {
-  width: 80px;
-  margin-bottom: 0.5rem;
-}
-
-.footer-right {
-  text-align: right;
-}
-
-.socials img {
-  width: 25px;
-  margin: 0 5px;
-}
-
-.copyright {
-  font-size: 0.9rem;
-  color: #666;
-  margin-top: 2rem;
-  text-align: center;
-}
-
 @media (max-width: 768px) {
   .custom-cake {
     flex-direction: column;
@@ -269,12 +226,5 @@ footer {
   .info-bar {
     flex-direction: column;
     align-items: center;
-  }
-  .footer-content {
-    flex-direction: column;
-    text-align: center;
-  }
-  .footer-right {
-    text-align: center;
   }
 }
