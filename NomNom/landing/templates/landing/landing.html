@@ -12,5 +12,82 @@
 
 <!-- content that will be found inside the `landing.html` page specifically -->
 {% block content %}
-  <h2 class="test">Hello World From Landing Page ( Working? )</h2>
+    <!-- Hero Section -->
+  <section class="hero">
+    <img src="{% static 'images/fudgy.png' %}" alt="Fudgy McFudgecake">
+    <div class="hero-text">
+      <h2>Bestseller of the month!</h2>
+      <h1>Fudgy McFudgecake</h1>
+      <button>Order Now</button>
+    </div>
+  </section>
+
+  <!-- Options Section -->
+  <section class="options">
+    <h2>Options</h2>
+    <div class="grid">
+      <div class="item">
+        <img src="{% static 'images/cake.png' %}" alt="Cakes">
+        <p>Cakes</p>
+      </div>
+      <div class="item">
+        <img src="{% static 'images/brownies.png' %}" alt="Brownies">
+        <p>Brownies</p>
+      </div>
+      <div class="item">
+        <img src="{% static 'images/cupcakes.png' %}" alt="Cupcakes">
+        <p>Cupcakes</p>
+      </div>
+      <div class="item">
+        <img src="{% static 'images/cookies.png' %}" alt="Cookies">
+        <p>Cookies</p>
+      </div>
+      <div class="item">
+        <img src="{% static 'images/donuts.png' %}" alt="Donuts">
+        <p>Donuts</p>
+      </div>
+      <div class="item">
+        <img src="{% static 'images/tarts.png' %}" alt="Tarts">
+        <p>Tarts</p>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
+
+
+<!-- Customise Cake Section -->
+<section class="custom-cake">
+  <div class="cake-text">
+    <h1>Customise Your Own Cake</h1>
+    <p>Choose your flavor, size, and toppings to create the perfect cake for any occasion!</p>
+    <button>Customise Now</button>
+  </div>
+  <img src="{% static 'images/customcake.png' %}" alt="Custom Cake">
+</section>
+
+<!-- Info Bar -->
+<section class="info-bar">
+  <div class="info-item">
+    <img src="{% static 'icons/clickcollect.png' %}" alt="Click & Collect">
+    <div>
+      <h3>Click & Collect</h3>
+      <p>Order online, pick up in-store at your convenience</p>
+    </div>
+  </div>
+  <div class="info-item">
+    <img src="{% static 'icons/delivery.png' %}" alt="Delivery">
+    <div>
+      <h3>Delivery</h3>
+      <p>Freshly delivered anywhere across the island</p>
+    </div>
+  </div>
+  <div class="info-item">
+    <img src="{% static 'icons/onsite.png' %}" alt="On Site">
+    <div>
+      <h3>On-Site</h3>
+      <p>Relax and enjoy your pastry at our café</p>
+    </div>
+  </div>
+</section>
 {% endblock %}
