@@ -489,5 +489,36 @@ INSTALLED_APPS = [
 > Instead of that, we wrote something like `"landing/landing.html"`... **No errors** would be found!
 >
 > It will simply go ahead and use that _inner_ specific application template ( _if found_ ) and will **not** cause any trouble.
->
-> > > > > > > origin/sunhaloo
+
+---
+
+# Developing On Login App
+
+## Creation Of New Superuser
+
+| Username    | Email                  | Password |
+| ----------- | ---------------------- | -------- |
+| first_admin | <firstadmin@email.com> | 1234     |
+
+#### Trouble Creating Superusers
+
+As we have now moved everything from the `landing` app and into the `login` app.
+
+We just _deleted_ everything in terms of the database and re-ran the following commands:
+
+- Make the migrations ( _overall_ ) and also for the `login` app:
+
+```bash
+# make the overall migrations
+python manage.py makemigrations
+
+# make the migrations for the login app
+python manage.py makemigrations login
+```
+
+- Actually ask Django to write to the database `db.sqlite3`:
+
+```bash
+# create the tables
+python manage.py migrate
+```
