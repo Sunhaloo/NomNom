@@ -1,13 +1,59 @@
-<!-- call the `base.html` template file -->
 {% extends 'base.html' %}
-
-<!-- load the `login/static/login/style.css` file -->
 {% load static %}
 
-<!-- change the title of the webpage -->
-{% block title %} NomNom Cart {% endblock %}
+{% block title %}NomNom Cart{% endblock %}
 
-<!-- the actual content for the cart page -->
 {% block content %}
-<h4 class="testing">This is inside the cart template</h4>
+<link rel="stylesheet" href="{% static 'cart/style.css' %}">
+
+<div class="main-cart-container">
+  <div class="cart-container">
+    <div class="cart-header">
+      <button class="back-btn">←</button>
+      <h1>My Cart</h1>
+      <div class="cart-icon">🛒</div>
+    </div>
+
+    <div class="cart-item">
+      <p class="item-title">Item 1</p>
+      <div class="item-box">
+        <img src="{% static 'cart/images/tart.png' %}" alt="Tart" class="item-img">
+        <div class="item-details">
+          <p class="product-name">Product Name</p>
+          <p class="price-label">Price</p>
+        </div>
+        <div class="quantity-box">
+          <button>-</button>
+          <span>1</span>
+          <button>+</button>
+        </div>
+        <p class="price">2500</p>
+      </div>
+    </div>
+
+    <div class="cart-item">
+      <p class="item-title">Item 2</p>
+      <div class="item-box">
+        <img src="{% static 'cart/images/cheesecake.png' %}" alt="Cheesecake" class="item-img">
+        <div class="item-details">
+          <p class="product-name">Product Name</p>
+          <p class="price-label">Price</p>
+        </div>
+        <div class="quantity-box">
+          <button>-</button>
+          <span>1</span>
+          <button>+</button>
+        </div>
+        <p class="price">2500</p>
+      </div>
+    </div>
+
+    <div class="total-section">
+      <div class="total-box">
+        <p>Total: <strong>5000</strong></p>
+      </div>
+      <button class="checkout-btn">Checkout</button>
+    </div>
+  </div>
+</div>
 {% endblock %}

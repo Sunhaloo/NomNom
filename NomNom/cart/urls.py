@@ -9,3 +9,5 @@ urlpatterns = [
     # our login path
     path("", views.index, name="cart")
 ]
+
+

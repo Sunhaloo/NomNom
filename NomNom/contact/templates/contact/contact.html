@@ -1,13 +1,49 @@
-<!-- call the `base.html` template file -->
 {% extends 'base.html' %}
-
-<!-- load the `login/static/login/style.css` file -->
 {% load static %}
 
-<!-- change the title of the webpage -->
-{% block title %} NomNom Contact {% endblock %}
+{% block title %}Nomnom Contact{% endblock %}
 
-<!-- the actual content for the login page -->
 {% block content %}
-<h4 class="testing">This is inside the contact template</h4>
+<link rel="stylesheet" href="{% static 'contact/style.css' %}">
+
+<div class="contact-page">
+  <div class="contact-container">
+    
+    <!-- LEFT SIDE: FORM -->
+    <div class="contact-form">
+      <h1>Contact Us</h1>
+      <form action="#" method="post">
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="form-group">
+            <label for="first-name">First name</label>
+            <input type="text" id="first-name" name="first-name" placeholder="Aisha">
+          </div>
+          <div class="form-group">
+            <label for="last-name">Last name</label>
+            <input type="text" id="last-name" name="last-name" placeholder="Ramjahn">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input type="email" id="email" name="email" placeholder="aisha@gmail.com">
+        </div>
+
+        <div class="form-group">
+          <label for="message">Your message</label>
+          <textarea id="message" name="message" rows="4" placeholder="Enter your question or message"></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">Submit</button>
+      </form>
+    </div>
+
+    <!-- RIGHT SIDE: IMAGE -->
+    <div class="contact-image">
+      <img src="{% static 'contact/images/contact_image.png' %}" alt="Contact Image">
+    </div>
+
+  </div>
+</div>
 {% endblock %}
