@@ -558,3 +558,50 @@ python manage.py createsuperuser --username first_admin --email firstadmin@email
 ```
 
 > Hence, simply run Django's development server and you should now be able to log into the 'admin' website!
+
+## Using Python Interactive Shell To Create Users
+
+Below you are going to learn how the code _look_ like to create a **customer** <strong><span style="color: orange";>Sign Up</span></strong>!!!
+
+- Open / Start the Python Interactive Shell:
+
+```bash
+# start the interactive shell with the following command
+python manage.py shell
+```
+
+- Import the `User` ( _user-defined / updated_ ) model:
+
+```python
+# import the 'User' "table"
+from login.models. import User
+```
+
+- Create a new customer:
+
+```python
+# I know its misleading with the variable name
+new_user = User.objects.create_user(
+    username="john_doe",
+    email="john@example.com",
+    password="strongpassword123",
+    first_name="John",
+    last_name="Doe",
+    gender="M",
+    region="Port Louis",
+    street="Royal Road"
+)
+```
+
+- Check if the `CUSTOMER` "_user_" has been created:
+
+```python
+# list all the 'CUSTOMER' users found in the `User` tables
+User.objects.filter(role="CUSTOMER")
+```
+
+- Therefore, in this case, we should get the following output:
+
+```console
+<QuerySet [<User: john_doe>]>
+```

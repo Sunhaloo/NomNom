@@ -5,9 +5,30 @@
 {% load static %}
 
 <!-- change the title of the webpage -->
-{% block title %} NomNom About Us {% endblock %}
+{% block title %} NomNom Login {% endblock %}
 
 <!-- the actual content for the login page -->
 {% block content %}
-  <h4 class="testing">This is inside the login template</h4>
+<div class="page-shell">
+  <div class="auth-card">
+    <h1 class="auth-title">Login</h1>
+
+    <form method="POST" action="{% url 'login:login' %}" class="auth-form">
+      {% csrf_token %}
+      <input class="auth-input" type="text" name="username" placeholder="Username" required />
+      <input class="auth-input" type="password" name="password" placeholder="Password" required />
+
+      <div class="auth-row">
+        <a class="muted-link" href="#">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="auth-btn">Login</button>
+
+      <p class="muted-center">
+        Not a member?
+        <a href="{% url 'login:signup' %}" class="muted-link">Signup</a>
+      </p>
+    </form>
+  </div>
+</div>
 {% endblock %}

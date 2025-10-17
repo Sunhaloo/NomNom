@@ -1,0 +1,31 @@
+<!-- call the `base.html` template file -->
+{% extends 'base.html' %}
+
+<!-- load the `login/static/login/style.css` file -->
+{% load static %}
+
+<!-- change the title of the webpage -->
+{% block title %} NomNom Sign Up {% endblock %}
+
+<!-- the actual content for the login page -->
+{% block content %}
+<div class="page-shell">
+  <div class="auth-card">
+    <h1 class="auth-title">Signup</h1>
+
+    <form method="POST" action="{% url 'login:signup' %}" class="auth-form">
+      {% csrf_token %}
+      <input class="auth-input" type="text" name="username" placeholder="Username" required />
+      <input class="auth-input" type="email" name="email" placeholder="Email" required />
+      <input class="auth-input" type="password" name="password1" placeholder="Password" required />
+
+      <button type="submit" class="auth-btn">Signup</button>
+
+      <p class="muted-center">
+        Already have an account?
+        <a href="{% url 'login:login' %}" class="muted-link">Login</a>
+      </p>
+    </form>
+  </div>
+</div>
+{% endblock %}

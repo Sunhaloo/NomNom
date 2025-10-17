@@ -6,9 +6,15 @@
   font-family: "Poppins", sans-serif;
 }
 
+/* HEADER AND FOOTER COLOUR */
+.header_navbar,
+.footer_content {
+  background-color: #eeddc9;
+}
+
 /* PAGE LAYOUT */
 .contact-page {
-  background-color: #fff;
+  background-color: #ffffff;
   display: flex;
   justify-content: center;
   padding: 60px 80px;
