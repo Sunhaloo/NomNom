@@ -522,3 +522,39 @@ python manage.py makemigrations login
 # create the tables
 python manage.py migrate
 ```
+
+> [!TIP] `find` Command Used To Delete Python Cache Directories
+>
+> - Here is the command that I used to find and delete all the `__pycache__` directories:
+>
+> ```bash
+> # this should be ran from the root of the `NomNom` directory
+>   find . -type d -name "__pycache__" -exec rm -rf {} +
+> ```
+
+#### Fixing Inability To Create Superusers
+
+Here are the steps that I tool to be able to make it work again.
+
+> Remember we are trying to move the "_data_" inside `landing/models.py` to `login/models.py`!
+
+1. Delete all the other unnecessary tables created in other applications like `about_us`, `cart` and `contact`
+   a. This means removing the _contents_ inside the applications' `models.py` and `admin.py` files
+2. Delete all the `migrations` folder found in **each** application ( _folder_ )
+3. Delete all the `__pycache__` folders --> ( _just to make sure and be safe that's its going to work_ )
+4. Move the contents found inside the `landing/models.py` file to `login/models.py`
+5. Also remove the contents from `landing/admin.py` and move to `login/admin.py`
+6. Finally change `AUTH_USER_MODEL = "landing.User"` to `AUTH_USER_MODEL = "login.User"`
+7. Hence, these following commands in order:
+   a. `python manage.py makemigrations`
+   b. `python manage.py makemigrations login`
+   c. `python manage.py migrate`
+
+Therefore, simply create our new superuser with the following command:
+
+```bash
+# create our new "first" superuser
+python manage.py createsuperuser --username first_admin --email firstadmin@email.com
+```
+
+> Hence, simply run Django's development server and you should now be able to log into the 'admin' website!
