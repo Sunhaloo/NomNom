@@ -3,14 +3,10 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 /* HEADER & FOOTER BACKGROUND */
-header,
-footer {
-  background-color: #EEDDC9 !important;
-}
 
 /* MAIN CONTAINER */
 .main-cart-container {

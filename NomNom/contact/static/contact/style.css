@@ -3,13 +3,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
-}
-
-/* HEADER & FOOTER COLORS */
-header,
-footer {
-  background-color: #f1e0c5 !important; /* light beige tone */
+  font-family: "Poppins", sans-serif;
 }
 
 /* PAGE LAYOUT */

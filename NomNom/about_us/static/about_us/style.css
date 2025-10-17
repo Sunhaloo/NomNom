@@ -1,9 +1,10 @@
 body {
-  font-family: Arial, Helvetica, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f1e4d3; 
-  color: #111;
+  /* background-color: #f1e4d3; */
+  background-color: #000000;
+  color: #111111;
+  font-family: "Poppins", sans-serif;
 }
 
 .about-section {
@@ -43,12 +44,11 @@ body {
 
 .about-block img {
   flex: 1;
-  max-width: 300px; 
+  max-width: 300px;
   border-radius: 15px;
   object-fit: cover;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
-
 
 @media (max-width: 900px) {
   .about-block,
