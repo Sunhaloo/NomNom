@@ -16,7 +16,15 @@
       {% csrf_token %}
       <input class="auth-input" type="text" name="username" placeholder="Username" required />
       <input class="auth-input" type="email" name="email" placeholder="Email" required />
-      <input class="auth-input" type="password" name="password1" placeholder="Password" required />
+      <input class="auth-input" type="password" name="password" placeholder="Password" required />
+      <select class="auth-input">
+        <option value="" disabled selected hidden>Gender</option>
+        <option value="Male"> Male</option>
+        <option value="Female"> Female</option>
+      </select>
+      <input class="auth-input" type="text" name="region" placeholder="Region" required />
+      <input class="auth-input" type="text" name="street" placeholder="Street" required />
+
 
       <button type="submit" class="auth-btn">Signup</button>
 
