@@ -67,14 +67,14 @@
 /* ------ */
 
 .main_footer {
-  background-color: #f5f5f5;
-  padding: 40px 20px 20px 20px;
 }
 
 .footer_content {
-  max-width: 500px;
+  max-width: 100%;
   margin: 0 auto;
   text-align: center;
+  padding: 40px 20px 20px 20px;
+  background-color: #f5f5f5;
 }
 
 .footer_logo,
