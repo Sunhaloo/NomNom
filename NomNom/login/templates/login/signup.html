@@ -12,12 +12,19 @@
   <div class="auth-card">
     <h1 class="auth-title">Signup</h1>
 
+    {% if error %}
+      <p class="error-message" style="color:red; text-align:center;">{{ error }}</p>
+    {% endif %}
+
     <form method="POST" action="{% url 'login:signup' %}" class="auth-form">
       {% csrf_token %}
       <input class="auth-input" type="text" name="username" placeholder="Username" required />
       <input class="auth-input" type="email" name="email" placeholder="Email" required />
       <input class="auth-input" type="password" name="password" placeholder="Password" required />
-      <select class="auth-input">
+      <input class="auth-input" type="text" name="firstName" placeholder="First Name" required />
+      <input class="auth-input" type="text" name="lastName" placeholder="Last Name" required />
+
+      <select class="auth-input" name="gender" required>
         <option value="" disabled selected hidden>Gender</option>
         <option value="Male"> Male</option>
         <option value="Female"> Female</option>
