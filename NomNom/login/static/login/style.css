@@ -1,12 +1,19 @@
+/* HEADER AND FOOTER COLOUR */
+.header_navbar,
+.footer_content {
+  background-color: #eeddc9 !important;
+}
+
 /* layout shell - keeps card centered on page */
 .page-shell {
   min-height: 70vh; /* push footer down like in mock */
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding-top: 6.5vh; /* visual vertical offset from header */
   background-color: #ffffff;
-  font-family: "Poppings", sans-serif;
+  font-family: "Poppins", sans-serif;
+  padding-top: 120px;
+  padding-bottom: 150px;
 }
 
 /* the rounded pale card */
