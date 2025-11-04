@@ -22,56 +22,47 @@
 
     <form method="POST" action="{% url 'login:signup' %}" class="auth-form">
       {% csrf_token %}
-      
-      <!-- Username -->
+
       {{ form.username }}
       {% if form.username.errors %}
         <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.username.errors }}</div>
       {% endif %}
-      
-      <!-- Email -->
+
       {{ form.email }}
       {% if form.email.errors %}
         <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.email.errors }}</div>
       {% endif %}
-      
-      <!-- Password1 -->
+
       {{ form.password1 }}
       {% if form.password1.errors %}
         <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.password1.errors }}</div>
       {% endif %}
-      
-      <!-- Password2 -->
+
       {{ form.password2 }}
       {% if form.password2.errors %}
         <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.password2.errors }}</div>
       {% endif %}
-      
-      <!-- First Name -->
+
       {{ form.first_name }}
       {% if form.first_name.errors %}
         <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.first_name.errors }}</div>
       {% endif %}
-      
-      <!-- Last Name -->
+
       {{ form.last_name }}
       {% if form.last_name.errors %}
         <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.last_name.errors }}</div>
       {% endif %}
-      
-      <!-- Gender -->
+
       {{ form.gender }}
       {% if form.gender.errors %}
         <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.gender.errors }}</div>
       {% endif %}
-      
-      <!-- Region -->
+
       {{ form.region }}
       {% if form.region.errors %}
         <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.region.errors }}</div>
       {% endif %}
-      
-      <!-- Street -->
+
       {{ form.street }}
       {% if form.street.errors %}
         <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.street.errors }}</div>

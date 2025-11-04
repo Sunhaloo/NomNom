@@ -23,14 +23,12 @@
 
     <form method="POST" action="{% url 'login:login' %}" class="auth-form">
       {% csrf_token %}
-      
-      <!-- Username -->
+
       {{ form.username }}
       {% if form.username.errors %}
         <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.username.errors }}</div>
       {% endif %}
-      
-      <!-- Password -->
+
       {{ form.password }}
       {% if form.password.errors %}
         <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.password.errors }}</div>
