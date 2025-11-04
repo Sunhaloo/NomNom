@@ -6,6 +6,6 @@ app_name = "login"
 
 urlpatterns = [
     # our login path
-    path("", views.index, name="login"),
+    path("", views.login_view, name="login"),
     path("signup/", views.signup, name="signup"),
 ]
