@@ -698,25 +698,7 @@ def signup(request):
 
 The above code is going to check if the data has been sent to the "_database_" using the 'POST' method ( _user is sending data to save_ ). If so then send all the data that the user entered on the 'Sign Up' form. Then its going to redirect the user to the login page so that he / she can login with the new credentials.
 
-- Update the inner routing of the `login/urls.py` file:
-
-```python
-from django.urls import path
-from . import views
-
-# define the app name here so that Django does not get confused with URLs
-app_name = "login"
-
-urlpatterns = [
-    # our login path
-    path("", views.index, name="login"),
-    path("signup/", views.signup, name="signup"),
-]
-```
-
-- Update the front-end to be able to see the changes:
-
-> Add this line just before the `<form>` tag / element!
+- Update the front-end ( _i.e `login/templates/signup.html`_ ) to be able to see the changes:
 
 ```html
 {% if form.non_field_errors %}
@@ -793,4 +775,83 @@ urlpatterns = [
 
   <button type="submit" class="auth-btn">Signup</button>
 </form>
+```
+
+## Form To Allow Users To Log In
+
+- Update the `login/forms.py` so that users are able to use their credentials to login:
+
+```python
+class LoginForm(AuthenticationForm):
+    username = forms.CharField(
+        max_length=254,
+        widget=forms.TextInput(
+            attrs={"class": "auth-input", "placeholder": "Username"}
+        ),
+    )
+    password = forms.CharField(
+        label="Password",
+        strip=False,
+        widget=forms.PasswordInput(
+            attrs={"class": "auth-input", "placeholder": "Password"}
+        ),
+    )
+```
+
+- Update the `views.py` file to be able to render out the form:
+
+```python
+def login_view(request):
+    if request.method == "POST":
+        form = LoginForm(data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect("landing:landing")
+    else:
+        form = LoginForm()
+    return render(request, "login/login.html", {"form": form})
+```
+
+> [!NOTE]
+> The `index` function is not change to the above `login_view` function!
+
+- Update the `/login/templates/login/login.html` template to be able to actually see the form:
+
+```html
+{% if form.non_field_errors %}
+<div class="error-message" style="color:red; text-align:center;">
+  {% for error in form.non_field_errors %} {{ error }} {% endfor %}
+</div>
+{% endif %}
+
+<form method="POST" action="{% url 'login:login' %}" class="auth-form">
+  {% csrf_token %}
+
+  <!-- Username -->
+  {{ form.username }} {% if form.username.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.username.errors }}
+  </div>
+  {% endif %}
+
+  <!-- Password -->
+  {{ form.password }} {% if form.password.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.password.errors }}
+  </div>
+  {% endif %}
+
+  <button type="submit" class="auth-btn">Login</button>
+</form>
+```
+
+- Additionally, we have to update our `templates/navbar.html` to show the log out button if user has been logged in:
+
+```html
+{% if user.is_authenticated %}
+<li><a href="{% url 'login:login' %}">Log Out</a></li>
+{% else %}
+<li><a href="{% url 'login:login' %}">Log in</a></li>
+{% endif %}
 ```
