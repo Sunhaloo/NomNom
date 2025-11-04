@@ -680,6 +680,11 @@ class SignupForm(UserCreationForm):
 - Write the _back-end logic_ for displaying the form:
 
 ```python
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model, login, logout
+from .forms import SignupForm
+
 def signup(request):
     if request.method == "POST":
         form = SignupForm(request.POST)
@@ -801,6 +806,11 @@ class LoginForm(AuthenticationForm):
 - Update the `views.py` file to be able to render out the form:
 
 ```python
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model, login, logout
+from .forms import SignupForm, LoginForm
+
 def login_view(request):
     if request.method == "POST":
         form = LoginForm(data=request.POST)
@@ -851,6 +861,51 @@ def login_view(request):
 ```html
 {% if user.is_authenticated %}
 <li><a href="{% url 'login:login' %}">Log Out</a></li>
+{% else %}
+<li><a href="{% url 'login:login' %}">Log in</a></li>
+{% endif %}
+```
+
+## Log Out User
+
+> Actually the above 'HTML' snippet is not good!
+
+- Update our `login/views.py` file like so:
+
+```python
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model, login, logout
+from .forms import SignupForm, LoginForm
+
+
+def logout_view(request):
+    logout(request)
+    return redirect("landing:landing")
+```
+
+- Update the `login/urls.py` file to add the new inner routing:
+
+```python
+from django.urls import path
+from . import views
+
+# define the app name here so that Django does not get confused with URLs
+app_name = "login"
+
+urlpatterns = [
+    # our login path
+    path("", views.login_view, name="login"),
+    path("signup/", views.signup, name="signup"),
+    path("logout/", views.logout_view, name="logout"),
+]
+```
+
+- Finally, update the actual `template/navbar.html` file so that's it correctly displays the links:
+
+```html
+{% if user.is_authenticated %}
+<li><a href="{% url 'login:logout' %}">Log Out</a></li>
 {% else %}
 <li><a href="{% url 'login:login' %}">Log in</a></li>
 {% endif %}

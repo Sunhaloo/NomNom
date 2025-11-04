@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from django.contrib.auth import get_user_model, login
+from django.contrib.auth import get_user_model, login, logout
 from .forms import SignupForm, LoginForm
 
 User = get_user_model()
@@ -30,3 +30,8 @@ def signup(request):
         form = SignupForm()
 
     return render(request, "login/signup.html", {"form": form})
+
+
+def logout_view(request):
+    logout(request)
+    return redirect("landing:landing")
