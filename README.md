@@ -605,3 +605,119 @@ User.objects.filter(role="CUSTOMER")
 ```console
 <QuerySet [<User: john_doe>]>
 ```
+
+---
+
+## Form To Allow Users To Sign Up
+
+This is how we implemented the `form.py` that is going to be responsible for allowing our users to **sign up**.
+
+- Create the `forms.py` file in our `NomNom/login` folder / application:
+
+```python
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from .models import User
+
+
+class SignupForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+    gender = forms.ChoiceField(choices=[("M", "Male"), ("F", "Female")])
+    first_name = forms.CharField(max_length=80)
+    last_name = forms.CharField(max_length=120)
+    region = forms.CharField(max_length=80)
+    street = forms.CharField(max_length=120)
+
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+            "password",
+            "firstName",
+            "lastName",
+            "gender",
+            "region",
+            "street",
+        ]
+```
+
+- Write the _back-end logic_ for displaying the form:
+
+```python
+def signup(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        first_name = request.POST.get("firstName")
+        last_name = request.POST.get("lastName")
+        gender = request.POST.get("gender")
+        region = request.POST.get("region")
+        street = request.POST.get("street")
+
+        # basic validation
+        if not all(
+            [username, email, password, first_name, last_name, gender, region, street]
+        ):
+            return render(
+                request, "login/signup.html", {"error": "Please fill in all fields."}
+            )
+
+        # check if username or email already exists
+        if User.objects.filter(username=username).exists():
+            return render(
+                request, "login/signup.html", {"error": "Username already taken."}
+            )
+
+        if User.objects.filter(email=email).exists():
+            return render(
+                request, "login/signup.html", {"error": "Email already registered."}
+            )
+
+        # create the new user
+        user = User.objects.create(
+            username=username,
+            email=email,
+            password=make_password(password),  # securely hash password
+            first_name=first_name,
+            last_name=last_name,
+            gender=gender,
+            region=region,
+            street=street,
+            role="CUSTOMER",
+        )
+
+        # redirect to login page after success
+        return redirect("login:login")
+
+    return render(request, "login/signup.html")
+```
+
+The above code is going to check if the data has been sent to the "_database_" using the 'POST' method ( _user is sending data to save_ ). If so then send all the data that the user entered on the 'Sign Up' form. Then its going to redirect the user to the login page so that he / she can login with the new credentials.
+
+- Update the inner routing of the `login/urls.py` file:
+
+```python
+from django.urls import path
+from . import views
+
+# define the app name here so that Django does not get confused with URLs
+app_name = "login"
+
+urlpatterns = [
+    # our login path
+    path("", views.index, name="login"),
+    path("signup/", views.signup, name="signup"),
+]
+```
+
+- Update the front-end to be able to see the changes:
+
+> Add this line just before the `<form>` tag / element!
+
+```python
+    {% if error %}
+      <p class="error-message" style="color:red; text-align:center;">{{ error }}</p>
+    {% endif %}
+```
