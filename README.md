@@ -621,25 +621,60 @@ from .models import User
 
 
 class SignupForm(UserCreationForm):
-    email = forms.EmailField(required=True)
-    gender = forms.ChoiceField(choices=[("M", "Male"), ("F", "Female")])
-    first_name = forms.CharField(max_length=80)
-    last_name = forms.CharField(max_length=120)
-    region = forms.CharField(max_length=80)
-    street = forms.CharField(max_length=120)
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={"class": "auth-input", "placeholder": "Email"}),
+    )
+    gender = forms.ChoiceField(
+        choices=[("M", "Male"), ("F", "Female")],
+        widget=forms.Select(attrs={"class": "auth-input"}),
+    )
+    first_name = forms.CharField(
+        max_length=80,
+        widget=forms.TextInput(
+            attrs={"class": "auth-input", "placeholder": "First Name"}
+        ),
+    )
+    last_name = forms.CharField(
+        max_length=120,
+        widget=forms.TextInput(
+            attrs={"class": "auth-input", "placeholder": "Last Name"}
+        ),
+    )
+    region = forms.CharField(
+        max_length=80,
+        widget=forms.TextInput(attrs={"class": "auth-input", "placeholder": "Region"}),
+    )
+    street = forms.CharField(
+        max_length=120,
+        widget=forms.TextInput(attrs={"class": "auth-input", "placeholder": "Street"}),
+    )
 
     class Meta:
         model = User
         fields = [
             "username",
             "email",
-            "password",
-            "firstName",
-            "lastName",
+            "password1",
+            "password2",
+            "first_name",
+            "last_name",
             "gender",
             "region",
             "street",
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].widget.attrs.update(
+            {"class": "auth-input", "placeholder": "Username"}
+        )
+        self.fields["password1"].widget.attrs.update(
+            {"class": "auth-input", "placeholder": "Password"}
+        )
+        self.fields["password2"].widget.attrs.update(
+            {"class": "auth-input", "placeholder": "Confirm Password"}
+        )
 ```
 
 - Write the _back-end logic_ for displaying the form:
@@ -647,51 +682,18 @@ class SignupForm(UserCreationForm):
 ```python
 def signup(request):
     if request.method == "POST":
-        username = request.POST.get("username")
-        email = request.POST.get("email")
-        password = request.POST.get("password")
-        first_name = request.POST.get("firstName")
-        last_name = request.POST.get("lastName")
-        gender = request.POST.get("gender")
-        region = request.POST.get("region")
-        street = request.POST.get("street")
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(
+                form.cleaned_data.get("password1")
+            )  # Use password1 from form
+            user.save()
+            return redirect("login:login")
+    else:
+        form = SignupForm()
 
-        # basic validation
-        if not all(
-            [username, email, password, first_name, last_name, gender, region, street]
-        ):
-            return render(
-                request, "login/signup.html", {"error": "Please fill in all fields."}
-            )
-
-        # check if username or email already exists
-        if User.objects.filter(username=username).exists():
-            return render(
-                request, "login/signup.html", {"error": "Username already taken."}
-            )
-
-        if User.objects.filter(email=email).exists():
-            return render(
-                request, "login/signup.html", {"error": "Email already registered."}
-            )
-
-        # create the new user
-        user = User.objects.create(
-            username=username,
-            email=email,
-            password=make_password(password),  # securely hash password
-            first_name=first_name,
-            last_name=last_name,
-            gender=gender,
-            region=region,
-            street=street,
-            role="CUSTOMER",
-        )
-
-        # redirect to login page after success
-        return redirect("login:login")
-
-    return render(request, "login/signup.html")
+    return render(request, "login/signup.html", {"form": form})
 ```
 
 The above code is going to check if the data has been sent to the "_database_" using the 'POST' method ( _user is sending data to save_ ). If so then send all the data that the user entered on the 'Sign Up' form. Then its going to redirect the user to the login page so that he / she can login with the new credentials.
@@ -716,8 +718,79 @@ urlpatterns = [
 
 > Add this line just before the `<form>` tag / element!
 
-```python
-    {% if error %}
-      <p class="error-message" style="color:red; text-align:center;">{{ error }}</p>
-    {% endif %}
+```html
+{% if form.non_field_errors %}
+<div class="error-message" style="color:red; text-align:center;">
+  {% for error in form.non_field_errors %} {{ error }} {% endfor %}
+</div>
+{% endif %}
+
+<form method="POST" action="{% url 'login:signup' %}" class="auth-form">
+  {% csrf_token %}
+
+  <!-- Username -->
+  {{ form.username }} {% if form.username.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.username.errors }}
+  </div>
+  {% endif %}
+
+  <!-- Email -->
+  {{ form.email }} {% if form.email.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.email.errors }}
+  </div>
+  {% endif %}
+
+  <!-- Password1 -->
+  {{ form.password1 }} {% if form.password1.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.password1.errors }}
+  </div>
+  {% endif %}
+
+  <!-- Password2 -->
+  {{ form.password2 }} {% if form.password2.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.password2.errors }}
+  </div>
+  {% endif %}
+
+  <!-- First Name -->
+  {{ form.first_name }} {% if form.first_name.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.first_name.errors }}
+  </div>
+  {% endif %}
+
+  <!-- Last Name -->
+  {{ form.last_name }} {% if form.last_name.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.last_name.errors }}
+  </div>
+  {% endif %}
+
+  <!-- Gender -->
+  {{ form.gender }} {% if form.gender.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.gender.errors }}
+  </div>
+  {% endif %}
+
+  <!-- Region -->
+  {{ form.region }} {% if form.region.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.region.errors }}
+  </div>
+  {% endif %}
+
+  <!-- Street -->
+  {{ form.street }} {% if form.street.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.street.errors }}
+  </div>
+  {% endif %}
+
+  <button type="submit" class="auth-btn">Signup</button>
+</form>
 ```
