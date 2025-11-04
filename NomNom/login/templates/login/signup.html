@@ -12,26 +12,70 @@
   <div class="auth-card">
     <h1 class="auth-title">Signup</h1>
 
-    {% if error %}
-      <p class="error-message" style="color:red; text-align:center;">{{ error }}</p>
+    {% if form.non_field_errors %}
+      <div class="error-message" style="color:red; text-align:center;">
+        {% for error in form.non_field_errors %}
+          {{ error }}
+        {% endfor %}
+      </div>
     {% endif %}
 
     <form method="POST" action="{% url 'login:signup' %}" class="auth-form">
       {% csrf_token %}
-      <input class="auth-input" type="text" name="username" placeholder="Username" required />
-      <input class="auth-input" type="email" name="email" placeholder="Email" required />
-      <input class="auth-input" type="password" name="password" placeholder="Password" required />
-      <input class="auth-input" type="text" name="firstName" placeholder="First Name" required />
-      <input class="auth-input" type="text" name="lastName" placeholder="Last Name" required />
-
-      <select class="auth-input" name="gender" required>
-        <option value="" disabled selected hidden>Gender</option>
-        <option value="Male"> Male</option>
-        <option value="Female"> Female</option>
-      </select>
-      <input class="auth-input" type="text" name="region" placeholder="Region" required />
-      <input class="auth-input" type="text" name="street" placeholder="Street" required />
-
+      
+      <!-- Username -->
+      {{ form.username }}
+      {% if form.username.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.username.errors }}</div>
+      {% endif %}
+      
+      <!-- Email -->
+      {{ form.email }}
+      {% if form.email.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.email.errors }}</div>
+      {% endif %}
+      
+      <!-- Password1 -->
+      {{ form.password1 }}
+      {% if form.password1.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.password1.errors }}</div>
+      {% endif %}
+      
+      <!-- Password2 -->
+      {{ form.password2 }}
+      {% if form.password2.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.password2.errors }}</div>
+      {% endif %}
+      
+      <!-- First Name -->
+      {{ form.first_name }}
+      {% if form.first_name.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.first_name.errors }}</div>
+      {% endif %}
+      
+      <!-- Last Name -->
+      {{ form.last_name }}
+      {% if form.last_name.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.last_name.errors }}</div>
+      {% endif %}
+      
+      <!-- Gender -->
+      {{ form.gender }}
+      {% if form.gender.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.gender.errors }}</div>
+      {% endif %}
+      
+      <!-- Region -->
+      {{ form.region }}
+      {% if form.region.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.region.errors }}</div>
+      {% endif %}
+      
+      <!-- Street -->
+      {{ form.street }}
+      {% if form.street.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.street.errors }}</div>
+      {% endif %}
 
       <button type="submit" class="auth-btn">Signup</button>
 
