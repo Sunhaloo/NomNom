@@ -6,12 +6,6 @@
   font-family: Arial, sans-serif;
 }
 
-/* HEADER & FOOTER COLORS */
-header,
-footer {
-  background-color: #f1e0c5 !important; /* light beige tone */
-}
-
 /* PAGE LAYOUT */
 .contact-page {
   background-color: #fff;

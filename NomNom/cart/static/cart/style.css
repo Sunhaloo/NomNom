@@ -6,12 +6,6 @@
   font-family: Arial, sans-serif;
 }
 
-/* HEADER & FOOTER BACKGROUND */
-header,
-footer {
-  background-color: #EEDDC9 !important;
-}
-
 /* MAIN CONTAINER */
 .main-cart-container {
   display: flex;

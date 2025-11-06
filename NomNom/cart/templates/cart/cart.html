@@ -2,6 +2,7 @@
 {% load static %}
 
 {% block title %}NomNom Cart{% endblock %}
+{% block body_class %}brown-background{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'cart/style.css' %}">
@@ -52,7 +53,7 @@
       <div class="total-box">
         <p>Total: <strong>5000</strong></p>
       </div>
-      <button class="checkout-btn">Checkout</button>
+      <button class="checkout-btn hover-grow-shadow">Checkout</button>
     </div>
   </div>
 </div>

@@ -1,5 +1,11 @@
 <!doctype html>
 <html lang="en">
+  <style>
+    header {
+      background-color: white;
+    }
+  </style>
+  
   <head>
     <!-- tell Django to load the files inside `static` folder -->
     {% load static %}
@@ -27,7 +33,7 @@
     <link href="{% static 'contact/style.css' %}" rel="stylesheet" />
     <link href="{% static 'style.css' %}" rel="stylesheet" />
   </head>
-  <body>
+  <body class="{% block body_class %}{% endblock %}">
     <!-- include the navigation bar at the top of `base.html` file -->
     {% include 'navbar.html' %}
     <!-- this should appear from the global `base.html` file -->
