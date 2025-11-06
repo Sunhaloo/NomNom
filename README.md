@@ -489,5 +489,424 @@ INSTALLED_APPS = [
 > Instead of that, we wrote something like `"landing/landing.html"`... **No errors** would be found!
 >
 > It will simply go ahead and use that _inner_ specific application template ( _if found_ ) and will **not** cause any trouble.
+
+---
+
+# Developing On Login App
+
+## Creation Of New Superuser
+
+| Username    | Email                  | Password |
+| ----------- | ---------------------- | -------- |
+| first_admin | <firstadmin@email.com> | 1234     |
+
+#### Trouble Creating Superusers
+
+As we have now moved everything from the `landing` app and into the `login` app.
+
+We just _deleted_ everything in terms of the database and re-ran the following commands:
+
+- Make the migrations ( _overall_ ) and also for the `login` app:
+
+```bash
+# make the overall migrations
+python manage.py makemigrations
+
+# make the migrations for the login app
+python manage.py makemigrations login
+```
+
+- Actually ask Django to write to the database `db.sqlite3`:
+
+```bash
+# create the tables
+python manage.py migrate
+```
+
+> [!TIP] `find` Command Used To Delete Python Cache Directories
 >
-> > > > > > > origin/sunhaloo
+> - Here is the command that I used to find and delete all the `__pycache__` directories:
+>
+> ```bash
+> # this should be ran from the root of the `NomNom` directory
+>   find . -type d -name "__pycache__" -exec rm -rf {} +
+> ```
+
+#### Fixing Inability To Create Superusers
+
+Here are the steps that I tool to be able to make it work again.
+
+> Remember we are trying to move the "_data_" inside `landing/models.py` to `login/models.py`!
+
+1. Delete all the other unnecessary tables created in other applications like `about_us`, `cart` and `contact`
+   a. This means removing the _contents_ inside the applications' `models.py` and `admin.py` files
+2. Delete all the `migrations` folder found in **each** application ( _folder_ )
+3. Delete all the `__pycache__` folders --> ( _just to make sure and be safe that's its going to work_ )
+4. Move the contents found inside the `landing/models.py` file to `login/models.py`
+5. Also remove the contents from `landing/admin.py` and move to `login/admin.py`
+6. Finally change `AUTH_USER_MODEL = "landing.User"` to `AUTH_USER_MODEL = "login.User"`
+7. Hence, these following commands in order:
+   a. `python manage.py makemigrations`
+   b. `python manage.py makemigrations login`
+   c. `python manage.py migrate`
+
+Therefore, simply create our new superuser with the following command:
+
+```bash
+# create our new "first" superuser
+python manage.py createsuperuser --username first_admin --email firstadmin@email.com
+```
+
+> Hence, simply run Django's development server and you should now be able to log into the 'admin' website!
+
+## Using Python Interactive Shell To Create Users
+
+Below you are going to learn how the code _look_ like to create a **customer** <strong><span style="color: orange";>Sign Up</span></strong>!!!
+
+- Open / Start the Python Interactive Shell:
+
+```bash
+# start the interactive shell with the following command
+python manage.py shell
+```
+
+- Import the `User` ( _user-defined / updated_ ) model:
+
+```python
+# import the 'User' "table"
+from login.models. import User
+```
+
+- Create a new customer:
+
+```python
+# I know its misleading with the variable name
+new_user = User.objects.create_user(
+    username="john_doe",
+    email="john@example.com",
+    password="strongpassword123",
+    first_name="John",
+    last_name="Doe",
+    gender="M",
+    region="Port Louis",
+    street="Royal Road"
+)
+```
+
+- Check if the `CUSTOMER` "_user_" has been created:
+
+```python
+# list all the 'CUSTOMER' users found in the `User` tables
+User.objects.filter(role="CUSTOMER")
+```
+
+- Therefore, in this case, we should get the following output:
+
+```console
+<QuerySet [<User: john_doe>]>
+```
+
+---
+
+## Form To Allow Users To Sign Up
+
+This is how we implemented the `form.py` that is going to be responsible for allowing our users to **sign up**.
+
+- Create the `forms.py` file in our `NomNom/login` folder / application:
+
+```python
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from .models import User
+
+
+class SignupForm(UserCreationForm):
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={"class": "auth-input", "placeholder": "Email"}),
+    )
+    gender = forms.ChoiceField(
+        choices=[("M", "Male"), ("F", "Female")],
+        widget=forms.Select(attrs={"class": "auth-input"}),
+    )
+    first_name = forms.CharField(
+        max_length=80,
+        widget=forms.TextInput(
+            attrs={"class": "auth-input", "placeholder": "First Name"}
+        ),
+    )
+    last_name = forms.CharField(
+        max_length=120,
+        widget=forms.TextInput(
+            attrs={"class": "auth-input", "placeholder": "Last Name"}
+        ),
+    )
+    region = forms.CharField(
+        max_length=80,
+        widget=forms.TextInput(attrs={"class": "auth-input", "placeholder": "Region"}),
+    )
+    street = forms.CharField(
+        max_length=120,
+        widget=forms.TextInput(attrs={"class": "auth-input", "placeholder": "Street"}),
+    )
+
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "email",
+            "password1",
+            "password2",
+            "first_name",
+            "last_name",
+            "gender",
+            "region",
+            "street",
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["username"].widget.attrs.update(
+            {"class": "auth-input", "placeholder": "Username"}
+        )
+        self.fields["password1"].widget.attrs.update(
+            {"class": "auth-input", "placeholder": "Password"}
+        )
+        self.fields["password2"].widget.attrs.update(
+            {"class": "auth-input", "placeholder": "Confirm Password"}
+        )
+```
+
+- Write the _back-end logic_ for displaying the form:
+
+```python
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model, login, logout
+from .forms import SignupForm
+
+def signup(request):
+    if request.method == "POST":
+        form = SignupForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(
+                form.cleaned_data.get("password1")
+            )  # Use password1 from form
+            user.save()
+            return redirect("login:login")
+    else:
+        form = SignupForm()
+
+    return render(request, "login/signup.html", {"form": form})
+```
+
+The above code is going to check if the data has been sent to the "_database_" using the 'POST' method ( _user is sending data to save_ ). If so then send all the data that the user entered on the 'Sign Up' form. Then its going to redirect the user to the login page so that he / she can login with the new credentials.
+
+- Update the front-end ( _i.e `login/templates/signup.html`_ ) to be able to see the changes:
+
+```html
+{% if form.non_field_errors %}
+<div class="error-message" style="color:red; text-align:center;">
+  {% for error in form.non_field_errors %} {{ error }} {% endfor %}
+</div>
+{% endif %}
+
+<form method="POST" action="{% url 'login:signup' %}" class="auth-form">
+  {% csrf_token %}
+
+  <!-- Username -->
+  {{ form.username }} {% if form.username.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.username.errors }}
+  </div>
+  {% endif %}
+
+  <!-- Email -->
+  {{ form.email }} {% if form.email.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.email.errors }}
+  </div>
+  {% endif %}
+
+  <!-- Password1 -->
+  {{ form.password1 }} {% if form.password1.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.password1.errors }}
+  </div>
+  {% endif %}
+
+  <!-- Password2 -->
+  {{ form.password2 }} {% if form.password2.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.password2.errors }}
+  </div>
+  {% endif %}
+
+  <!-- First Name -->
+  {{ form.first_name }} {% if form.first_name.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.first_name.errors }}
+  </div>
+  {% endif %}
+
+  <!-- Last Name -->
+  {{ form.last_name }} {% if form.last_name.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.last_name.errors }}
+  </div>
+  {% endif %}
+
+  <!-- Gender -->
+  {{ form.gender }} {% if form.gender.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.gender.errors }}
+  </div>
+  {% endif %}
+
+  <!-- Region -->
+  {{ form.region }} {% if form.region.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.region.errors }}
+  </div>
+  {% endif %}
+
+  <!-- Street -->
+  {{ form.street }} {% if form.street.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.street.errors }}
+  </div>
+  {% endif %}
+
+  <button type="submit" class="auth-btn">Signup</button>
+</form>
+```
+
+## Form To Allow Users To Log In
+
+- Update the `login/forms.py` so that users are able to use their credentials to login:
+
+```python
+class LoginForm(AuthenticationForm):
+    username = forms.CharField(
+        max_length=254,
+        widget=forms.TextInput(
+            attrs={"class": "auth-input", "placeholder": "Username"}
+        ),
+    )
+    password = forms.CharField(
+        label="Password",
+        strip=False,
+        widget=forms.PasswordInput(
+            attrs={"class": "auth-input", "placeholder": "Password"}
+        ),
+    )
+```
+
+- Update the `views.py` file to be able to render out the form:
+
+```python
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model, login, logout
+from .forms import SignupForm, LoginForm
+
+def login_view(request):
+    if request.method == "POST":
+        form = LoginForm(data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect("landing:landing")
+    else:
+        form = LoginForm()
+    return render(request, "login/login.html", {"form": form})
+```
+
+> [!NOTE]
+> The `index` function is not change to the above `login_view` function!
+
+- Update the `/login/templates/login/login.html` template to be able to actually see the form:
+
+```html
+{% if form.non_field_errors %}
+<div class="error-message" style="color:red; text-align:center;">
+  {% for error in form.non_field_errors %} {{ error }} {% endfor %}
+</div>
+{% endif %}
+
+<form method="POST" action="{% url 'login:login' %}" class="auth-form">
+  {% csrf_token %}
+
+  <!-- Username -->
+  {{ form.username }} {% if form.username.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.username.errors }}
+  </div>
+  {% endif %}
+
+  <!-- Password -->
+  {{ form.password }} {% if form.password.errors %}
+  <div class="error-message" style="color:red; font-size: 0.8em;">
+    {{ form.password.errors }}
+  </div>
+  {% endif %}
+
+  <button type="submit" class="auth-btn">Login</button>
+</form>
+```
+
+- Additionally, we have to update our `templates/navbar.html` to show the log out button if user has been logged in:
+
+```html
+{% if user.is_authenticated %}
+<li><a href="{% url 'login:login' %}">Log Out</a></li>
+{% else %}
+<li><a href="{% url 'login:login' %}">Log in</a></li>
+{% endif %}
+```
+
+## Log Out User
+
+> Actually the above 'HTML' snippet is not good!
+
+- Update our `login/views.py` file like so:
+
+```python
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model, login, logout
+from .forms import SignupForm, LoginForm
+
+
+def logout_view(request):
+    logout(request)
+    return redirect("landing:landing")
+```
+
+- Update the `login/urls.py` file to add the new inner routing:
+
+```python
+from django.urls import path
+from . import views
+
+# define the app name here so that Django does not get confused with URLs
+app_name = "login"
+
+urlpatterns = [
+    # our login path
+    path("", views.login_view, name="login"),
+    path("signup/", views.signup, name="signup"),
+    path("logout/", views.logout_view, name="logout"),
+]
+```
+
+- Finally, update the actual `template/navbar.html` file so that's it correctly displays the links:
+
+```html
+{% if user.is_authenticated %}
+<li><a href="{% url 'login:logout' %}">Log Out</a></li>
+{% else %}
+<li><a href="{% url 'login:login' %}">Log in</a></li>
+{% endif %}
+```

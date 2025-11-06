@@ -3,12 +3,12 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 /* PAGE LAYOUT */
 .contact-page {
-  background-color: #fff;
+  background-color: #ffffff;
   display: flex;
   justify-content: center;
   padding: 60px 80px;

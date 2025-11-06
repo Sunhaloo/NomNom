@@ -10,53 +10,6 @@ body {
   color: #222;
 }
 
-/* Header */
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #fff;
-  padding: 1rem 3rem;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.header_navbar a img:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.6); /* white glow */
-}
-
-/* Navbar cart icon  */
-.navbar_ul li a img {
-  width: 22px !important;  
-  height: auto !important;  
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.logo img {
-  height: 80px;
-}
-
-nav ul {
-  list-style: none;
-  display: flex;
-  gap: 2rem;
-}
-
-nav a {
-  text-decoration: none;
-  color: #000;
-  font-weight: 500;
-}
-
-nav a:hover {
-  color: #b55a30;
-}
-
 /* Hero Section */
 .hero {
   position: relative;
