@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Customize Cake{% endblock %}
+
+{% block content %}
+<h2>Customize Your Cake</h2>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn">Save Customization</button>
+</form>
+
+<a href="{% url 'category_view' 'cakes' %}">← Back to Cakes</a>
+{% endblock %}

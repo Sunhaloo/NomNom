@@ -1,12 +1,12 @@
+# pastry/urls.py
 from django.urls import path
 from . import views
 
-#redirecting to each category of pastry from landing page
+app_name = 'pastry'
+
 urlpatterns = [
-    path('cakes/', views.cakes, name='cakes'),
-    path('brownies/', views.brownies, name='brownies'),
-    path('cookies/', views.cookies, name='cookies'),
-    path('cupcakes/', views.cupcakes, name='cupcakes'),
-    path('doughnuts/', views.doughnuts, name='doughnuts'),
-    path('tarts/', views.tarts, name='tarts'),
+    path('<str:category>/', views.category_view, name='category_view'),
+    path('add/<int:pastry_id>/', views.add_to_cart, name='add_to_cart'),
+    path('customize/<int:pastry_id>/', views.customize_pastry, name='customize_pastry'),
 ]
+

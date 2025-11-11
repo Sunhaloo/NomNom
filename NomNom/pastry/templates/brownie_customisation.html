@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Customize Brownie{% endblock %}
+
+{% block content %}
+<h2>Customize Your Brownie</h2>
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn">Save Customization</button>
+</form>
+
+<a href="{% url 'category_view' 'brownies' %}">← Back to Brownies</a>
+{% endblock %}
