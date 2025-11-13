@@ -83,6 +83,30 @@ body.brown-background footer.main_footer {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
+/* Shared hover effect */
+.hover-grow-shadow {
+  display: inline-block;
+  padding: 12px 28px;
+  border-radius: 6px;
+  background-color: #111; /* Button base color */
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+/* Hover animation (grow + shadow) */
+.hover-grow-shadow:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background-color: #333; /* Slightly lighter on hover */
+}
+
+
 /* FOOTER */
 .main_footer {
   background-color: #ffffff !important;

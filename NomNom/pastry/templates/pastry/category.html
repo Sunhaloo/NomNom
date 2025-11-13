@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category }} Menu{% endblock %}
+
+{% block content %}
+<div class="category-wrapper">
+  <h2 class="page-title">{{ category }} Menu</h2>
+
+  {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+        <div class="alert">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% if pastries %}
+    <div class="pastry-grid">
+      {% for pastry in pastries %}
+        <div class="pastry-card">
+          {% if pastry.image %}
+            <img src="{{ pastry.image.url }}" alt="{{ pastry.pastry_name }}" class="pastry-image">
+          {% else %}
+            <img src="{% static 'images/default_pastry.jpg' %}" alt="Pastry image" class="pastry-image">
+          {% endif %}
+
+          <div class="pastry-info">
+            <h3 class="pastry-name">{{ pastry.pastry_name }}</h3>
+            <p class="pastry-price">Rs {{ pastry.pastry_price }}</p>
+          </div>
+
+          <div class="pastry-actions">
+            <a href="{% url 'pastry:add_to_cart' pastry.id %}" class="btn secondary">Add to Cart</a>
+            <a href="{% url 'pastry:customize_pastry' category %}" class="btn primary">Customize</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="no-items">No {{ category|lower }}s available at the moment.</p>
+  {% endif %}
+</div>
+{% endblock %}
