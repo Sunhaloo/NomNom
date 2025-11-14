@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Pastry
+from django.shortcuts import render, redirect
 from django.contrib import messages
+from .models import Pastry
 
+
+'''View pastry by category, each of them will have preset values for their variables'''
 def category_view(request, category):
-    #Display pastry based on category
     category = category.upper()
     pastries = Pastry.objects.filter(
         pastry_category=category,
@@ -11,35 +12,38 @@ def category_view(request, category):
         is_custom=False
     )
 
-    if not pastries.exists():
-        messages.info(request, f"No {category.lower()}s are currently available.")
-
-    return render(request, 'pastry/category.html', {
+    context = {
         'category': category.capitalize(),
         'pastries': pastries
-    })
+    }
+    return render(request, 'pastry/category.html', context)
 
 
-def customize_pastry(request, category):
-    #Creating a custom pastry
-    category = category.upper()
+'''View a customisable cake - only category has been preset(as only cakes should be customisable)'''
+def customize_pastry(request):
+    """
+    Displays the cake customization form (GET)
+    and saves a custom cake (POST).
+    """
+    category = "CAKE" 
 
     if request.method == 'POST':
+        # Create a new custom cake from form input
         pastry = Pastry.objects.create(
-            pastry_name=f"Custom {category}",
+            pastry_name="Custom Cake",
             pastry_category=category,
-            pastry_price=request.POST.get('price', 0) or 0,
-            flavour=request.POST.get('flavour') or '',
-            filling=request.POST.get('filling') or '',
-            frosting=request.POST.get('frosting') or '',
-            decoration=request.POST.get('decoration') or '',
-            message=request.POST.get('message') or '',
-            size=request.POST.get('size') or '',
+            pastry_price=request.POST.get('price', 0),
+            flavour=request.POST.get('flavour', ''),
+            filling=request.POST.get('filling', ''),
+            frosting=request.POST.get('frosting', ''),
+            decoration=request.POST.get('decoration', ''),
+            size=request.POST.get('size', ''),
             is_custom=True
         )
+        messages.success(request, "Your custom cake has been added to cart!")
+        return redirect('cart:cart')
 
-        #messages.success(request, f"Your custom {category.lower()} has been added to cart!")
-        #return redirect('pastry:add_to_cart', pastry_id=pastry.id)
-
-    # display form form custom cake
+    # Render the customization form page
     return render(request, 'pastry/customize_pastry.html', {'category': category})
+
+
