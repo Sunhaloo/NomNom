@@ -153,11 +153,10 @@ body {
 
 /* Info Bar */
 .info-bar {
-  background-color: #e8dbc7;
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
-  padding: 2rem 10%;
+  padding: 0.8rem 10%;
   gap: 2rem;
   text-align: left;
 }
