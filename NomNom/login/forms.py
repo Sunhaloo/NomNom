@@ -74,3 +74,20 @@ class SignupForm(UserCreationForm):
         self.fields["password2"].widget.attrs.update(
             {"class": "auth-input", "placeholder": "Confirm Password"}
         )
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.first_name = user.first_name.capitalize()
+        user.last_name = user.last_name.upper()
+        if commit:
+            user.save()
+        return user
+
+
+class PasswordResetForm(forms.Form):
+    email = forms.EmailField(
+        max_length=254,
+        widget=forms.EmailInput(
+            attrs={"class": "auth-input", "placeholder": "Enter your email"}
+        ),
+    )
