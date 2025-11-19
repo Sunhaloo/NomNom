@@ -1,0 +1,42 @@
+<!-- call the `base.html` template file -->
+{% extends 'base.html' %}
+
+<!-- load the `login/static/login/style.css` file -->
+{% load static %}
+
+<!-- change the title of the webpage -->
+{% block title %} NomNom Forgot Password {% endblock %}
+
+<!-- the actual content for the forgot password page -->
+{% block content %}
+<div class="page-shell">
+  <div class="auth-card">
+    <h1 class="auth-title">Forgot Password</h1>
+
+    {% if form.non_field_errors %}
+      <div class="error-message" style="color:red; text-align:center;">
+        {% for error in form.non_field_errors %}
+          {{ error }}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'login:forget_passwd' %}" class="auth-form">
+      {% csrf_token %}
+
+      {{ form.email }}
+      {% if form.email.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.email.errors }}</div>
+      {% endif %}
+
+      <button type="submit" class="btn btn-primary auth-btn">Send Reset Link</button>
+
+      <p class="muted-center">
+        Already have an account?
+        <a href="{% url 'login:login' %}" class="muted-link">Login</a>
+      </p>
+    </form>
+
+  </div>
+</div>
+{% endblock %}

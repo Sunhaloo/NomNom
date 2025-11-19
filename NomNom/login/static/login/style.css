@@ -98,9 +98,17 @@
 
 /* center small paragraph under button */
 .muted-center {
-  margin-top: 14px;
+  margin-top: 12px;
   color: #444;
-  font-size: 13px;
+  font-size: 16px;
+}
+
+.muted-center a {
+  font-size: 16px;
+}
+
+.forget-password {
+  font-size: 14px;
 }
 
 /* responsiveness */
