@@ -143,6 +143,11 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
+# redirects on login - used by @login decorator to verify session of logged in user
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/landing/'
+LOGOUT_REDIRECT_URL = '/landing/'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
