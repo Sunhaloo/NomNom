@@ -9,14 +9,18 @@ def add_to_cart(request, pastry_id=None):
 
     # Adding preset cakes to carts
     if pastry_id:
-        pastry = Pastry.objects.get(id=pastry_id)
-        cart.append({
-            'pastry_id': pastry.id,
-            'name': pastry.pastry_name,
-            'price': float(pastry.pastry_price),
-            'quantity': 1,
-            'is_custom': False,
-        })
+        try:
+            pastry = Pastry.objects.get(id=pastry_id)
+            cart.append({
+                'pastry_id': pastry.id,
+                'name': pastry.pastry_name,
+                'price': float(pastry.pastry_price),
+                'quantity': 1,
+                'is_custom': False,
+            })
+        except Pastry.DoesNotExist:
+            messages.error(request, "The selected pastry does not exist.")
+            return redirect('pastry:category_view', category='cake')  # Redirect to pastry page
     else:
         # Adding a customized cake to cart
         cart.append({
@@ -44,9 +48,14 @@ def view_cart(request):
 def remove_from_cart(request, index):
     cart = request.session.get('cart', [])
     if 0 <= index < len(cart):
-        cart.pop(index)
-        request.session['cart'] = cart
-        messages.info(request, "Item removed from cart.")
+        try:
+            cart.pop(index)
+            request.session['cart'] = cart
+            messages.info(request, "Item removed from cart.")
+        except IndexError:
+            messages.error(request, "Invalid item index.")
+    else:
+        messages.error(request, "Invalid item index.")
     return redirect('cart:view_cart')
 
 

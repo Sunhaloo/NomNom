@@ -44,41 +44,53 @@ def forget_passwd(request):
         form = PasswordResetForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data["email"]
-            user = User.objects.filter(email=email).first()
+            try:
+                user = User.objects.filter(email=email).first()
+            except Exception as e:
+                # Handle unexpected database errors
+                print(f"Database error in password reset: {e}")
+                messages.error(request, "An error occurred. Please try again later.")
+                return render(request, "login/forget_passwd.html", {"form": form})
 
             if user:
-                # Generate password reset token and URL
-                token = default_token_generator.make_token(user)
-                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                try:
+                    # Generate password reset token and URL
+                    token = default_token_generator.make_token(user)
+                    uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-                # Get the current site for the password reset link
-                current_site = get_current_site(request)
+                    # Get the current site for the password reset link
+                    current_site = get_current_site(request)
 
-                # Create the password reset email
-                subject = "Password Reset Request"
-                message = render_to_string(
-                    "login/password_reset_email.html",
-                    {
-                        "user": user,
-                        "domain": current_site.domain,
-                        "uid": uid,
-                        "token": token,
-                    },
-                )
+                    # Create the password reset email
+                    subject = "Password Reset Request"
+                    message = render_to_string(
+                        "login/password_reset_email.html",
+                        {
+                            "user": user,
+                            "domain": current_site.domain,
+                            "uid": uid,
+                            "token": token,
+                        },
+                    )
 
-                # Send the email
-                send_mail(
-                    subject,
-                    message,
-                    "from@example.com",  # Replace with your email
-                    [email],
-                    fail_silently=False,
-                )
+                    # send the email
+                    send_mail(
+                        subject,
+                        message,
+                        None,  # Use the DEFAULT_FROM_EMAIL setting
+                        [email],
+                        fail_silently=False,
+                    )
+                except Exception as e:
+                    # Handle email sending errors
+                    print(f"Email sending error: {e}")
+                    messages.error(request, "Failed to send password reset email.")
+                    return render(request, "login/forget_passwd.html", {"form": form})
 
-                # Redirect to a success page or display a message
+                # redirect to a success page or display a message
                 return render(request, "login/password_reset_sent.html")
             else:
-                # If email doesn't exist, still show success to prevent email enumeration
+                # if email doesn't exist, still show success to prevent email enumeration
                 return render(request, "login/password_reset_sent.html")
     else:
         form = PasswordResetForm()
