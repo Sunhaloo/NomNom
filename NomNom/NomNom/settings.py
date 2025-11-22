@@ -122,6 +122,23 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+<<<<<<< Updated upstream
+=======
+# global directory of where the static files are found ( in project )
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+
+# redirects on login - used by @login decorator to verify session of logged in user
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/landing/'
+LOGOUT_REDIRECT_URL = '/landing/'
+
+>>>>>>> Stashed changes
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
