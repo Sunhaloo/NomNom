@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login Required - NomNom{% endblock %}
+{% block body_class %}brown-background{% endblock %}
+
+{% block content %}
+<style>
+    .login-gate-container {
+        max-width: 600px;
+        margin: 100px auto;
+        padding: 40px;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .login-gate-icon {
+        font-size: 64px;
+        color: #8D6E63;
+        margin-bottom: 20px;
+    }
+
+    .login-gate-container h1 {
+        color: #3E2723;
+        margin-bottom: 20px;
+        font-size: 28px;
+    }
+
+    .login-gate-container p {
+        color: #5D4037;
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 30px;
+    }
+
+    .login-gate-link {
+        display: inline-block;
+        padding: 12px 32px;
+        background-color: #8D6E63;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .login-gate-link:hover {
+        background-color: #5D4037;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(93, 64, 55, 0.3);
+    }
+
+    .secondary-link {
+        display: inline-block;
+        margin-left: 15px;
+        color: #8D6E63;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .secondary-link:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div class="login-gate-container">
+    <i class="fas fa-lock login-gate-icon"></i>
+    <h1>Login Required</h1>
+    <p>
+        You must be logged in to add items to your cart.<br>
+        Please <a href="{% url 'login:login' %}" class="login-gate-link">Click Here to Login</a>
+        or <a href="{% url 'login:login' %}" class="secondary-link">Sign Up</a>
+    </p>
+    <p style="margin-top: 20px; font-size: 14px; color: #999;">
+        <a href="/#where" style="color: #8D6E63; text-decoration: none;">← Back to shopping</a>
+    </p>
+</div>
+
+{% endblock %}
