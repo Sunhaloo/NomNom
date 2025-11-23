@@ -13,12 +13,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout | The Sweet Corner</title>
 
-    <!-- Google Fonts -->
+    <!-- Google fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 
-    <!-- Font Awesome for Icons -->
+    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Custom CSS -->
@@ -28,7 +28,7 @@
 <body>
 
     <div class="container">
-        <!-- Progress Bar -->
+        <!-- Progress bar -->
         <div class="progress-container">
             <div class="progress-bar">
                 <div class="progress-track" id="progress-track"></div>
@@ -48,18 +48,22 @@
         </div>
 
         <main class="main-content">
-            <!-- Page Content Area -->
+            <!-- Page content area -->
             <div class="content-area">
-                <!-- === CART PAGE === -->
+                <!-- CART PAGE -->
                 <section id="cart-page" class="page-section active">
                     <div class="cart-items-section">
-                        <h2>Your Cart</h2>
+                        <div class="cart-header">
+                            <a href="/" class="continue-shopping-link"><i class="fas fa-arrow-left"></i> Continue
+                                Shopping</a>
+                            <h2>My Cart</h2>
+                        </div>
                         <ul class="cart-list" id="cart-list">
-                            <!-- Items will be dynamically inserted here by JavaScript -->
+                            <!-- Items will be dynamically inserted here by JS -->
                         </ul>
                     </div>
 
-                    <!-- Order Summary is now part of cart page -->
+                    <!-- Order summary -->
                     <aside class="order-summary" id="order-summary">
                         <h2><i class="fas fa-receipt"></i> Order Summary</h2>
 
@@ -103,39 +107,51 @@
                         </div>
 
                         <div class="action-buttons" id="cart-page-actions">
-                            <a href="/" class="start-shopping-btn"
-                                style="text-align: center; background-color: transparent; color: var(--secondary-medium-brown); border: 2px solid var(--secondary-medium-brown);">Continue
-                                Shopping</a>
-                            <button class="btn btn-primary" id="to-info-btn">Proceed to Checkout <i
+                            <!-- Continue Shopping button -->
+                            <button class="btn btn-primary" id="to-info-btn"
+                                style="width: 270px; padding: 15px 24px; font-size: 1.2rem;">Proceed to Checkout <i
                                     class="fas fa-arrow-right"></i></button>
                         </div>
                     </aside>
 
-                    <!-- Empty Cart Message -->
+                    <!-- Empty cart message -->
                     <div class="empty-cart" id="empty-cart-message">
-                        <img src="{% static 'cart/images/cheesecake.png' %}" alt="Empty Cart">
-                        <h2>Your cart is feeling a little empty!</h2>
-                        <p>Why not add some sweetness to your day?</p>
+                        <i class="fas fa-shopping-cart empty-cart-icon"></i>
+                        <h2>Your Cart is Empty</h2>
+                        <p>Looks like you haven't added any items to your cart yet.</p>
                         <a href="/" class="start-shopping-btn">Start Shopping</a>
+                    </div>
+
+                    <!-- Purchase summary (Hidden by default) -->
+                    <div class="purchase-summary" id="purchase-summary" style="display: none;">
+                        <h2><i class="fas fa-check-circle"></i> Purchase Summary</h2>
+                        <div id="purchase-details">
+                            <!-- Details will be injected here -->
+                        </div>
                     </div>
                 </section>
 
-                <!-- === INFORMATION PAGE (CHECKOUT) === -->
+                <!-- CHECKOUT PAGE -->
                 {% include 'checkout/checkout.html' %}
 
-                <!-- === PAYMENT PAGE === -->
+                <!-- PAYMENT PAGE -->
                 {% include 'payment/payment.html' %}
 
             </div>
         </main>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- Toast notification -->
     <div class="toast" id="toast">
         <i class="fas fa-info-circle"></i>
         <span class="toast-message" id="toast-message">Notification message</span>
         <button class="toast-close" onclick="this.parentElement.classList.remove('show')">&times;</button>
     </div>
+
+    <!-- Initialize cart data from Django session -->
+    <script>
+        window.initialCartData = {{ cart_json | safe }};
+    </script>
 
     <!-- Custom JS -->
     <script src="{% static 'cart/cart.js' %}"></script>

@@ -4,24 +4,45 @@
 <!-- start of the navigation bar area -->
 <header class="main_header">
   <nav class="header_navbar">
-    <a href="{% url 'landing:landing' %}"><img src="{% static 'images/NomNom-Logo.png' %}"/></a>
+    <a href="{% url 'landing:landing' %}"
+      ><img src="{% static 'images/NomNom-Logo.png' %}"
+    /></a>
     <!-- test the navigation bar -->
     <ul class="navbar_ul">
       <li><a href="{% url 'landing:landing' %}">Home</a></li>
       <li><a href="{% url 'about_us:about' %}">About Us</a></li>
 
-      {% if user.is_authenticated %}
-        {% if user.is_staff or user.is_superuser %}
-          <li><a href="/admin/">Admin Page</a></li>
-        {% endif %}
+      {% if user.is_authenticated %} {% if user.is_staff or user.is_superuser %}
+      <li><a href="/admin/">Admin Page</a></li>
+      {% endif %}
 
-        <li><a href="{% url 'login:logout' %}">Log Out</a></li>
+      <li><a href="{% url 'login:logout' %}">Log Out</a></li>
       {% else %}
-        <li><a href="{% url 'login:login' %}">Log in</a></li>
+      <li><a href="{% url 'login:login' %}">Log in</a></li>
       {% endif %}
 
       <li><a href="{% url 'contact:contact' %}">Contact Us</a></li>
-      <li><a href="{% url 'cart:cart' %}"><img src="{% static 'images/Cart-Icon.png' %}"/></a></li>
+      <li>
+        {% if user.is_authenticated %}
+        <a href="{% url 'cart:cart' %}" class="cart-link">
+          <div class="cart-icon-container">
+            <img src="{% static 'images/Cart-Icon.png' %}" />
+            <span class="cart-count" id="cart-count"
+              >{{ cart_item_count }}</span
+            >
+          </div>
+        </a>
+        {% else %}
+        <a href="#" class="cart-link" onclick="showCartLoginPrompt(event)">
+          <div class="cart-icon-container">
+            <img src="{% static 'images/Cart-Icon.png' %}" />
+            <span class="cart-count" id="cart-count"
+              >{{ cart_item_count }}</span
+            >
+          </div>
+        </a>
+        {% endif %}
+      </li>
     </ul>
   </nav>
 </header>

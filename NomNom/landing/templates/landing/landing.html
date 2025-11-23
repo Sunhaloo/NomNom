@@ -6,22 +6,25 @@
 
 <!-- modify the tab name for our landing page -->
 {% block title %}
-  Landing Page
+Landing Page
 {% endblock %}
 
 <!-- content that will be found inside the `landing.html` page specifically -->
 {% block content %}
-  <!-- Hero Section -->
-  <section class="hero">
-    <img src="{% static 'landing/images/fudgy.png' %}" alt="Fudgy McFudgecake">
-    <div class="hero-text">
-      <h2>Bestseller of the month!</h2>
-      <h1>Fudgy McFudgecake</h1>
-      <button class="hover-grow-shadow">Order Now</button>
-    </div>
-  </section>
+<!-- Hero section -->
+<section class="hero">
+  <img src="{% static 'landing/images/fudgy.png' %}" alt="Fudgy McFudgecake">
+  <div class="hero-text">
+    <h2>Bestseller of the month!</h2>
+    <h1>Fudgy McFudgecake</h1>
+    {% csrf_token %}
+    <button class="hover-grow-shadow"
+      onclick="addFudgyToCart(event, '{{ fudgy_cake.pastry_name }}', {{ fudgy_cake.pastry_price }}, '{{ fudgy_cake.image }}', '{{ fudgy_cake.pastry_category }}')">Order
+      Now</button>
+  </div>
+</section>
 
-<!-- Options Section -->
+<!-- Options section -->
 <section class="options" style="padding: 39.6px 0;">
   <h2 style="font-size: 31.5px; font-weight: 700; text-align: center; margin-bottom: 29.7px;">
     Options
@@ -38,59 +41,44 @@
 
     <!-- Cakes -->
     <div style="flex: 0 1 calc(33.333% - 49.5px); text-align: center;">
-      <a href="{% url 'pastry:category_view' 'cakes' %}"> 
-        <img 
-          src="{% static 'landing/images/cake.png' %}" 
-          alt="Cakes"
-          class="hover-grow-shadow"
+      <a href="{% url 'pastry:category_view' 'cakes' %}">
+        <img src="{% static 'landing/images/cake.png' %}" alt="Cakes" class="image-hover"
           style="width: 100%; height: auto; object-fit: cover; border-radius: 18px; display: block;">
-      </a>    
+      </a>
       <p style="font-size: 20.7px; font-weight: 600; margin-top: 8.1px;">Cakes</p>
     </div>
 
     <!-- Brownies -->
     <div style="flex: 0 1 calc(33.333% - 49.5px); text-align: center;">
-      <a href="{% url 'pastry:category_view' 'brownies' %}"> 
-        <img 
-          src="{% static 'landing/images/brownies.png' %}" 
-          alt="Brownies"
-          class="hover-grow-shadow"
+      <a href="{% url 'pastry:category_view' 'brownies' %}">
+        <img src="{% static 'landing/images/brownies.png' %}" alt="Brownies" class="image-hover"
           style="width: 100%; height: auto; object-fit: cover; border-radius: 18px; display: block;">
-      </a>    
+      </a>
       <p style="font-size: 20.7px; font-weight: 600; margin-top: 8.1px;">Brownies</p>
     </div>
 
     <!-- Cupcakes -->
     <div style="flex: 0 1 calc(33.333% - 49.5px); text-align: center;">
-      <a href="{% url 'pastry:category_view' 'cupcakes' %}"> 
-        <img 
-          src="{% static 'landing/images/cupcakes.png' %}" 
-          alt="Cupcakes"
-          class="hover-grow-shadow"
+      <a href="{% url 'pastry:category_view' 'cupcakes' %}">
+        <img src="{% static 'landing/images/cupcakes.png' %}" alt="Cupcakes" class="image-hover"
           style="width: 100%; height: auto; object-fit: cover; border-radius: 18px; display: block;">
-       </a>    
+      </a>
       <p style="font-size: 20.7px; font-weight: 600; margin-top: 8.1px;">Cupcakes</p>
     </div>
 
     <!-- Cookies -->
     <div style="flex: 0 1 calc(33.333% - 49.5px); text-align: center;">
-      <a href="{% url 'pastry:category_view' 'cookies' %}"> 
-        <img 
-          src="{% static 'landing/images/cookies.png' %}" 
-          alt="Cookies"
-          class="hover-grow-shadow"
+      <a href="{% url 'pastry:category_view' 'cookies' %}">
+        <img src="{% static 'landing/images/cookies.png' %}" alt="Cookies" class="image-hover"
           style="width: 100%; height: auto; object-fit: cover; border-radius: 18px; display: block;">
-      </a>     
+      </a>
       <p style="font-size: 20.7px; font-weight: 600; margin-top: 8.1px;">Cookies</p>
     </div>
 
     <!-- Donuts -->
     <div style="flex: 0 1 calc(33.333% - 49.5px); text-align: center;">
-      <a href="{% url 'pastry:category_view' 'doughnuts' %}"> 
-        <img 
-          src="{% static 'landing/images/donuts.png' %}" 
-          alt="Donuts"
-          class="hover-grow-shadow"
+      <a href="{% url 'pastry:category_view' 'donuts' %}">
+        <img src="{% static 'landing/images/donuts.png' %}" alt="Donuts" class="image-hover"
           style="width: 100%; height: auto; object-fit: cover; border-radius: 18px; display: block;">
       </a>
       <p style="font-size: 20.7px; font-weight: 600; margin-top: 8.1px;">Donuts</p>
@@ -98,13 +86,10 @@
 
     <!-- Tarts -->
     <div style="flex: 0 1 calc(33.333% - 49.5px); text-align: center;">
-      <a href="{% url 'pastry:category_view' 'tarts' %}"> 
-        <img 
-          src="{% static 'landing/images/tarts.png' %}" 
-          alt="Tarts"
-          class="hover-grow-shadow"
+      <a href="{% url 'pastry:category_view' 'tarts' %}">
+        <img src="{% static 'landing/images/tarts.png' %}" alt="Tarts" class="image-hover"
           style="width: 100%; height: auto; object-fit: cover; border-radius: 18px; display: block;">
-      </a>    
+      </a>
       <p style="font-size: 20.7px; font-weight: 600; margin-top: 8.1px;">Tarts</p>
     </div>
 
@@ -112,19 +97,21 @@
 </section>
 
 
-<!-- Customise Cake Section -->
+<!-- Customise cake section -->
 <section class="custom-cake">
   <div class="cake-text">
     <h1>Customise Your Own Cake</h1>
     <p>Choose your flavor, size, and toppings to create the perfect cake for any occasion!</p>
-    <a href="{% url 'pastry:customize_pastry' %}" class="hover-grow-shadow">
+    <a href="{% url 'pastry:customize_pastry' %}" class="image-hover">
       Customise Now
     </a>
   </div>
-  <img src="{% static 'landing/images/customcake.png' %}" class="hover-grow-shadow" alt="Custom Cake">
+  <a href="{% url 'pastry:customize_pastry' %}" class="custom-cake-link">
+    <img src="{% static 'landing/images/customcake.png' %}" class="image-hover" alt="Custom Cake">
+  </a>
 </section>
 
-<!-- Info Bar -->
+<!-- Info bar -->
 <section class="info-bar">
   <div class="info-item">
     <img src="{% static 'landing/icons/clickcollect.png' %}" alt="Click & Collect">
@@ -148,4 +135,48 @@
     </div>
   </div>
 </section>
+
+<!-- Include pastry script for reusable functions like createFlyingAnimation -->
+<script src="{% static 'pastry/script.js' %}"></script>
+
+<script>
+  function addFudgyToCart(event, name, price, image, category) {
+    event.preventDefault();
+    const btn = event.target;
+
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    fetch('/cart/add/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrftoken
+      },
+      body: JSON.stringify({
+        name: name,
+        price: price,
+        image: image,
+        quantity: 1,
+        category: category
+      })
+    })
+      .then(response => {
+        if (response.status === 401) {
+          showLoginPrompt();
+          return;
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data && data.success) {
+          // Update cart count using global function
+          updateCartCount(data.cart_count);
+
+          // Trigger flying animation
+          createFlyingAnimation(btn);
+        }
+      })
+      .catch(error => console.error('Error:', error));
+  }
+</script>
 {% endblock %}

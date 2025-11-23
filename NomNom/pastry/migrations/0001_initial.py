@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('pastry_name', models.CharField(max_length=100)),
-                ('pastry_category', models.CharField(choices=[('CAKE', 'Cake'), ('BROWNIE', 'Brownie'), ('DOUGHNUT', 'Doughnut'), ('COOKIE', 'Cookie'), ('TART', 'Tart'), ('CUPCAKE', 'Cupcake')], max_length=20)),
+                ('pastry_category', models.CharField(choices=[('CAKE', 'Cake'), ('BROWNIE', 'Brownie'), ('DONUT', 'Donut'), ('COOKIE', 'Cookie'), ('TART', 'Tart'), ('CUPCAKE', 'Cupcake')], max_length=20)),
                 ('pastry_price', models.DecimalField(decimal_places=2, max_digits=8)),
                 ('image', models.ImageField(blank=True, null=True, upload_to='pastries/')),
                 ('is_available', models.BooleanField(default=True)),

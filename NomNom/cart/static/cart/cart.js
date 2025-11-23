@@ -1,33 +1,12 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // --- STATE MANAGEMENT ---
-    let cartData = [
-        {
-            id: 1,
-            name: "Chocolate Fudge Cake",
-            price: 450.00,
-            qty: 1,
-            image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            customization: "Size: Medium (1kg), Toppings: Extra Chocolate Shavings",
-            note: "Happy Birthday!",
-            badge: "Bestseller"
-        },
-        {
-            id: 2,
-            name: "Macaron Box (12pc)",
-            price: 350.00,
-            qty: 2,
-            image: "https://images.unsplash.com/photo-1569864358642-9d1684040f43?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-            customization: "Flavors: Assorted",
-            note: "",
-            badge: "New"
-        },
-        { id: 3, name: 'Strawberry Tart', price: 250.00, qty: 3, customization: '', note: 'Please pack carefully', image: 'https://images.pexels.com/photos/1998633/pexels-photo-1998633.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1', badge: 'New' }
-    ];
 
-    let deliveryCost = 0.00; // Default
+// JS for cart, checkout and payment pages
+
+document.addEventListener('DOMContentLoaded', () => {
+    let cartData = window.initialCartData || [];
+
+    let deliveryCost = 700.00;
     const TAX_RATE = 0.15; // 15% tax for Mauritius
 
-    // --- DOM ELEMENT SELECTORS ---
     const cartList = document.getElementById('cart-list');
     const orderSummary = document.getElementById('order-summary');
     const emptyCartMessage = document.getElementById('empty-cart-message');
@@ -43,16 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const deliveryDateInput = document.getElementById('deliveryDate');
     const datePickerGroup = document.getElementById('date-picker-group');
 
-    // Navigation Elements
     const pages = document.querySelectorAll('.page-section');
     const progressSteps = document.querySelectorAll('.progress-step');
     const progressTrack = document.getElementById('progress-track');
 
-    // --- INITIALIZATION ---
     renderCart();
     updateOrderSummary();
 
-    // --- CORE FUNCTIONS ---
     function showPage(pageName, stepNumber) {
         pages.forEach(page => page.classList.remove('active'));
         document.getElementById(pageName).classList.add('active');
@@ -79,19 +55,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderCart() {
         cartList.innerHTML = '';
+        const cartPage = document.getElementById('cart-page');
 
         if (cartData.length === 0) {
+            cartPage.classList.add('empty-state');
             orderSummary.style.display = 'none';
             cartPageActions.style.display = 'none';
             emptyCartMessage.style.display = 'block';
-            document.querySelector('.cart-items-section h2').style.display = 'none';
+            document.querySelector('.cart-items-section').style.display = 'none'; // Hide header and list
+
+            // Check if we just completed a purchase
+            const purchaseSummary = document.getElementById('purchase-summary');
+            if (window.lastPurchaseData) {
+                renderPurchaseSummary(window.lastPurchaseData);
+                purchaseSummary.style.display = 'block';
+                // Adjust layout for side-by-side
+                cartPage.classList.add('purchase-completed');
+            } else {
+                purchaseSummary.style.display = 'none';
+                cartPage.classList.remove('purchase-completed');
+            }
         } else {
+            cartPage.classList.remove('empty-state');
             orderSummary.style.display = 'block';
             emptyCartMessage.style.display = 'none';
-            document.querySelector('.cart-items-section h2').style.display = 'block';
+            document.querySelector('.cart-items-section').style.display = 'block'; // Show header and list
 
-            cartData.forEach(item => {
-                const itemCard = createCartItemHTML(item);
+            cartData.forEach((item, index) => {
+                const itemCard = createCartItemHTML(item, index);
                 cartList.appendChild(itemCard);
             });
         }
@@ -99,42 +90,70 @@ document.addEventListener('DOMContentLoaded', () => {
         updateOrderSummary();
     }
 
-    function createCartItemHTML(item) {
+    function createCartItemHTML(item, index) {
         const li = document.createElement('li');
         li.className = 'cart-item-card';
-        li.dataset.id = item.id;
+        li.dataset.index = index;
 
-        const subtotal = (item.price * item.qty).toFixed(2);
-        const noteHTML = item.note ? `<p class="item-note"><i class="fas fa-gift"></i> ${item.note}</p>` : '';
-        const badgeHTML = item.badge ? `<span class="item-badge">${item.badge}</span>` : '';
+        const qty = item.quantity || 1;
+        const subtotal = (item.price * qty).toFixed(2);
+
+        // Handle image URL - the backend already provides the full URL via image.url
+        let imageUrl = item.image || '/static/images/placeholder.png';
+
+        // If image doesn't start with / or http, prepend /static/
+        if (imageUrl && !imageUrl.startsWith('/') && !imageUrl.startsWith('http')) {
+            imageUrl = `/static/${imageUrl}`;
+        }
+
+        // Build custom cake details HTML if it's a custom cake
+        let customDetailsHTML = '';
+        if (item.is_custom) {
+            customDetailsHTML = `
+                <div class="custom-cake-details">
+                    <div class="custom-details-grid">
+                        ${item.flavour ? `<div class="detail-item"><strong>Flavour:</strong> ${item.flavour}</div>` : ''}
+                        ${item.size ? `<div class="detail-item"><strong>Size:</strong> ${item.size}</div>` : ''}
+                        ${item.filling ? `<div class="detail-item"><strong>Filling:</strong> ${item.filling}</div>` : ''}
+                        ${item.frosting ? `<div class="detail-item"><strong>Frosting:</strong> ${item.frosting}</div>` : ''}
+                        ${item.decoration ? `<div class="detail-item"><strong>Decoration:</strong> ${item.decoration}</div>` : ''}
+                        ${item.layers && item.layers > 1 ? `<div class="detail-item"><strong>Layers:</strong> ${item.layers}</div>` : ''}
+                        ${item.cake_message ? `<div class="detail-item detail-message"><strong>Message:</strong> "${item.cake_message}"</div>` : ''}
+                        ${item.pickup_date ? `<div class="detail-item detail-date"><strong>Pickup Date:</strong> ${formatDate(item.pickup_date)}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
 
         li.innerHTML = `
+            ${item.is_custom ? '' : `
             <div class="item-image-container">
-                <img src="${item.image}" alt="${item.name}" class="item-image">
-                ${badgeHTML}
+                <img src="${imageUrl}" alt="${item.name}" class="item-image">
             </div>
+            `}
             <div class="item-details">
                 <h3>${item.name}</h3>
-                <p>${item.customization}</p>
-                ${noteHTML}
+                <p>Rs ${item.price.toFixed(2)}</p>
+                ${customDetailsHTML}
             </div>
             <div class="item-price-qty">
                 <div class="qty-selector">
                     <button class="qty-minus">−</button>
-                    <span>${item.qty}</span>
+                    <span>${qty}</span>
                     <button class="qty-plus">+</button>
                 </div>
                 <span class="item-subtotal">Rs.${subtotal}</span>
             </div>
             <button class="remove-item"><i class="fas fa-times"></i></button>
         `;
+
         return li;
     }
 
     function updateOrderSummary() {
-        const subtotal = cartData.reduce((total, item) => total + (item.price * item.qty), 0);
-        const itemCount = cartData.reduce((total, item) => total + item.qty, 0);
-        const tax = (subtotal + deliveryCost) * TAX_RATE;
+        const subtotal = cartData.reduce((total, item) => total + (item.price * (item.quantity || 1)), 0);
+        const itemCount = cartData.reduce((total, item) => total + (item.quantity || 1), 0);
+        const tax = subtotal * TAX_RATE;
         const total = subtotal + deliveryCost + tax;
 
         itemCountSpan.textContent = itemCount;
@@ -142,6 +161,13 @@ document.addEventListener('DOMContentLoaded', () => {
         deliveryCostSpan.textContent = `Rs.${deliveryCost.toFixed(2)}`;
         taxCostSpan.textContent = `Rs.${tax.toFixed(2)}`;
         totalCostSpan.textContent = `Rs.${total.toFixed(2)}`;
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
     }
 
     function showToast(message) {
@@ -154,29 +180,84 @@ document.addEventListener('DOMContentLoaded', () => {
     cartList.addEventListener('click', (event) => {
         const itemCard = event.target.closest('.cart-item-card');
         if (!itemCard) return;
-        const itemId = parseInt(itemCard.dataset.id);
-        const item = cartData.find(i => i.id === itemId);
+        const itemIndex = parseInt(itemCard.dataset.index);
+        const item = cartData[itemIndex];
         if (!item) return;
 
         if (event.target.classList.contains('qty-plus')) {
-            item.qty++;
-            renderCart();
+            const newQuantity = (item.quantity || 1) + 1;
+            updateQuantityInBackend(itemIndex, newQuantity);
         } else if (event.target.classList.contains('qty-minus')) {
-            if (item.qty > 1) {
-                item.qty--;
-                renderCart();
+            if ((item.quantity || 1) > 1) {
+                const newQuantity = (item.quantity || 1) - 1;
+                updateQuantityInBackend(itemIndex, newQuantity);
             }
         } else if (event.target.classList.contains('remove-item') || event.target.parentElement.classList.contains('remove-item')) {
-            cartData = cartData.filter(i => i.id !== itemId);
-            showToast(`${item.name} removed from cart`);
-            renderCart();
+            // Redirect to Django backend to remove item
+            window.location.href = `/cart/remove/${itemIndex}/`;
         }
     });
+
+    // Function to update quantity in backend via AJAX
+    function updateQuantityInBackend(index, quantity) {
+        fetch('/cart/update/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                index: index,
+                quantity: quantity
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update local cart data
+                    cartData[index].quantity = quantity;
+                    renderCart();
+
+                    // Update cart count in navbar
+                    const cartCountElement = document.getElementById('cart-count');
+                    if (cartCountElement) {
+                        cartCountElement.textContent = data.cart_count;
+                        if (data.cart_count === 0) {
+                            cartCountElement.classList.add('hidden');
+                        } else {
+                            cartCountElement.classList.remove('hidden');
+                        }
+                    }
+                } else {
+                    showToast('Failed to update quantity');
+                }
+            })
+            .catch(error => {
+                showToast('Error updating quantity');
+            });
+    }
+
+    // Helper function to get CSRF token
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
 
     deliveryOptions.forEach(option => {
         option.addEventListener('change', (event) => {
             if (event.target.value === 'express') {
-                deliveryCost = 1000.00;
+                deliveryCost = 700.00;
                 datePickerGroup.classList.remove('show');
             } else if (event.target.value === 'schedule') {
                 deliveryCost = 300.00;
@@ -188,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 deliveryDateInput.min = minDateStr;
                 deliveryDateInput.disabled = false;
             } else {
-                // Fallback/Default
+                // Default
                 const tomorrow = new Date();
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 deliveryDateInput.min = tomorrow.toISOString().split('T')[0];
@@ -543,6 +624,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (validCard && validName && validExpiry && validCvv && validDate) {
             showToast('Order placed successfully! Thank you for your purchase.');
+
+            // Capture purchase data before clearing
+            const totalCost = document.getElementById('total-cost').textContent;
+            const deliveryDate = deliveryDateInput.value;
+            const isScheduled = document.getElementById('schedule').checked;
+
+            window.lastPurchaseData = {
+                items: [...cartData],
+                total: totalCost,
+                deliveryDate: deliveryDate,
+                isScheduled: isScheduled
+            };
+
             setTimeout(() => {
                 cartData = [];
                 showPage('cart-page', 1);
@@ -552,4 +646,43 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast('Please correct the errors in the payment form.');
         }
     });
+    function renderPurchaseSummary(data) {
+        const container = document.getElementById('purchase-details');
+        let itemsHtml = '<ul class="summary-items-list">';
+        data.items.forEach(item => {
+            itemsHtml += `
+                <li>
+                    <span>${item.quantity}x ${item.name}</span>
+                    <span>Rs. ${(item.price * item.quantity).toFixed(2)}</span>
+                </li>
+            `;
+        });
+        itemsHtml += '</ul>';
+
+        let deliveryHtml = '';
+        if (data.isScheduled && data.deliveryDate) {
+            const date = new Date(data.deliveryDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Create a date object for the delivery date at midnight for comparison
+            const deliveryDateObj = new Date(data.deliveryDate);
+            deliveryDateObj.setHours(0, 0, 0, 0);
+
+            if (deliveryDateObj < today) {
+                deliveryHtml = `<p><strong>Delivered on:</strong> ${date.toLocaleDateString()}</p>`;
+            } else {
+                deliveryHtml = `<p><strong>Delivery:</strong> ${date.toLocaleDateString()}</p>`;
+            }
+        } else {
+            deliveryHtml = `<p><strong>Delivery:</strong> Express (Tomorrow)</p>`;
+        }
+
+        container.innerHTML = `
+            ${itemsHtml}
+            <div class="summary-divider"></div>
+            ${deliveryHtml}
+            <p class="summary-total-line"><strong>Total Paid:</strong> ${data.total}</p>
+        `;
+    }
 });

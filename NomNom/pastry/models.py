@@ -1,23 +1,21 @@
 from django.db import models
 
 class Pastry(models.Model):
-    PASTRY_TYPES = [
+    CATEGORY_CHOICES = [
         ('CAKE', 'Cake'),
         ('BROWNIE', 'Brownie'),
-        ('DOUGHNUT', 'Doughnut'),
+        ('DONUT', 'Donut'),
         ('COOKIE', 'Cookie'),
         ('TART', 'Tart'),
         ('CUPCAKE', 'Cupcake'),
     ]
 
-    # Pastry basic model - Predefined for filtered pastries BUT blank for pastries created through cake customisation page
     pastry_name = models.CharField(max_length=100)
-    pastry_category = models.CharField(max_length=20, choices=PASTRY_TYPES)
+    pastry_category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     pastry_price = models.DecimalField(max_digits=8, decimal_places=2)
     image = models.ImageField(upload_to='pastries/', blank=True, null=True)
     is_available = models.BooleanField(default=True)
 
-    # Customisation attributes - Predefined for filtered pastries BUT blank for pastries created through cake customisation page
     flavour = models.CharField(max_length=50, blank=True, null=True)
     filling = models.CharField(max_length=50, blank=True, null=True)
     frosting = models.CharField(max_length=50, blank=True, null=True)
@@ -33,6 +31,12 @@ class Pastry(models.Model):
         ],
         blank=True, null=True
     )
+    
+    # Additional custom cake fields
+    layers = models.IntegerField(default=1, blank=True, null=True)
+    cake_message = models.CharField(max_length=50, blank=True, null=True)
+    pickup_date = models.DateField(blank=True, null=True)
+    reference_image = models.ImageField(upload_to='custom_cakes/', blank=True, null=True)
 
     # To identify between customized and predefined pastry
     is_custom = models.BooleanField(default=False)
