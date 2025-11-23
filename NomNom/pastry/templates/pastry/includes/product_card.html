@@ -8,9 +8,9 @@
         {% endif %}
     </div>
     <div class="product-info">
-        <h3 class="product-title">{{ product.name }}</h3>
+        <h3 class="product-title">{{ product.pastry_name }}</h3>
         <div class="price-quantity-row">
-            <div class="product-price">Rs {{ product.price }}</div>
+            <div class="product-price">Rs {{ product.pastry_price}}</div>
             <div class="quantity-selector">
                 <button class="qty-btn qty-minus" onclick="decrementQuantity(event)">−</button>
                 <input type="number" class="qty-input" value="1" min="1" max="99" readonly>
