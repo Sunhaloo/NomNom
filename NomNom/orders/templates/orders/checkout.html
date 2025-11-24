@@ -1,0 +1,411 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout - Nomnom{% endblock %}
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | Nomnom</title>
+
+    <!-- Google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'cart/style.css' %}">
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- Progress bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-track" id="progress-track"></div>
+                <div class="progress-step" id="step-1">
+                    <div class="step-icon"><i class="fas fa-shopping-cart"></i></div>
+                    <div class="step-label">Cart</div>
+                </div>
+                <div class="progress-step active" id="step-2">
+                    <div class="step-icon">2</div>
+                    <div class="step-label">Information</div>
+                </div>
+                <div class="progress-step" id="step-3">
+                    <div class="step-icon">3</div>
+                    <div class="step-label">Payment</div>
+                </div>
+            </div>
+        </div>
+
+        <main class="main-content">
+            <!-- Page content area -->
+            <div class="content-area">
+                <!-- INFORMATION PAGE -->
+                <section id="info-page" class="page-section active">
+                    <div class="form-section">
+                        <h2><i class="fas fa-address-card"></i> Contact Information</h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" placeholder="aisha@example.com" required>
+                                <div class="error-message" id="email-error"
+                                    style="color: red; font-size: 0.85rem; display: none; margin-top: 0.25rem;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone Number</label>
+                                <input type="tel" id="phone" placeholder="51234567" required>
+                                <div class="error-message" id="phone-error"
+                                    style="color: red; font-size: 0.85rem; display: none; margin-top: 0.25rem;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h2><i class="fas fa-shipping-fast"></i> Shipping Address</h2>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="firstName">First Name</label>
+                                <input type="text" id="firstName" required>
+                                <div class="error-message" id="firstName-error"
+                                    style="color: red; font-size: 0.85rem; display: none; margin-top: 0.25rem;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name</label>
+                                <input type="text" id="lastName" required>
+                                <div class="error-message" id="lastName-error"
+                                    style="color: red; font-size: 0.85rem; display: none; margin-top: 0.25rem;"></div>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="address">Street Address</label>
+                                <input type="text" id="address" placeholder="e.g., 123 Main Street" required>
+                                <div class="error-message" id="address-error"
+                                    style="color: red; font-size: 0.85rem; display: none; margin-top: 0.25rem;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="city">City / Town</label>
+                                <input type="text" id="city" list="city-list" placeholder="Select or type city" required>
+                                <datalist id="city-list">
+                                    <option value="Port Louis">
+                                    <option value="Curepipe">
+                                    <option value="Vacoas">
+                                    <option value="Quatre Bornes">
+                                    <option value="Rose Hill">
+                                    <option value="Beau Bassin">
+                                    <option value="Phoenix">
+                                    <option value="Grand Baie">
+                                    <option value="Flic en Flac">
+                                    <option value="Tamarin">
+                                    <option value="Mahebourg">
+                                    <option value="Goodlands">
+                                    <option value="Triolet">
+                                    <option value="Rose Belle">
+                                    <option value="Chemin Grenier">
+                                    <option value="Riviere du Rempart">
+                                    <option value="Lallmatie">
+                                    <option value="Plaine Magnien">
+                                    <option value="Pailles">
+                                    <option value="Surinam">
+                                    <option value="Le Hochet">
+                                    <option value="Montagne Blanche">
+                                    <option value="Grand Gaube">
+                                    <option value="Petit Raffray">
+                                    <option value="Baie du Tombeau">
+                                    <option value="Bambous">
+                                    <option value="Bambous Virieux">
+                                    <option value="Bananes">
+                                    <option value="Beau Vallon">
+                                    <option value="Bel Air Riviere Seche">
+                                    <option value="Bel Ombre">
+                                    <option value="Belle Vue Maurel">
+                                    <option value="Benares">
+                                    <option value="Bois Cheri">
+                                    <option value="Bois des Amourettes">
+                                    <option value="Bon Accueil">
+                                    <option value="Bramsthan">
+                                    <option value="Brisée Verdière">
+                                    <option value="Britannia">
+                                    <option value="Camp de Masque">
+                                    <option value="Camp de Masque Pavé">
+                                    <option value="Camp Diable">
+                                    <option value="Camp Ithier">
+                                    <option value="Camp Thorel">
+                                    <option value="Cap Malheureux">
+                                    <option value="Cascavelle">
+                                    <option value="Case Noyale">
+                                    <option value="Chamarel">
+                                    <option value="Chamouny">
+                                    <option value="Cluny">
+                                    <option value="Congomah">
+                                    <option value="Cottage">
+                                    <option value="Crève Coeur">
+                                    <option value="D'Epinay">
+                                    <option value="Dagotière">
+                                    <option value="Dubreuil">
+                                    <option value="Ecroignard">
+                                    <option value="Espérance Trébuchet">
+                                    <option value="Flic en Flac">
+                                    <option value="Fond du Sac">
+                                    <option value="Grand Bel Air">
+                                    <option value="Grand Bois">
+                                    <option value="Grand Gaube">
+                                    <option value="Grand River South East">
+                                    <option value="Grande Retraite">
+                                    <option value="Grande Riviere Noire">
+                                    <option value="Gros Cailloux">
+                                    <option value="L'Avenir">
+                                    <option value="L'Escalier">
+                                    <option value="La Flora">
+                                    <option value="La Gaulette">
+                                    <option value="La Laura-Malenga">
+                                    <option value="Lalmatie">
+                                    <option value="Laventure">
+                                    <option value="Le Morne">
+                                    <option value="Long Mountain">
+                                    <option value="Mare Chicose">
+                                    <option value="Mare d'Albert">
+                                    <option value="Mare La Chaux">
+                                    <option value="Mare Tabac">
+                                    <option value="Melrose">
+                                    <option value="Midlands">
+                                    <option value="Moka">
+                                    <option value="Montagne Longue">
+                                    <option value="Morcellement Saint Andre">
+                                    <option value="New Grove">
+                                    <option value="Notre Dame">
+                                    <option value="Nouvelle Decouverte">
+                                    <option value="Nouvelle France">
+                                    <option value="Olivia">
+                                    <option value="Pamplemousses">
+                                    <option value="Petit Bel Air">
+                                    <option value="Petit Raffray">
+                                    <option value="Petite Riviere">
+                                    <option value="Piton">
+                                    <option value="Plaine des Papayes">
+                                    <option value="Plaine des Roches">
+                                    <option value="Pointe aux Cannoniers">
+                                    <option value="Pointe aux Piments">
+                                    <option value="Poste de Flacq">
+                                    <option value="Poudre d'Or">
+                                    <option value="Poudre d'Or Hamlet">
+                                    <option value="Providence">
+                                    <option value="Quartier Militaire">
+                                    <option value="Quatre Cocos">
+                                    <option value="Quatre Soeurs">
+                                    <option value="Queen Victoria">
+                                    <option value="Richelieu">
+                                    <option value="Ripailles">
+                                    <option value="Riviere des Anguilles">
+                                    <option value="Riviere des Creoles">
+                                    <option value="Riviere du Poste">
+                                    <option value="Riviere du Rempart">
+                                    <option value="Riviere Noire">
+                                    <option value="Roche Terre">
+                                    <option value="Roches Noires">
+                                    <option value="Saint Aubin">
+                                    <option value="Saint Hubert">
+                                    <option value="Saint Julien d'Hotman">
+                                    <option value="Saint Pierre">
+                                    <option value="Sebastopol">
+                                    <option value="Souillac">
+                                    <option value="Surinam">
+                                    <option value="Tamarin">
+                                    <option value="Terre Rouge">
+                                    <option value="The Vale">
+                                    <option value="Triolet">
+                                    <option value="Trois Boutiques">
+                                    <option value="Trou aux Biches">
+                                    <option value="Trou d'Eau Douce">
+                                    <option value="Tyack">
+                                    <option value="Union Park">
+                                    <option value="Vale">
+                                    <option value="Ville Bague">
+                                    <option value="Wooton">
+                                </datalist>
+                                <div class="error-message" id="city-error"
+                                    style="color: red; font-size: 0.85rem; display: none; margin-top: 0.25rem;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="zip">Postal Code</label>
+                                <input type="text" id="zip" placeholder="12345" required>
+                                <div class="error-message" id="zip-error"
+                                    style="color: red; font-size: 0.85rem; display: none; margin-top: 0.25rem;"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="country">Country</label>
+                                <input type="text" id="country" value="Mauritius" readonly
+                                    style="background-color: #f0f0f0; cursor: not-allowed;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order summary section (from cart) -->
+                    <aside class="order-summary" id="order-summary">
+                        <h2><i class="fas fa-receipt"></i> Order Summary</h2>
+
+                        <div class="summary-row">
+                            <span>Subtotal (<span id="item-count">0</span> items):</span>
+                            <span id="subtotal">Rs.0.00</span>
+                        </div>
+
+                        <div class="delivery-options">
+                            <input type="radio" name="delivery" value="express" id="express" checked>
+                            <label for="express">Express Delivery (Rs.700.00)</label>
+                            <div class="delivery-info">Delivery scheduled for tomorrow between 10 AM - 2 PM</div>
+
+                            <input type="radio" name="delivery" value="schedule" id="schedule">
+                            <label for="schedule">Schedule for Later (Rs.300.00)</label>
+                            <div class="delivery-info">Select your preferred delivery date</div>
+                        </div>
+
+                        <div class="date-picker-group" id="date-picker-group">
+                            <label for="deliveryDate">Select a Delivery Date:</label>
+                            <input type="date" id="deliveryDate" name="deliveryDate">
+                            <div class="error-message" id="date-error"
+                                style="color: red; font-size: 0.85rem; display: none; margin-top: 0.25rem;"></div>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>Delivery:</span>
+                            <span id="delivery-cost">Rs.0.00</span>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>Tax (15%):</span>
+                            <span id="tax-cost">Rs.0.00</span>
+                        </div>
+
+                        <div class="summary-total">
+                            <div class="summary-row">
+                                <span>Total:</span>
+                                <span id="total-cost">Rs.0.00</span>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <a href="{% url 'cart:cart' %}" class="btn btn-secondary" id="back-to-cart-btn"><i class="fas fa-arrow-left"></i> Return to
+                                Cart</a>
+                            <button class="btn btn-primary" id="to-payment-btn">Continue to Payment <i
+                                    class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </aside>
+                </section>
+
+                <!-- PAYMENT PAGE (hidden by default) -->
+                <section id="payment-page" class="page-section">
+                    <div class="form-section">
+                        <h2><i class="fas fa-credit-card"></i> Payment Information</h2>
+                        
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label for="cardNumber">Card Number</label>
+                                <input type="text" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" required>
+                                <div class="card-icons">
+                                    <i class="fab fa-cc-visa" style="color: #1a1f71;"></i>
+                                    <i class="fab fa-cc-mastercard" style="color: #eb001b;"></i>
+                                    <i class="fab fa-cc-amex" style="color: #016fd0;"></i>
+                                </div>
+                                <div class="error-message" id="cardNumber-error"
+                                    style="color: red; font-size: 0.85rem; display: none; margin-top: 0.25rem;"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="nameOnCard">Name on Card</label>
+                                <input type="text" id="nameOnCard" placeholder="John Doe" required>
+                                <div class="error-message" id="nameOnCard-error"
+                                    style="color: red; font-size: 0.85rem; display: none; margin-top: 0.25rem;"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="expiry">Expiry Date</label>
+                                <input type="text" id="expiry" placeholder="MM/YY" maxlength="5" required>
+                                <div class="error-message" id="expiry-error"
+                                    style="color: red; font-size: 0.85rem; display: none; margin-top: 0.25rem;"></div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="cvv">CVV</label>
+                                <input type="text" id="cvv" placeholder="123" maxlength="3" required>
+                                <div class="error-message" id="cvv-error"
+                                    style="color: red; font-size: 0.85rem; display: none; margin-top: 0.25rem;"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="save-info" checked>
+                            <label for="save-info">Save my information for a faster checkout experience</label>
+                        </div>
+                    </div>
+
+                    <!-- Order summary for payment page -->
+                    <aside class="order-summary" id="payment-order-summary">
+                        <h2><i class="fas fa-receipt"></i> Order Summary</h2>
+
+                        <div class="summary-row">
+                            <span>Subtotal (<span id="payment-item-count">0</span> items):</span>
+                            <span id="payment-subtotal">Rs.0.00</span>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>Delivery:</span>
+                            <span id="payment-delivery-cost">Rs.0.00</span>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>Tax (15%):</span>
+                            <span id="payment-tax-cost">Rs.0.00</span>
+                        </div>
+
+                        <div class="summary-total">
+                            <div class="summary-row">
+                                <span>Total:</span>
+                                <span id="payment-total-cost">Rs.0.00</span>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary" id="back-to-info-btn"><i class="fas fa-arrow-left"></i> Back to Information</button>
+                            <button class="btn btn-primary" id="place-order-btn">Place Order <i class="fas fa-check"></i></button>
+                        </div>
+                        
+                        <div class="security-note">
+                            <i class="fas fa-lock"></i>
+                            <span>Your payment details are securely encrypted</span>
+                        </div>
+                    </aside>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-info-circle"></i>
+        <span class="toast-message" id="toast-message">Notification message</span>
+        <button class="toast-close" onclick="this.parentElement.classList.remove('show')">&times;</button>
+    </div>
+
+    <!-- Initialize cart data from Django context -->
+    <script>
+        // Get cart data from the Django context
+        window.initialCartData = {{ cart_json | safe }};
+        window.deliveryCost = 700.00; // Default express delivery
+    </script>
+
+    <!-- Custom JS -->
+    <script src="{% static 'cart/cart.js' %}"></script>
+
+</body>
+
+</html>
+
+{% endblock %}

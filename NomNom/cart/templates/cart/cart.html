@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Nomnom Contact{% endblock %}
+{% block title %}My Cart - Nomnom{% endblock %}
 
 {% block content %}
 
@@ -108,9 +108,9 @@
 
                         <div class="action-buttons" id="cart-page-actions">
                             <!-- Continue Shopping button -->
-                            <button class="btn btn-primary" id="to-info-btn"
+                            <a href="{% url 'orders:checkout' %}" class="btn btn-primary" id="to-info-btn"
                                 style="width: 270px; padding: 15px 24px; font-size: 1.2rem;">Proceed to Checkout <i
-                                    class="fas fa-arrow-right"></i></button>
+                                    class="fas fa-arrow-right"></i></a>
                         </div>
                     </aside>
 
@@ -130,13 +130,6 @@
                         </div>
                     </div>
                 </section>
-
-                <!-- CHECKOUT PAGE -->
-                {% include 'checkout/checkout.html' %}
-
-                <!-- PAYMENT PAGE -->
-                {% include 'payment/payment.html' %}
-
             </div>
         </main>
     </div>

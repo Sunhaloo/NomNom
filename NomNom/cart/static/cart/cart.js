@@ -22,12 +22,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const deliveryDateInput = document.getElementById('deliveryDate');
     const datePickerGroup = document.getElementById('date-picker-group');
 
+    // Payment page summary elements (for checkout)
+    window.paymentItemCountSpan = document.getElementById('payment-item-count');
+    window.paymentSubtotalSpan = document.getElementById('payment-subtotal');
+    window.paymentDeliveryCostSpan = document.getElementById('payment-delivery-cost');
+    window.paymentTaxCostSpan = document.getElementById('payment-tax-cost');
+    window.paymentTotalCostSpan = document.getElementById('payment-total-cost');
+
     const pages = document.querySelectorAll('.page-section');
     const progressSteps = document.querySelectorAll('.progress-step');
     const progressTrack = document.getElementById('progress-track');
 
     renderCart();
     updateOrderSummary();
+
+    // Initialize the correct page based on which section is present and active
+    if (document.getElementById('cart-page') && document.querySelector('#cart-page.active')) {
+        showPage('cart-page', 1);
+    } else if (document.getElementById('info-page') && document.querySelector('#info-page.active')) {
+        showPage('info-page', 2);
+    } else if (document.getElementById('payment-page') && document.querySelector('#payment-page.active')) {
+        showPage('payment-page', 3);
+    } else {
+        // Default to cart page if no specific page is marked active
+        showPage('cart-page', 1);
+    }
 
     function showPage(pageName, stepNumber) {
         pages.forEach(page => page.classList.remove('active'));
@@ -156,11 +175,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const tax = subtotal * TAX_RATE;
         const total = subtotal + deliveryCost + tax;
 
-        itemCountSpan.textContent = itemCount;
-        subtotalSpan.textContent = `Rs.${subtotal.toFixed(2)}`;
-        deliveryCostSpan.textContent = `Rs.${deliveryCost.toFixed(2)}`;
-        taxCostSpan.textContent = `Rs.${tax.toFixed(2)}`;
-        totalCostSpan.textContent = `Rs.${total.toFixed(2)}`;
+        // Update cart page summary elements (if they exist)
+        if(itemCountSpan) itemCountSpan.textContent = itemCount;
+        if(subtotalSpan) subtotalSpan.textContent = `Rs.${subtotal.toFixed(2)}`;
+        if(deliveryCostSpan) deliveryCostSpan.textContent = `Rs.${deliveryCost.toFixed(2)}`;
+        if(taxCostSpan) taxCostSpan.textContent = `Rs.${tax.toFixed(2)}`;
+        if(totalCostSpan) totalCostSpan.textContent = `Rs.${total.toFixed(2)}`;
+
+        // Update payment page summary elements (if they exist)
+        if(window.paymentItemCountSpan) window.paymentItemCountSpan.textContent = itemCount;
+        if(window.paymentSubtotalSpan) window.paymentSubtotalSpan.textContent = `Rs.${subtotal.toFixed(2)}`;
+        if(window.paymentDeliveryCostSpan) window.paymentDeliveryCostSpan.textContent = `Rs.${deliveryCost.toFixed(2)}`;
+        if(window.paymentTaxCostSpan) window.paymentTaxCostSpan.textContent = `Rs.${tax.toFixed(2)}`;
+        if(window.paymentTotalCostSpan) window.paymentTotalCostSpan.textContent = `Rs.${total.toFixed(2)}`;
     }
 
     function formatDate(dateString) {
@@ -302,27 +329,33 @@ document.addEventListener('DOMContentLoaded', () => {
     deliveryDateInput.disabled = true; // Disabled by default until schedule is selected
 
     // Page Navigation Listeners
-    document.getElementById('to-info-btn').addEventListener('click', () => {
-        if (cartData.length > 0) {
-            // Validate date if scheduled
-            const scheduleRadio = document.getElementById('schedule');
-            if (scheduleRadio.checked) {
-                if (!deliveryDateInput.value) {
-                    showToast('Please select a delivery date before proceeding.');
-                    document.getElementById('date-error').textContent = 'Please select a delivery date.';
-                    document.getElementById('date-error').style.display = 'block';
-                    return;
+    const toInfoBtn = document.getElementById('to-info-btn');
+    if (toInfoBtn) {
+        toInfoBtn.addEventListener('click', () => {
+            if (cartData.length > 0) {
+                // Validate date if scheduled
+                const scheduleRadio = document.getElementById('schedule');
+                if (scheduleRadio.checked) {
+                    if (!deliveryDateInput.value) {
+                        showToast('Please select a delivery date before proceeding.');
+                        document.getElementById('date-error').textContent = 'Please select a delivery date.';
+                        document.getElementById('date-error').style.display = 'block';
+                        return;
+                    }
                 }
+                showPage('info-page', 2);
+            } else {
+                showToast("Your cart is empty!");
             }
-            showPage('info-page', 2);
-        } else {
-            showToast("Your cart is empty!");
-        }
-    });
+        });
+    }
 
-    document.getElementById('back-to-cart-btn').addEventListener('click', () => {
-        showPage('cart-page', 1);
-    });
+    const backToCartBtn = document.getElementById('back-to-cart-btn');
+    if (backToCartBtn) {
+        backToCartBtn.addEventListener('click', () => {
+            showPage('cart-page', 1);
+        });
+    }
 
     // --- VALIDATION FUNCTIONS ---
     const validators = {
@@ -589,63 +622,72 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.getElementById('to-payment-btn').addEventListener('click', () => {
-        const contactValid = validateField('email', 'email') & validateField('phone', 'phone');
-        const addressValid = validateField('firstName', 'name') &
-            validateField('lastName', 'name') &
-            validateField('address', 'address') &
-            validateField('city', 'city') &
-            validateField('zip', 'zip');
+    const toPaymentBtn = document.getElementById('to-payment-btn');
+    if (toPaymentBtn) {
+        toPaymentBtn.addEventListener('click', () => {
+            const contactValid = validateField('email', 'email') & validateField('phone', 'phone');
+            const addressValid = validateField('firstName', 'name') &
+                validateField('lastName', 'name') &
+                validateField('address', 'address') &
+                validateField('city', 'city') &
+                validateField('zip', 'zip');
 
-        if (contactValid && addressValid) {
-            showPage('payment-page', 3);
-        } else {
-            showToast('Please fill in all required fields correctly.');
-        }
-    });
+            if (contactValid && addressValid) {
+                showPage('payment-page', 3);
+            } else {
+                showToast('Please fill in all required fields correctly.');
+            }
+        });
+    }
 
-    document.getElementById('back-to-info-btn').addEventListener('click', () => {
-        showPage('info-page', 2);
-    });
+    const backToInfoBtn = document.getElementById('back-to-info-btn');
+    if (backToInfoBtn) {
+        backToInfoBtn.addEventListener('click', () => {
+            showPage('info-page', 2);
+        });
+    }
 
-    document.getElementById('place-order-btn').addEventListener('click', () => {
-        const validCard = validateField('cardNumber', 'cardNumber');
-        const validName = validateField('nameOnCard', 'name');
-        const validExpiry = validateField('expiry', 'expiry');
-        const validCvv = validateField('cvv', 'cvv');
+    const placeOrderBtn = document.getElementById('place-order-btn');
+    if (placeOrderBtn) {
+        placeOrderBtn.addEventListener('click', () => {
+            const validCard = validateField('cardNumber', 'cardNumber');
+            const validName = validateField('nameOnCard', 'name');
+            const validExpiry = validateField('expiry', 'expiry');
+            const validCvv = validateField('cvv', 'cvv');
 
-        // Re-validate date just in case
-        let validDate = true;
-        const scheduleRadio = document.getElementById('schedule');
-        if (scheduleRadio.checked && !deliveryDateInput.value) {
-            validDate = false;
-            showToast('Please select a delivery date.');
-        }
+            // Re-validate date just in case
+            let validDate = true;
+            const scheduleRadio = document.getElementById('schedule');
+            if (scheduleRadio.checked && !deliveryDateInput.value) {
+                validDate = false;
+                showToast('Please select a delivery date.');
+            }
 
-        if (validCard && validName && validExpiry && validCvv && validDate) {
-            showToast('Order placed successfully! Thank you for your purchase.');
+            if (validCard && validName && validExpiry && validCvv && validDate) {
+                showToast('Order placed successfully! Thank you for your purchase.');
 
-            // Capture purchase data before clearing
-            const totalCost = document.getElementById('total-cost').textContent;
-            const deliveryDate = deliveryDateInput.value;
-            const isScheduled = document.getElementById('schedule').checked;
+                // Capture purchase data before clearing
+                const totalCost = document.getElementById('total-cost').textContent;
+                const deliveryDate = deliveryDateInput.value;
+                const isScheduled = document.getElementById('schedule').checked;
 
-            window.lastPurchaseData = {
-                items: [...cartData],
-                total: totalCost,
-                deliveryDate: deliveryDate,
-                isScheduled: isScheduled
-            };
+                window.lastPurchaseData = {
+                    items: [...cartData],
+                    total: totalCost,
+                    deliveryDate: deliveryDate,
+                    isScheduled: isScheduled
+                };
 
-            setTimeout(() => {
-                cartData = [];
-                showPage('cart-page', 1);
-                renderCart();
-            }, 3000);
-        } else {
-            showToast('Please correct the errors in the payment form.');
-        }
-    });
+                setTimeout(() => {
+                    cartData = [];
+                    showPage('cart-page', 1);
+                    renderCart();
+                }, 3000);
+            } else {
+                showToast('Please correct the errors in the payment form.');
+            }
+        });
+    }
     function renderPurchaseSummary(data) {
         const container = document.getElementById('purchase-details');
         let itemsHtml = '<ul class="summary-items-list">';

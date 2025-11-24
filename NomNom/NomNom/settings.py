@@ -48,7 +48,12 @@ INSTALLED_APPS = [
     "contact.apps.ContactConfig",
     # add our specific cart page application
     "cart.apps.CartConfig",
+    # add our specific pastry application
     "pastry.apps.PastryConfig",
+    # add our specific order application
+    "orders.apps.OrdersConfig",
+    # add our specific payment application
+    "payments.apps.PaymentsConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
