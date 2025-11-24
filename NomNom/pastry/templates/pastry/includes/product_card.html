@@ -1,10 +1,10 @@
 {% load static %}
-<div class="product-card" data-product="{{ product.name }}">
+<div class="product-card" data-product="{{ product.pastry_name }}">
     <div class="product-image">
         {% if product.image %}
-        <img src="{% static product.image %}" alt="{{ product.name }}">
+        <img src="{% static product.image %}" alt="{{ product.pastry_name }}">
         {% else %}
-        <img src="{% static 'images/placeholder.png' %}" alt="{{ product.name }}">
+        <img src="{% static 'images/placeholder.png' %}" alt="{{ product.pastry_name }}">
         {% endif %}
     </div>
     <div class="product-info">
@@ -33,9 +33,9 @@
         </div>
         <div class="product-actions">
             <button class="btn btn-add-cart"
-                onclick="addToCartWithQuantity(event, '{{ product.name }}', '{{ product.price }}', '{{ product.image }}', '{{ db_category }}')">Add
+                onclick="addToCartWithQuantity(event, '{{ product.pastry_name }}', '{{ product.pastry_price }}', '{{ product.image }}', '{{ db_category }}')">Add
                 to Cart</button>
-            <button class="btn btn-review" onclick="openReviewModal('{{ product.name }}')">Reviews</button>
+            <button class="btn btn-review" onclick="openReviewModal('{{ product.pastry_name }}')">Reviews</button>
         </div>
     </div>
 </div>

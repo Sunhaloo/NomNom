@@ -308,7 +308,7 @@
                         <label class="form-label">
                             Flavour <span class="required">*</span>
                         </label>
-                        <select id="flavour" class="form-select" required>
+                        <select id="flavour" name="flavour" class="form-select" required>
                             <option value="" selected>Select Flavour</option>
                             <option value="Vanilla" data-price="0">Vanilla</option>
                             <option value="Chocolate" data-price="175">Chocolate</option>
@@ -324,7 +324,7 @@
                         <label class="form-label">
                             Cake Size <span class="required">*</span>
                         </label>
-                        <select id="size" class="form-select" required>
+                        <select id="size" name="size" class="form-select" required>
                             <option value="" selected>Select Size</option>
                             <option value="6" data-price="900" data-cm="15">Small (15 cm)</option>
                             <option value="8" data-price="1250" data-cm="20">Medium (20 cm)</option>
@@ -338,7 +338,7 @@
                         <label class="form-label">
                             Filling <span class="required">*</span>
                         </label>
-                        <select id="filling" class="form-select" required>
+                        <select id="filling" name="filling" class="form-select" required>
                             <option value="" selected>Select Filling</option>
                             <option value="None" data-price="0">No Filling</option>
                             <option value="Cream" data-price="300">Cream</option>
@@ -354,7 +354,7 @@
                         <label class="form-label">
                             Frosting <span class="required">*</span>
                         </label>
-                        <select id="frosting" class="form-select" required>
+                        <select id="frosting" name="frosting" class="form-select" required>
                             <option value="" selected>Select Frosting</option>
                             <option value="Buttercream" data-price="0">Buttercream</option>
                             <option value="Cream Cheese" data-price="175">Cream Cheese</option>
@@ -370,7 +370,7 @@
                         <label class="form-label">
                             Decoration <span class="required">*</span>
                         </label>
-                        <select id="decoration" class="form-select" required>
+                        <select id="decoration" name="decoration" class="form-select" required>
                             <option value="" selected>Select Decoration</option>
                             <option value="None" data-price="0">No Decoration</option>
                             <option value="Flowers" data-price="300">Flowers</option>
@@ -392,6 +392,7 @@
                             <span class="number-value" id="layers-value">1</span>
                             <button type="button" class="number-btn" id="increase-layers">+</button>
                         </div>
+                        <input type="hidden" id="layers" name="layers" value="1">
                     </div>
 
                     <!-- Pickup date -->
@@ -399,13 +400,13 @@
                         <label class="form-label">
                             Pickup Date <span class="required">*</span>
                         </label>
-                        <input type="date" id="pickup-date" class="form-input" required>
+                        <input type="date" id="pickup-date" name="pickup_date" class="form-input" required>
                     </div>
 
                     <!-- Cake message -->
                     <div class="form-group full-width">
                         <label class="form-label">Cake Message</label>
-                        <input type="text" id="cake-message" class="form-input"
+                        <input type="text" id="cake-message" name="cake_message" class="form-input"
                             placeholder="Enter your message (max 50 characters)" maxlength="50">
                     </div>
             </form>
@@ -442,7 +443,7 @@
             size: '',
             sizeCm: '',
             layers: 1,
-            message: '',
+            cake_message: '',  // Changed from 'message' to 'cake_message' to match model
             uploadedFile: null,
             pickupDate: '',
             basePrice: 0
@@ -461,6 +462,8 @@
                         const selectedOption = this.options[this.selectedIndex];
                         cakeState.basePrice = parseInt(selectedOption.dataset.price) || 0;
                         cakeState.sizeCm = selectedOption.dataset.cm || '';
+                        // Update cakeState.size to include the cm description as expected by the view
+                        cakeState.size = cakeState.sizeCm + ' cm';
                     }
                     updateOrderSummary();
                 });
@@ -475,7 +478,7 @@
             });
 
             document.getElementById('decrease-layers').addEventListener('click', function () {
-                if (cakeState.layers > 0) {
+                if (cakeState.layers > 1) { // Changed from > 0 to > 1 to prevent going below 1
                     cakeState.layers--;
                     updateLayersDisplay();
                     updateOrderSummary();
@@ -488,10 +491,19 @@
             });
 
             document.getElementById('cake-message').addEventListener('input', function () {
-                cakeState.message = this.value;
+                cakeState.cake_message = this.value;
             });
 
             document.getElementById('add-to-cart').addEventListener('click', function () {
+                // Update cakeState with current values from form elements before validation
+                cakeState.flavour = document.getElementById('flavour').value;
+                cakeState.filling = document.getElementById('filling').value;
+                cakeState.frosting = document.getElementById('frosting').value;
+                cakeState.decoration = document.getElementById('decoration').value;
+                cakeState.size = document.getElementById('size').value;
+                cakeState.pickupDate = document.getElementById('pickup-date').value;
+                cakeState.cake_message = document.getElementById('cake-message').value;
+
                 const form = document.getElementById('cake-form');
                 const requiredFields = form.querySelectorAll('[required]');
                 for (let field of requiredFields) {
@@ -524,9 +536,17 @@
                 formData.append('filling', cakeState.filling);
                 formData.append('frosting', cakeState.frosting);
                 formData.append('decoration', cakeState.decoration);
-                formData.append('size', cakeState.sizeCm + ' cm');
+                // Convert cm value to model size choices (S, M, L, XL)
+                let modelSize = '';
+                if (cakeState.sizeCm === '15') modelSize = 'S';      // Small
+                else if (cakeState.sizeCm === '20') modelSize = 'M';  // Medium
+                else if (cakeState.sizeCm === '25') modelSize = 'L';  // Large
+                else if (cakeState.sizeCm === '30') modelSize = 'XL'; // Extra Large
+                else modelSize = 'M'; // default to Medium
+
+                formData.append('size', modelSize);
                 formData.append('layers', cakeState.layers);
-                formData.append('cake_message', cakeState.message);
+                formData.append('cake_message', cakeState.cake_message);
                 formData.append('pickup_date', cakeState.pickupDate);
                 formData.append('price', totalPrice);
 
@@ -556,6 +576,7 @@
 
         function updateLayersDisplay() {
             document.getElementById('layers-value').textContent = cakeState.layers;
+            document.getElementById('layers').value = cakeState.layers;
             document.getElementById('decrease-layers').disabled = cakeState.layers <= 1;
             document.getElementById('increase-layers').disabled = cakeState.layers >= 5;
         }
