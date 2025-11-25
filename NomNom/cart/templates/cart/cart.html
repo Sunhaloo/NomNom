@@ -3,180 +3,119 @@
 
 {% block title %}My Cart - Nomnom{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'cart/style.css' %}">
+{% endblock %}
+
 {% block content %}
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout | The Sweet Corner</title>
-
-    <!-- Google fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'cart/style.css' %}">
-</head>
-
-<body>
-
+<div class="cart-wrapper">
     <div class="container">
-        <!-- Progress bar -->
-        <div class="progress-container">
-            <div class="progress-bar">
-                <div class="progress-track" id="progress-track"></div>
-                <div class="progress-step active" id="step-1">
-                    <div class="step-icon"><i class="fas fa-shopping-cart"></i></div>
-                    <div class="step-label">Cart</div>
+
+    <main class="main-content">
+        <div class="content-area">
+
+            <!-- CART PAGE -->
+            <section id="cart-page" class="page-section active">
+
+                <div class="cart-items-section">
+
+                    <div class="cart-header">
+                        <a href="/" class="continue-shopping-link">
+                            <i class="fas fa-arrow-left"></i> Continue Shopping
+                        </a>
+                        <h2>My Cart</h2>
+                    </div>
+
+                    <ul class="cart-list" id="cart-list">
+                        <!-- Items inserted dynamically -->
+                    </ul>
                 </div>
-                <div class="progress-step" id="step-2">
-                    <div class="step-icon">2</div>
-                    <div class="step-label">Information</div>
+
+                <!-- Order summary -->
+                <aside class="order-summary" id="order-summary">
+
+                    <h2><i class="fas fa-receipt"></i> Order Summary</h2>
+
+                    <div class="summary-row">
+                        <span>Subtotal (<span id="item-count">0</span> items):</span>
+                        <span id="subtotal">Rs.0.00</span>
+                    </div>
+
+                    <div class="delivery-options">
+                        <input type="radio" name="delivery" value="express" id="express" checked>
+                        <label for="express">Express Delivery (Rs.1000.00)</label>
+                        <div class="delivery-info">Delivery scheduled for tomorrow between 10 AM - 2 PM</div>
+
+                        <input type="radio" name="delivery" value="schedule" id="schedule">
+                        <label for="schedule">Schedule for Later (Rs.300.00)</label>
+                        <div class="delivery-info">Select your preferred delivery date</div>
+                    </div>
+
+                    <div class="date-picker-group" id="date-picker-group">
+                        <label for="deliveryDate">Select a Delivery Date:</label>
+                        <input type="date" id="deliveryDate" name="deliveryDate">
+                        <div class="error-message" id="date-error" style="display:none;"></div>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Delivery:</span>
+                        <span id="delivery-cost">Rs.0.00</span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Tax (15%):</span>
+                        <span id="tax-cost">Rs.0.00</span>
+                    </div>
+
+                    <div class="summary-total">
+                        <div class="summary-row">
+                            <span>Total:</span>
+                            <span id="total-cost">Rs.0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons" id="cart-page-actions">
+                        <a href="{% url 'orders:checkout' %}" class="btn btn-primary"
+                           style="width: 270px; padding: 15px 24px; font-size: 1.2rem;">
+                            Proceed to Checkout <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </aside>
+
+                <!-- Empty cart -->
+                <div class="empty-cart" id="empty-cart-message">
+                    <i class="fas fa-shopping-cart empty-cart-icon"></i>
+                    <h2>Your Cart is Empty</h2>
+                    <p>Looks like you haven't added any items yet.</p>
+                    <a href="/" class="start-shopping-btn">Start Shopping</a>
                 </div>
-                <div class="progress-step" id="step-3">
-                    <div class="step-icon">3</div>
-                    <div class="step-label">Payment</div>
+
+                <!-- Purchase summary -->
+                <div class="purchase-summary" id="purchase-summary" style="display:none;">
+                    <h2><i class="fas fa-check-circle"></i> Purchase Summary</h2>
+                    <div id="purchase-details"></div>
                 </div>
-            </div>
+
+            </section>
+
         </div>
+    </main>
+</div>
 
-        <main class="main-content">
-            <!-- Page content area -->
-            <div class="content-area">
-                <!-- CART PAGE -->
-                <section id="cart-page" class="page-section active">
-                    <div class="cart-items-section">
-                        <div class="cart-header">
-                            <a href="/" class="continue-shopping-link"><i class="fas fa-arrow-left"></i> Continue
-                                Shopping</a>
-                            <h2>My Cart</h2>
-                        </div>
-                        <ul class="cart-list" id="cart-list">
-                            <!-- Items will be dynamically inserted here by JS -->
-                        </ul>
-                    </div>
+<!-- Toast -->
+<div class="toast" id="toast">
+    <i class="fas fa-info-circle"></i>
+    <span class="toast-message" id="toast-message"></span>
+    <button class="toast-close" onclick="this.parentElement.classList.remove('show')">&times;</button>
+</div>
 
-                    <!-- Order summary -->
-                    <aside class="order-summary" id="order-summary">
-                        <h2><i class="fas fa-receipt"></i> Order Summary</h2>
+<!-- JS -->
+<script>
+    window.initialCartData = {{ cart_json|safe }};
+    window.deliveryCost = 1000.00;
+</script>
 
-                        <div class="summary-row">
-                            <span>Subtotal (<span id="item-count">0</span> items):</span>
-                            <span id="subtotal">Rs.0.00</span>
-                        </div>
-
-                        <div class="delivery-options">
-                            <input type="radio" name="delivery" value="express" id="express" checked>
-                            <label for="express">Express Delivery (Rs.1000.00)</label>
-                            <div class="delivery-info">Delivery scheduled for tomorrow between 10 AM - 2 PM</div>
-
-                            <input type="radio" name="delivery" value="schedule" id="schedule">
-                            <label for="schedule">Schedule for Later (Rs.300.00)</label>
-                            <div class="delivery-info">Select your preferred delivery date</div>
-                        </div>
-
-                        <div class="date-picker-group" id="date-picker-group">
-                            <label for="deliveryDate">Select a Delivery Date:</label>
-                            <input type="date" id="deliveryDate" name="deliveryDate">
-                            <div class="error-message" id="date-error"
-                                style="color: red; font-size: 0.85rem; display: none; margin-top: 0.25rem;"></div>
-                        </div>
-
-                        <div class="summary-row">
-                            <span>Delivery:</span>
-                            <span id="delivery-cost">Rs.0.00</span>
-                        </div>
-
-                        <div class="summary-row">
-                            <span>Tax (15%):</span>
-                            <span id="tax-cost">Rs.0.00</span>
-                        </div>
-
-                        <div class="summary-total">
-                            <div class="summary-row">
-                                <span>Total:</span>
-                                <span id="total-cost">Rs.0.00</span>
-                            </div>
-                        </div>
-
-                        <div class="action-buttons" id="cart-page-actions">
-                            <!-- Continue Shopping button -->
-                            <a href="{% url 'orders:checkout' %}" class="btn btn-primary" id="to-info-btn"
-                                style="width: 270px; padding: 15px 24px; font-size: 1.2rem;">Proceed to Checkout <i
-                                    class="fas fa-arrow-right"></i></a>
-                        </div>
-                    </aside>
-
-                    <!-- Empty cart message -->
-                    <div class="empty-cart" id="empty-cart-message">
-                        <i class="fas fa-shopping-cart empty-cart-icon"></i>
-                        <h2>Your Cart is Empty</h2>
-                        <p>Looks like you haven't added any items to your cart yet.</p>
-                        <a href="/" class="start-shopping-btn">Start Shopping</a>
-                    </div>
-
-                    <!-- Purchase summary (Hidden by default) -->
-                    <div class="purchase-summary" id="purchase-summary" style="display: none;">
-                        <h2><i class="fas fa-check-circle"></i> Purchase Summary</h2>
-                        <div id="purchase-details">
-                            <!-- Details will be injected here -->
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </main>
+<script src="{% static 'cart/cart.js' %}"></script>
     </div>
-
-    <!-- Toast notification -->
-    <div class="toast" id="toast">
-        <i class="fas fa-info-circle"></i>
-        <span class="toast-message" id="toast-message">Notification message</span>
-        <button class="toast-close" onclick="this.parentElement.classList.remove('show')">&times;</button>
-    </div>
-
-    <!-- Initialize cart data from Django session -->
-    <script>
-        window.initialCartData = {{ cart_json | safe }};
-        window.deliveryCost = 1000.00; // Default express delivery cost for cart page
-
-        // Initialize order summary with server-side values if available
-        document.addEventListener('DOMContentLoaded', function() {
-            // If cart data exists, calculate and display initial values
-            if (window.initialCartData && Array.isArray(window.initialCartData) && window.initialCartData.length > 0) {
-                const TAX_RATE = 0.15;
-                const subtotal = window.initialCartData.reduce((total, item) => total + (item.price * (item.quantity || 1)), 0);
-                const itemCount = window.initialCartData.reduce((total, item) => total + (item.quantity || 1), 0);
-                const tax = subtotal * TAX_RATE;
-                const total = subtotal + window.deliveryCost + tax;
-
-                // Update cart page summary elements
-                const itemCountSpan = document.getElementById('item-count');
-                const subtotalSpan = document.getElementById('subtotal');
-                const deliveryCostSpan = document.getElementById('delivery-cost');
-                const taxCostSpan = document.getElementById('tax-cost');
-                const totalCostSpan = document.getElementById('total-cost');
-
-                if(itemCountSpan) itemCountSpan.textContent = itemCount;
-                if(subtotalSpan) subtotalSpan.textContent = `Rs.${subtotal.toFixed(2)}`;
-                if(deliveryCostSpan) deliveryCostSpan.textContent = `Rs.${window.deliveryCost.toFixed(2)}`;
-                if(taxCostSpan) taxCostSpan.textContent = `Rs.${tax.toFixed(2)}`;
-                if(totalCostSpan) totalCostSpan.textContent = `Rs.${total.toFixed(2)}`;
-            }
-        });
-    </script>
-
-    <!-- Custom JS -->
-    <script src="{% static 'cart/cart.js' %}"></script>
-
-</body>
-
-</html>
-
+</div>
 {% endblock %}

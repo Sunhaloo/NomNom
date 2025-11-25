@@ -27,26 +27,6 @@
 
 <body>
 
-    <div class="container">
-        <!-- Progress bar -->
-        <div class="progress-container">
-            <div class="progress-bar">
-                <div class="progress-track" id="progress-track"></div>
-                <div class="progress-step" id="step-1">
-                    <div class="step-icon"><i class="fas fa-shopping-cart"></i></div>
-                    <div class="step-label">Cart</div>
-                </div>
-                <div class="progress-step active" id="step-2">
-                    <div class="step-icon">2</div>
-                    <div class="step-label">Information</div>
-                </div>
-                <div class="progress-step" id="step-3">
-                    <div class="step-icon">3</div>
-                    <div class="step-label">Payment</div>
-                </div>
-            </div>
-        </div>
-
         <main class="main-content">
             <!-- Page content area -->
             <div class="content-area">
@@ -438,12 +418,8 @@
             }
         });
     </script>
-
     <!-- Custom JS -->
-    <script src="{% static 'cart/cart.js' %}"></script>
     <script src="{% static 'orders/checkout.js' %}"></script>
-    <script src="{% static 'payments/payment.js' %}"></script>
-
 </body>
 
 </html>

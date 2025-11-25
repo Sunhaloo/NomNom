@@ -249,21 +249,24 @@
 
   <!-- Initialize cart count -->
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const cartCountElement = document.getElementById('cart-count');
-      if (cartCountElement) {
-        const count = {{ cart_item_count|default: 0
+  document.addEventListener('DOMContentLoaded', function () {
+    const cartCountElement = document.getElementById('cart-count');
+
+    // Get cart count from Django context
+    const count = {{ cart_item_count|default:0 }};
+
+    if (cartCountElement) {
+      cartCountElement.textContent = count;
+
+      if (count === 0) {
+        cartCountElement.classList.add('hidden');
+      } else {
+        cartCountElement.classList.remove('hidden');
       }
-    };
-    cartCountElement.textContent = count;
-    if (count === 0) {
-      cartCountElement.classList.add('hidden');
-    } else {
-      cartCountElement.classList.remove('hidden');
     }
-      }
-    });
-  </script>
+  });
+</script>
+
 </body>
 
 </html>
