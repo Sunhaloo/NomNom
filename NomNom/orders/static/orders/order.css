@@ -1,16 +1,19 @@
 /* Order-specific CSS styles */
 
 .order-wrapper {
-    display: flex;
-    justify-content: center;
     width: 100%;
+    padding: 2rem 0;
+    background: #f5e8d6; /* matches your site background */
 }
 
-.container {
+.order-wrapper .container {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
-
 
 :root {
     --primary-light-brown: #F5EFE6;
@@ -25,78 +28,6 @@
     --shadow-sm: 0 4px 10px rgba(111, 78, 55, 0.08);
     --shadow-md: 0 8px 20px rgba(111, 78, 55, 0.12);
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* --- Progress Bar --- */
-.progress-container {
-    margin-bottom: 3rem;
-    padding: 2rem 0;
-}
-
-.progress-bar {
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-.progress-bar .progress-track {
-    position: absolute;
-    top: 25px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background-color: var(--border-color);
-    z-index: 1;
-    transition: var(--transition);
-}
-
-.progress-step {
-    position: relative;
-    z-index: 3;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.progress-step .step-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background-color: #fff;
-    border: 2px solid var(--border-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 0.75rem;
-    transition: var(--transition);
-    font-size: 1.2rem;
-}
-
-.progress-step.active .step-icon {
-    border-color: var(--accent-dark-brown);
-    background-color: var(--accent-dark-brown);
-    color: white;
-    transform: scale(1.1);
-}
-
-.progress-step.completed .step-icon {
-    border-color: var(--accent-dark-brown);
-    background-color: var(--accent-dark-brown);
-    color: white;
-}
-
-.progress-step .step-label {
-    font-size: 1rem;
-    color: var(--text-light);
-    font-weight: 600;
-    transition: var(--transition);
-}
-
-.progress-step.active .step-label {
-    color: var(--text-dark);
 }
 
 .page-section {
@@ -117,8 +48,8 @@
 /* Information and payment page layouts */
 #info-page.active,
 #payment-page.active {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
+    flex-direction: column;
+    align-items: center;
     gap: 3rem;
 }
 

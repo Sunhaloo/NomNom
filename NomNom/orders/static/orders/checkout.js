@@ -9,6 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const deliveryOptions = document.getElementsByName('delivery');
     const deliveryDateInput = document.getElementById('deliveryDate');
     const datePickerGroup = document.getElementById('date-picker-group');
+    const itemCountSpan = document.getElementById('item-count');
+    const subtotalSpan = document.getElementById('subtotal');
+    const deliveryCostSpan = document.getElementById('delivery-cost');
+    const taxCostSpan = document.getElementById('tax-cost');
+    const totalCostSpan = document.getElementById('total-cost');
+
     
     // Payment page summary elements (for checkout)
     window.paymentItemCountSpan = document.getElementById('payment-item-count');
@@ -22,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressTrack = document.getElementById('progress-track');
 
     updateOrderSummary();
-
+    });
     // Checkout.js should not handle page navigation if cart.js is also loaded
     // Let cart.js handle the page navigation; checkout.js just enhances functionality
 
@@ -132,9 +138,12 @@ document.addEventListener('DOMContentLoaded', () => {
         name: (value) => /^[A-Za-z\s]+$/.test(value) ? '' : 'Name must contain only letters.',
         address: (value) => value.trim() ? '' : 'Street address is required.',
         city: (value) => {
-            const options = Array.from(document.querySelectorAll('#city-list option')).map(opt => opt.value.toLowerCase());
-            return options.includes(value.toLowerCase()) ? '' : 'Please select a valid city.';
+            if (!window.cityList) return ''; // Will validate after JSON loads
+            return window.cityList.map(c => c.toLowerCase()).includes(value.toLowerCase())
+                ? '' 
+                : 'Please select a valid city.';
         },
+
         zip: (value) => /^\d{5}$/.test(value) ? '' : 'Postal code must be exactly 5 digits.',
         cardNumber: (value) => /^\d{16}$/.test(value.replace(/\s/g, '')) ? '' : 'Card number must be exactly 16 digits.',
         expiry: (value) => {
@@ -412,147 +421,54 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- CITY AUTO-FILL POSTAL CODE ---
-    const cityZipMap = {
-        "Port Louis": "11302",
-        "Curepipe": "74213",
-        "Vacoas": "73411",
-        "Quatre Bornes": "72101",
-        "Rose Hill": "71301",
-        "Beau Bassin": "71501",
-        "Phoenix": "73521",
-        "Grand Baie": "30510",
-        "Flic en Flac": "90502",
-        "Tamarin": "90901",
-        "Mahebourg": "50804",
-        "Goodlands": "30406",
-        "Triolet": "21503",
-        "Rose Belle": "51802",
-        "Chemin Grenier": "60103",
-        "Riviere du Rempart": "30906",
-        "Lallmatie": "41803",
-        "Plaine Magnien": "51603",
-        "Pailles": "11202",
-        "Surinam": "61203",
-        "Le Hochet": "20905",
-        "Montagne Blanche": "41302",
-        "Grand Gaube": "30605",
-        "Petit Raffray": "30703",
-        "Baie du Tombeau": "20102",
-        "Bambous": "90102",
-        "Bambous Virieux": "50102",
-        "Bananes": "50202",
-        "Beau Vallon": "50302",
-        "Bel Air Riviere Seche": "40102",
-        "Bel Ombre": "60202",
-        "Belle Vue Maurel": "30102",
-        "Benares": "60302",
-        "Bois Cheri": "60402",
-        "Bois des Amourettes": "50402",
-        "Bon Accueil": "40202",
-        "Bramsthan": "40302",
-        "Brisée Verdière": "40402",
-        "Britannia": "60502",
-        "Camp de Masque": "40502",
-        "Camp de Masque Pavé": "40602",
-        "Camp Diable": "60602",
-        "Camp Ithier": "40702",
-        "Camp Thorel": "40802",
-        "Cap Malheureux": "30202",
-        "Cascavelle": "90202",
-        "Case Noyale": "90302",
-        "Chamarel": "90402",
-        "Chamouny": "60702",
-        "Cluny": "50502",
-        "Congomah": "20202",
-        "Cottage": "30302",
-        "Crève Coeur": "20302",
-        "D'Epinay": "20402",
-        "Dagotière": "80102",
-        "Dubreuil": "70102",
-        "Ecroignard": "40902",
-        "Espérance Trébuchet": "30402",
-        "Fond du Sac": "20502",
-        "Grand Bel Air": "50602",
-        "Grand Bois": "60802",
-        "Grand River South East": "41002",
-        "Grande Retraite": "41102",
-        "Grande Riviere Noire": "90602",
-        "Gros Cailloux": "90702",
-        "L'Avenir": "80202",
-        "L'Escalier": "60902",
-        "La Flora": "61002",
-        "La Gaulette": "90802",
-        "La Laura-Malenga": "80302",
-        "Lalmatie": "41202",
-        "Laventure": "41402",
-        "Le Morne": "91002",
-        "Long Mountain": "20602",
-        "Mare Chicose": "50902",
-        "Mare d'Albert": "51002",
-        "Mare La Chaux": "41502",
-        "Mare Tabac": "51102",
-        "Melrose": "41602",
-        "Midlands": "70202",
-        "Moka": "80402",
-        "Montagne Longue": "20702",
-        "Morcellement Saint Andre": "20802",
-        "New Grove": "51202",
-        "Notre Dame": "21002",
-        "Nouvelle Decouverte": "80502",
-        "Nouvelle France": "51302",
-        "Olivia": "41702",
-        "Pamplemousses": "21102",
-        "Petit Bel Air": "51402",
-        "Petite Riviere": "91102",
-        "Piton": "30802",
-        "Plaine des Papayes": "21202",
-        "Plaine des Roches": "31002",
-        "Pointe aux Cannoniers": "31102",
-        "Pointe aux Piments": "21302",
-        "Poste de Flacq": "41902",
-        "Poudre d'Or": "31202",
-        "Poudre d'Or Hamlet": "31302",
-        "Providence": "42002",
-        "Quartier Militaire": "42102",
-        "Quatre Cocos": "42202",
-        "Quatre Soeurs": "42302",
-        "Queen Victoria": "42402",
-        "Richelieu": "91202",
-        "Ripailles": "80602",
-        "Riviere des Anguilles": "61102",
-        "Riviere des Creoles": "51702",
-        "Riviere du Poste": "51502",
-        "Riviere Noire": "91302",
-        "Roche Terre": "31402",
-        "Roches Noires": "31502",
-        "Saint Aubin": "61302",
-        "Saint Hubert": "51902",
-        "Saint Julien d'Hotman": "42502",
-        "Saint Pierre": "80702",
-        "Sebastopol": "42602",
-        "Souillac": "61402",
-        "Terre Rouge": "21402",
-        "The Vale": "31602",
-        "Trois Boutiques": "52002",
-        "Trou aux Biches": "21602",
-        "Trou d'Eau Douce": "42702",
-        "Tyack": "61502",
-        "Union Park": "52102",
-        "Vale": "31702",
-        "Ville Bague": "70302"
-    };
+fetch("/static/data/city_zip.json")
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        window.cityZipMap = data;
 
-    if(document.getElementById('city')) {
-        document.getElementById('city').addEventListener('input', function () {
-            const city = this.value;
-            // Case-insensitive lookup
-            const matchedCity = Object.keys(cityZipMap).find(key => key.toLowerCase() === city.toLowerCase());
+        const cityInput = document.getElementById("city");
+        const zipInput = document.getElementById("zip");
 
-            if (matchedCity) {
-                document.getElementById('zip').value = cityZipMap[matchedCity];
-                // Trigger validation for zip to clear any errors
-                validateField('zip', 'zip');
-            }
-        });
-    }
+        if (cityInput && zipInput) {
+            // Add event listener for both input and change events to handle typing and selection from datalist
+            cityInput.addEventListener("input", function () {
+                const typed = this.value.trim().toLowerCase();
+
+                // Find city that matches (case-insensitive) - use fuzzy matching
+                let matchedCity = null;
+                for (const city in window.cityZipMap) {
+                    if (city.toLowerCase() === typed) {
+                        matchedCity = city;
+                        break;
+                    }
+                }
+
+                if (matchedCity) {
+                    zipInput.value = window.cityZipMap[matchedCity];
+                    validateField("zip", "zip");
+                } else {
+                    // Clear zip if no exact match is found
+                    zipInput.value = '';
+                }
+            });
+
+            // Also handle the 'change' event for when user selects from datalist
+            cityInput.addEventListener("change", function () {
+                const selectedCity = this.value.trim();
+
+                if (window.cityZipMap[selectedCity]) {
+                    zipInput.value = window.cityZipMap[selectedCity];
+                    validateField("zip", "zip");
+                }
+            });
+        }
+    })
+    .catch(err => console.error("Failed to load city_zip.json:", err));
+
+
 });
