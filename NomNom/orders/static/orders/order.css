@@ -1,5 +1,17 @@
 /* Order-specific CSS styles */
 
+.order-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
 :root {
     --primary-light-brown: #F5EFE6;
     --secondary-medium-brown: #A0826D;

@@ -47,6 +47,16 @@ body {
     color: var(--text-dark);
 }
 
+
+/* Hide the global toast notification on the cart page */
+#toast {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+
 /* ------------------------- */
 /*   CART HEADER             */
 /* ------------------------- */
