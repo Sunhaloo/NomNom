@@ -144,6 +144,32 @@
     <!-- Initialize cart data from Django session -->
     <script>
         window.initialCartData = {{ cart_json | safe }};
+        window.deliveryCost = 1000.00; // Default express delivery cost for cart page
+
+        // Initialize order summary with server-side values if available
+        document.addEventListener('DOMContentLoaded', function() {
+            // If cart data exists, calculate and display initial values
+            if (window.initialCartData && Array.isArray(window.initialCartData) && window.initialCartData.length > 0) {
+                const TAX_RATE = 0.15;
+                const subtotal = window.initialCartData.reduce((total, item) => total + (item.price * (item.quantity || 1)), 0);
+                const itemCount = window.initialCartData.reduce((total, item) => total + (item.quantity || 1), 0);
+                const tax = subtotal * TAX_RATE;
+                const total = subtotal + window.deliveryCost + tax;
+
+                // Update cart page summary elements
+                const itemCountSpan = document.getElementById('item-count');
+                const subtotalSpan = document.getElementById('subtotal');
+                const deliveryCostSpan = document.getElementById('delivery-cost');
+                const taxCostSpan = document.getElementById('tax-cost');
+                const totalCostSpan = document.getElementById('total-cost');
+
+                if(itemCountSpan) itemCountSpan.textContent = itemCount;
+                if(subtotalSpan) subtotalSpan.textContent = `Rs.${subtotal.toFixed(2)}`;
+                if(deliveryCostSpan) deliveryCostSpan.textContent = `Rs.${window.deliveryCost.toFixed(2)}`;
+                if(taxCostSpan) taxCostSpan.textContent = `Rs.${tax.toFixed(2)}`;
+                if(totalCostSpan) totalCostSpan.textContent = `Rs.${total.toFixed(2)}`;
+            }
+        });
     </script>
 
     <!-- Custom JS -->

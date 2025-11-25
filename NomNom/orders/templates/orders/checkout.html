@@ -397,12 +397,52 @@
     <!-- Initialize cart data from Django context -->
     <script>
         // Get cart data from the Django context
-        window.initialCartData = {{ cart_json | safe }};
+        window.initialCartData = {{ cart_json | safe }}; // Remove quotes to make it valid JSON
         window.deliveryCost = 700.00; // Default express delivery
+
+        // Initialize order summary with server-side values if available
+        document.addEventListener('DOMContentLoaded', function() {
+            // If cart data exists, calculate and display initial values
+            if (window.initialCartData && Array.isArray(window.initialCartData) && window.initialCartData.length > 0) {
+                const TAX_RATE = 0.15;
+                const subtotal = window.initialCartData.reduce((total, item) => total + (item.price * (item.quantity || 1)), 0);
+                const itemCount = window.initialCartData.reduce((total, item) => total + (item.quantity || 1), 0);
+                const tax = subtotal * TAX_RATE;
+                const total = subtotal + window.deliveryCost + tax;
+
+                // Update cart page summary elements
+                const itemCountSpan = document.getElementById('item-count');
+                const subtotalSpan = document.getElementById('subtotal');
+                const deliveryCostSpan = document.getElementById('delivery-cost');
+                const taxCostSpan = document.getElementById('tax-cost');
+                const totalCostSpan = document.getElementById('total-cost');
+
+                if(itemCountSpan) itemCountSpan.textContent = itemCount;
+                if(subtotalSpan) subtotalSpan.textContent = `Rs.${subtotal.toFixed(2)}`;
+                if(deliveryCostSpan) deliveryCostSpan.textContent = `Rs.${window.deliveryCost.toFixed(2)}`;
+                if(taxCostSpan) taxCostSpan.textContent = `Rs.${tax.toFixed(2)}`;
+                if(totalCostSpan) totalCostSpan.textContent = `Rs.${total.toFixed(2)}`;
+
+                // Update payment page summary elements
+                const paymentItemCountSpan = document.getElementById('payment-item-count');
+                const paymentSubtotalSpan = document.getElementById('payment-subtotal');
+                const paymentDeliveryCostSpan = document.getElementById('payment-delivery-cost');
+                const paymentTaxCostSpan = document.getElementById('payment-tax-cost');
+                const paymentTotalCostSpan = document.getElementById('payment-total-cost');
+
+                if(paymentItemCountSpan) paymentItemCountSpan.textContent = itemCount;
+                if(paymentSubtotalSpan) paymentSubtotalSpan.textContent = `Rs.${subtotal.toFixed(2)}`;
+                if(paymentDeliveryCostSpan) paymentDeliveryCostSpan.textContent = `Rs.${window.deliveryCost.toFixed(2)}`;
+                if(paymentTaxCostSpan) paymentTaxCostSpan.textContent = `Rs.${tax.toFixed(2)}`;
+                if(paymentTotalCostSpan) paymentTotalCostSpan.textContent = `Rs.${total.toFixed(2)}`;
+            }
+        });
     </script>
 
     <!-- Custom JS -->
     <script src="{% static 'cart/cart.js' %}"></script>
+    <script src="{% static 'orders/checkout.js' %}"></script>
+    <script src="{% static 'payments/payment.js' %}"></script>
 
 </body>
 
