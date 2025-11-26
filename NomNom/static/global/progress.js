@@ -17,7 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-// Global function to update progress steps
 function updateProgress(stepNumber) {
     const steps = document.querySelectorAll(".progress-step");
 
@@ -36,5 +35,4 @@ function updateProgress(stepNumber) {
     });
 }
 
-// Make function available globally
 window.updateProgress = updateProgress;

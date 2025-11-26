@@ -37,11 +37,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // Get the button that was clicked
         const clickedButton = event.target.closest('.btn-add-cart');
 
-        // Create flying animation
-        if (clickedButton) {
-            createFlyingAnimation(clickedButton);
-        }
-
         // Get CSRF token
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 
@@ -63,12 +58,12 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => {
                 if (response.status === 403 || response.status === 401) {
                     // If user not logged in, show login prompt
+                    // Don't show animation for unauthenticated users
                     showLoginPrompt();
                     return Promise.reject('Not authenticated');
                 }
 
-                // Only show animation if logged in
-                const clickedButton = event.target.closest('.btn-add-cart');
+                // Only show animation if logged in and request was successful
                 if (clickedButton) {
                     createFlyingAnimation(clickedButton);
                 }
@@ -95,9 +90,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     window.addToCart = function (productName, productPrice, productImage) {
-        // Get the button that was clicked
-        const clickedButton = event.target.closest('.btn-add-cart');
-
         // Get CSRF token
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 
@@ -118,14 +110,13 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => {
                 if (response.status === 403 || response.status === 401) {
                     // If user not logged in, show login prompt
+                    // Don't show animation for unauthenticated users
                     showLoginPrompt();
                     return Promise.reject('Not authenticated');
                 }
 
-                // Only show animation if logged in
-                if (clickedButton) {
-                    createFlyingAnimation(clickedButton);
-                }
+                // Note: We can't show animation here since we don't have an event context
+                // Animation is typically shown when called from an event handler
 
                 return response.json();
             })

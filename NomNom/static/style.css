@@ -22,6 +22,17 @@ body.brown-background footer.main_footer {
   /* header & footer */
 }
 
+/* White navbar and footer with brown background */
+body.white-navbar-brown-bg header.main_header,
+body.white-navbar-brown-bg footer.main_footer {
+  background-color: white !important;
+}
+
+body.white-navbar-brown-bg {
+  background-color: #e8dbc7;
+}
+
+
 .header_navbar {
   display: flex;
   justify-content: space-between;
@@ -360,4 +371,86 @@ body.brown-background footer.main_footer {
     word-break: break-word; /* Handle long labels */
 }
 
+.login-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    opacity: 0;
+    transition: opacity .25s ease;
+    backdrop-filter: blur(3px);
+    z-index: 9998;
+}
+
+.login-overlay.show {
+    opacity: 1;
+}
+
+.login-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(.85);
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    width: 380px;
+    text-align: center;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    opacity: 0;
+    transition: all .25s cubic-bezier(.25,.8,.25,1);
+    z-index: 9999;
+}
+
+.login-popup.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.popup-icon {
+    font-size: 48px;
+    color: #6b3e26;
+    margin-bottom: 1rem;
+}
+
+.login-btn {
+    background: #6b3e26;
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    display: inline-block;
+    text-decoration: none;
+    margin-top: 1rem;
+    transition: .2s;
+}
+
+.login-btn:hover {
+    background: #542f1e;
+}
+
+.close-btn {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #777;
+    transition: .2s;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+#cart-count.bump {
+    animation: bump .3s ease;
+}
+
+@keyframes bump {
+    0%   { transform: scale(1); }
+    30%  { transform: scale(1.25); }
+    100% { transform: scale(1); }
+}
 
