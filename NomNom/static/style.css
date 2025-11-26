@@ -308,7 +308,6 @@ body.brown-background footer.main_footer {
 .progress-step {
     width: 48px;
     height: 48px;
-    line-height: 48px;
     background: #fff;
     border: 3px solid #d2bba3;
     border-radius: 50%;
@@ -323,6 +322,12 @@ body.brown-background footer.main_footer {
     box-shadow: 0 4px 10px rgba(140, 68, 20, 0.1);
 }
 
+.progress-step i {
+    font-size: 1.2rem;
+    margin: 0;
+    padding: 0;
+}
+
 .progress-step.active {
     background: #6b3e26;
     border-color: #6b3e26;
@@ -330,9 +335,17 @@ body.brown-background footer.main_footer {
     transform: scale(1.1);
 }
 
+.progress-step.active i {
+    color: #fff;
+}
+
 .progress-step.completed {
     background: #a06f45;
     border-color: #a06f45;
+    color: #fff;
+}
+
+.progress-step.completed i {
     color: #fff;
 }
 

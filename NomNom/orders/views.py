@@ -117,7 +117,7 @@ def checkout(request):
         cart.items.all().delete()
 
         messages.success(request, f"Order #{order.id} created successfully!")
-        return redirect('payment:payment_page', order_id=order.id)
+        return redirect('landing:landing')  # Redirect to landing page instead of payment
 
     # Render template
     return render(request, 'orders/checkout.html', {

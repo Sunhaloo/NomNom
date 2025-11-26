@@ -16,3 +16,25 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+// Global function to update progress steps
+function updateProgress(stepNumber) {
+    const steps = document.querySelectorAll(".progress-step");
+
+    if (!steps.length) return;
+
+    steps.forEach(step => {
+        const num = parseInt(step.dataset.step);
+
+        step.classList.remove("active", "completed");
+
+        if (num < stepNumber) {
+            step.classList.add("completed");
+        } else if (num === stepNumber) {
+            step.classList.add("active");
+        }
+    });
+}
+
+// Make function available globally
+window.updateProgress = updateProgress;

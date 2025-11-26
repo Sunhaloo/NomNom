@@ -281,6 +281,16 @@ body {
     transform: translateY(-2px);
 }
 
+.checkout-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 270px;
+    padding: 15px 24px !important;
+    font-size: 1.2rem;
+}
+
 /* ------------------------- */
 /*   EMPTY CART              */
 /* ------------------------- */

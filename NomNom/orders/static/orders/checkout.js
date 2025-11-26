@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressTrack = document.getElementById('progress-track');
 
     updateOrderSummary();
-    });
+
     // Checkout.js should not handle page navigation if cart.js is also loaded
     // Let cart.js handle the page navigation; checkout.js just enhances functionality
 
@@ -421,7 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- CITY AUTO-FILL POSTAL CODE ---
-fetch("/static/data/city_zip.json")
+fetch("/static/orders/data/city_zip.json")
     .then(response => {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -437,12 +437,12 @@ fetch("/static/data/city_zip.json")
         if (cityInput && zipInput) {
             // Add event listener for both input and change events to handle typing and selection from datalist
             cityInput.addEventListener("input", function () {
-                const typed = this.value.trim().toLowerCase();
+                const typed = this.value.trim();
 
-                // Find city that matches (case-insensitive) - use fuzzy matching
+                // Find city that matches (case-insensitive) - first try exact match
                 let matchedCity = null;
                 for (const city in window.cityZipMap) {
-                    if (city.toLowerCase() === typed) {
+                    if (city.toLowerCase() === typed.toLowerCase()) {
                         matchedCity = city;
                         break;
                     }
@@ -461,8 +461,17 @@ fetch("/static/data/city_zip.json")
             cityInput.addEventListener("change", function () {
                 const selectedCity = this.value.trim();
 
-                if (window.cityZipMap[selectedCity]) {
-                    zipInput.value = window.cityZipMap[selectedCity];
+                // Look for exact match in the cityZipMap, case-insensitive
+                let matchedCity = null;
+                for (const city in window.cityZipMap) {
+                    if (city.toLowerCase() === selectedCity.toLowerCase()) {
+                        matchedCity = city;
+                        break;
+                    }
+                }
+
+                if (matchedCity) {
+                    zipInput.value = window.cityZipMap[matchedCity];
                     validateField("zip", "zip");
                 }
             });
@@ -471,4 +480,68 @@ fetch("/static/data/city_zip.json")
     .catch(err => console.error("Failed to load city_zip.json:", err));
 
 
+    // Page navigation function
+    function showPage(pageId, step) {
+        // Hide all page sections
+        document.querySelectorAll('.page-section').forEach(section => {
+            section.classList.remove('active');
+        });
+
+        // Show the requested page
+        const targetPage = document.getElementById(pageId);
+        if (targetPage) {
+            targetPage.classList.add('active');
+        }
+
+        // Update progress bar if it exists
+        if (window.updateProgress) {
+            window.updateProgress(step);
+        } else {
+            // Update progress steps manually if global function not available
+            const steps = document.querySelectorAll('.progress-step');
+            steps.forEach((element, index) => {
+                element.classList.remove('active', 'completed');
+                if (index + 1 < step) {
+                    element.classList.add('completed');
+                } else if (index + 1 === step) {
+                    element.classList.add('active');
+                }
+            });
+        }
+    }
+    window.showPage = showPage; // Make function globally accessible
+
+    // Handle Place Order button click
+    const placeOrderBtn = document.getElementById('place-order-btn');
+    if (placeOrderBtn) {
+        placeOrderBtn.addEventListener('click', () => {
+            // Validate payment fields
+            const cardValid = validateField('cardNumber', 'cardNumber') &
+                             validateField('nameOnCard', 'name') &
+                             validateField('expiry', 'expiry') &
+                             validateField('cvv', 'cvv');
+
+            if (cardValid) {
+                // Create a form and submit it to trigger the Django checkout view
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = window.location.href; // Current checkout URL
+
+                // Add CSRF token
+                const csrfToken = getCookie('csrftoken');
+                if (csrfToken) {
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = 'csrfmiddlewaretoken';
+                    csrfInput.value = csrfToken;
+                    form.appendChild(csrfInput);
+                }
+
+                document.body.appendChild(form);
+                form.submit();
+            } else {
+                showToast('Please fill in all payment fields correctly.');
+            }
+        });
+    }
 });

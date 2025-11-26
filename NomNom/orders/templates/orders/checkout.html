@@ -87,6 +87,16 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Navigation buttons for the information page -->
+                    <div class="action-buttons" id="cart-page-actions">
+                        <a href="{% url 'cart:cart' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Cart
+                        </a>
+                        <button class="btn btn-primary" id="to-payment-btn">
+                            Continue to Payment <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
                 </section>
 
                 <!-- PAYMENT PAGE -->

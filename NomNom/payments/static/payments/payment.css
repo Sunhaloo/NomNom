@@ -1,4 +1,3 @@
-/* Payment-specific CSS styles */
 
 :root {
     --primary-light-brown: #F5EFE6;
@@ -15,7 +14,6 @@
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Payment form styles */
 .form-section {
     background-color: #fff;
     padding: 2.5rem;
@@ -99,7 +97,6 @@
     color: var(--accent-dark-brown);
 }
 
-/* Order summary section */
 .order-summary {
     background-color: #fff;
     padding: 2.5rem;
@@ -182,7 +179,6 @@
     box-shadow: var(--shadow-md);
 }
 
-/* Purchase summary styling */
 .purchase-summary {
     background: #fff;
     border-radius: 15px;
@@ -267,10 +263,147 @@
     font-size: 1.2rem;
 }
 
-/* --- Responsive design --- */
+
+@media (max-width: 768px) {
+    .payment-form-grid {
+        grid-template-columns: 1fr;/
+
+.form-section {
+    background-color: #fff;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 2rem;
+}
+
+.form-section h2 {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: var(--text-dark);
+    border-bottom: 2px solid var(--primary-light-brown);
+    padding-bottom: 0.75rem;
+}
+
+.payment-form-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: var(--text-light);
+    font-size: 1rem;
+}
+
+.form-group input {
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--accent-dark-brown);
+    box-shadow: 0 0 0 2px rgba(111, 78, 55, 0.2);
+}
+
+.card-icons {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.card-icons i {
+    font-size: 1.8rem;
+    color: var(--text-light);
+}
+
+.security-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.security-note i {
+    color: var(--accent-dark-brown);
+}
+
+.action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1.5rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: var(--secondary-medium-brown);
+    color: white;
+    padding: 1.25rem 2rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    font-size: 1rem;
+}
+
+.toast.show {
+    transform: translateX(0);
+}
+
+.toast i {
+    font-size: 1.5rem;
+}
+
+.toast-message {
+    flex-grow: 1;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
 @media (max-width: 768px) {
     .payment-form-grid {
         grid-template-columns: 1fr;
+    }
+
+    .action-buttons {
+        grid-template-columns: 1fr;
+    }
+}
+
     }
 
     .action-buttons {

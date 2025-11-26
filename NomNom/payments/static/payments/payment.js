@@ -1,28 +1,51 @@
-// Payment-specific JavaScript functionality
+// ===============================
+//   Clean Payment.js (Frontend Only)
+// ===============================
 
 document.addEventListener('DOMContentLoaded', () => {
-    let cartData = window.initialCartData || [];
-    let deliveryCost = 700.00;
-    const TAX_RATE = 0.15; // 15% tax for Mauritius
 
-    const deliveryDateInput = document.getElementById('deliveryDate');
+    /* -----------------------
+       TOAST NOTIFICATION
+    ------------------------ */
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toast-message');
 
-    // --- VALIDATION FUNCTIONS ---
+    function showToast(message) {
+        if (toast && toastMessage) {
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+    }
+
+    /* -----------------------
+       VALIDATION RULES
+    ------------------------ */
     const validators = {
-        cardNumber: (value) => /^\d{16}$/.test(value.replace(/\s/g, '')) ? '' : 'Card number must be exactly 16 digits.',
+        cardNumber: (value) =>
+            /^\d{16}$/.test(value.replace(/\s/g, ''))
+                ? ''
+                : 'Card number must be exactly 16 digits.',
+
         expiry: (value) => {
             if (!/^\d{2}\/\d{2}$/.test(value)) return 'Invalid format (MM/YY).';
+
             const [month, year] = value.split('/').map(Number);
             const now = new Date();
             const currentYear = now.getFullYear() % 100;
             const currentMonth = now.getMonth() + 1;
+
             if (month < 1 || month > 12) return 'Invalid month.';
-            if (year < currentYear || (year === currentYear && month < currentMonth)) return 'Expiry date cannot be in the past.';
+            if (year < currentYear || (year === currentYear && month < currentMonth))
+                return 'Expiry date cannot be in the past.';
+
             return '';
         },
-        cvv: (value) => /^\d{3}$/.test(value) ? '' : 'CVV must be exactly 3 digits.'
+
+        cvv: (value) =>
+            /^\d{3}$/.test(value)
+                ? ''
+                : 'CVV must be exactly 3 digits.'
     };
 
     function validateField(fieldId, validatorName) {
@@ -41,154 +64,90 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function showToast(message) {
-        if(toast && toastMessage) {
-            toastMessage.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-    }
-
-    // Format card number input
-    if(document.getElementById('cardNumber')) {
-        document.getElementById('cardNumber').addEventListener('input', (e) => {
+    /* -----------------------
+       CARD NUMBER FORMATTING
+    ------------------------ */
+    const cardNumberEl = document.getElementById('cardNumber');
+    if (cardNumberEl) {
+        cardNumberEl.addEventListener('input', (e) => {
             let value = e.target.value.replace(/\D/g, '');
-            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
-            e.target.value = formattedValue;
+            e.target.value = value.match(/.{1,4}/g)?.join(' ') || value;
 
-            // Clear error if valid
             const errorEl = document.getElementById('cardNumber-error');
-            const errorMessage = validators['cardNumber'](e.target.value);
-            if (!errorMessage) {
-                errorEl.style.display = 'none';
-            }
+            if (!validators.cardNumber(e.target.value)) errorEl.style.display = 'none';
         });
 
-        document.getElementById('cardNumber').addEventListener('blur', () => {
-            validateField('cardNumber', 'cardNumber');
-        });
+        cardNumberEl.addEventListener('blur', () =>
+            validateField('cardNumber', 'cardNumber')
+        );
     }
 
-    // Format expiry date input
-    if(document.getElementById('expiry')) {
-        document.getElementById('expiry').addEventListener('input', (e) => {
+    /* -----------------------
+       EXPIRY FORMAT
+    ------------------------ */
+    const expiryEl = document.getElementById('expiry');
+    if (expiryEl) {
+        expiryEl.addEventListener('input', (e) => {
             let value = e.target.value.replace(/\D/g, '');
+
             if (value.length >= 2) {
                 value = value.slice(0, 2) + '/' + value.slice(2, 4);
             }
+
             e.target.value = value;
 
-            // Clear error if valid
             const errorEl = document.getElementById('expiry-error');
-            const errorMessage = validators['expiry'](e.target.value);
-            if (!errorMessage) {
-                errorEl.style.display = 'none';
-            }
+            if (!validators.expiry(e.target.value)) errorEl.style.display = 'none';
         });
 
-        document.getElementById('expiry').addEventListener('blur', () => {
-            validateField('expiry', 'expiry');
-        });
+        expiryEl.addEventListener('blur', () =>
+            validateField('expiry', 'expiry')
+        );
     }
 
-    // CVV Input restriction
-    if(document.getElementById('cvv')) {
-        document.getElementById('cvv').addEventListener('input', (e) => {
+    /* -----------------------
+       CVV FORMAT
+    ------------------------ */
+    const cvvEl = document.getElementById('cvv');
+    if (cvvEl) {
+        cvvEl.addEventListener('input', (e) => {
             e.target.value = e.target.value.replace(/\D/g, '');
 
-            // Clear error if valid
             const errorEl = document.getElementById('cvv-error');
-            const errorMessage = validators['cvv'](e.target.value);
-            if (!errorMessage) {
-                errorEl.style.display = 'none';
-            }
+            if (!validators.cvv(e.target.value)) errorEl.style.display = 'none';
         });
 
-        document.getElementById('cvv').addEventListener('blur', () => {
-            validateField('cvv', 'cvv');
-        });
+        cvvEl.addEventListener('blur', () =>
+            validateField('cvv', 'cvv')
+        );
     }
 
+    /* -----------------------
+       PLACE ORDER BUTTON
+    ------------------------ */
     const placeOrderBtn = document.getElementById('place-order-btn');
+
     if (placeOrderBtn) {
         placeOrderBtn.addEventListener('click', () => {
             const validCard = validateField('cardNumber', 'cardNumber');
-            const validName = validateField('nameOnCard', 'name');
             const validExpiry = validateField('expiry', 'expiry');
             const validCvv = validateField('cvv', 'cvv');
+            const validName = document.getElementById('nameOnCard').value.trim() !== '';
 
-            // Re-validate date just in case
-            let validDate = true;
-            const scheduleRadio = document.getElementById('schedule');
-            if (scheduleRadio && scheduleRadio.checked && !deliveryDateInput.value) {
-                validDate = false;
-                showToast('Please select a delivery date.');
+            if (!validName) {
+                showToast('Please enter name on card.');
             }
 
-            if (validCard && validName && validExpiry && validCvv && validDate) {
-                showToast('Order placed successfully! Thank you for your purchase.');
-
-                // Capture purchase data before clearing
-                const totalCost = document.getElementById('total-cost').textContent;
-                const deliveryDate = deliveryDateInput.value;
-                const isScheduled = document.getElementById('schedule').checked;
-
-                window.lastPurchaseData = {
-                    items: [...cartData],
-                    total: totalCost,
-                    deliveryDate: deliveryDate,
-                    isScheduled: isScheduled
-                };
-
-                // Simulate order placement, then redirect or update UI
+            if (validCard && validExpiry && validCvv && validName) {
+                // SUCCESS
+                showToast('Payment successful! Redirecting...');
                 setTimeout(() => {
-                    // This would normally be handled by backend
-                    // For now, just show a success message or redirect
-                    window.location.href = '/orders/success/';
-                }, 1000);
+                    window.location.href = '/'; // Landing page redirect
+                }, 1500);
             } else {
-                showToast('Please correct the errors in the payment form.');
+                // FAIL
+                showToast('Please correct the errors before proceeding.');
             }
         });
-    }
-
-    function renderPurchaseSummary(data) {
-        const container = document.getElementById('purchase-details');
-        let itemsHtml = '<ul class="summary-items-list">';
-        data.items.forEach(item => {
-            itemsHtml += `
-                <li>
-                    <span>${item.quantity}x ${item.name}</span>
-                    <span>Rs. ${(item.price * item.quantity).toFixed(2)}</span>
-                </li>
-            `;
-        });
-        itemsHtml += '</ul>';
-
-        let deliveryHtml = '';
-        if (data.isScheduled && data.deliveryDate) {
-            const date = new Date(data.deliveryDate);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            // Create a date object for the delivery date at midnight for comparison
-            const deliveryDateObj = new Date(data.deliveryDate);
-            deliveryDateObj.setHours(0, 0, 0, 0);
-
-            if (deliveryDateObj < today) {
-                deliveryHtml = `<p><strong>Delivered on:</strong> ${date.toLocaleDateString()}</p>`;
-            } else {
-                deliveryHtml = `<p><strong>Delivery:</strong> ${date.toLocaleDateString()}</p>`;
-            }
-        } else {
-            deliveryHtml = `<p><strong>Delivery:</strong> Express (Tomorrow)</p>`;
-        }
-
-        container.innerHTML = `
-            ${itemsHtml}
-            <div class="summary-divider"></div>
-            ${deliveryHtml}
-            <p class="summary-total-line"><strong>Total Paid:</strong> ${data.total}</p>
-        `;
     }
 });
