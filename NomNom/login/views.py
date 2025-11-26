@@ -8,9 +8,6 @@ from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from .forms import SignupForm, LoginForm, PasswordResetForm
-from django.contrib.auth.decorators import login_required
-from .forms import EditUsernameForm, EditProfilePicForm
-from cart.models import Order
 
 User = get_user_model()
 
@@ -47,41 +44,53 @@ def forget_passwd(request):
         form = PasswordResetForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data["email"]
-            user = User.objects.filter(email=email).first()
+            try:
+                user = User.objects.filter(email=email).first()
+            except Exception as e:
+                # Handle unexpected database errors
+                print(f"Database error in password reset: {e}")
+                messages.error(request, "An error occurred. Please try again later.")
+                return render(request, "login/forget_passwd.html", {"form": form})
 
             if user:
-                # Generate password reset token and URL
-                token = default_token_generator.make_token(user)
-                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                try:
+                    # Generate password reset token and URL
+                    token = default_token_generator.make_token(user)
+                    uid = urlsafe_base64_encode(force_bytes(user.pk))
 
-                # Get the current site for the password reset link
-                current_site = get_current_site(request)
+                    # Get the current site for the password reset link
+                    current_site = get_current_site(request)
 
-                # Create the password reset email
-                subject = "Password Reset Request"
-                message = render_to_string(
-                    "login/password_reset_email.html",
-                    {
-                        "user": user,
-                        "domain": current_site.domain,
-                        "uid": uid,
-                        "token": token,
-                    },
-                )
+                    # Create the password reset email
+                    subject = "Password Reset Request"
+                    message = render_to_string(
+                        "login/password_reset_email.html",
+                        {
+                            "user": user,
+                            "domain": current_site.domain,
+                            "uid": uid,
+                            "token": token,
+                        },
+                    )
 
-                # Send the email
-                send_mail(
-                    subject,
-                    message,
-                    "from@example.com",  # Replace with your email
-                    [email],
-                    fail_silently=False,
-                )
+                    # send the email
+                    send_mail(
+                        subject,
+                        message,
+                        None,  # Use the DEFAULT_FROM_EMAIL setting
+                        [email],
+                        fail_silently=False,
+                    )
+                except Exception as e:
+                    # Handle email sending errors
+                    print(f"Email sending error: {e}")
+                    messages.error(request, "Failed to send password reset email.")
+                    return render(request, "login/forget_passwd.html", {"form": form})
 
-                # Redirect to a success page or display a message
+                # redirect to a success page or display a message
                 return render(request, "login/password_reset_sent.html")
             else:
-                # If email doesn't exist, still show success to prevent email enumeration
+                # if email doesn't exist, still show success to prevent email enumeration
                 return render(request, "login/password_reset_sent.html")
     else:
         form = PasswordResetForm()
@@ -123,49 +132,3 @@ def password_reset_confirm(request, uidb64, token):
 def logout_view(request):
     logout(request)
     return redirect("landing:landing")
-
-
-def profile_view(request):
-    user = request.user
-    return render(request, 'login/profile.html', {'user': user})
-
-
-def edit_profile(request):
-    user = request.user
-
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        region = request.POST.get('region')
-        street = request.POST.get('street')
-        profile_pic = request.FILES.get('profile_pic')
-
-        if username:
-            user.username = username
-        if region:
-            user.region = region
-        if street:
-            user.street = street
-        if profile_pic:
-            user.profile_pic = profile_pic
-
-        user.save()
-        return redirect('login:profile')
-
-    return render(request, 'login/edit_profile.html')
-
-
-from django.contrib.auth.decorators import login_required
-from cart.models import Order
-
-@login_required
-def profile_view(request):
-    user = request.user
-
-    # Existing orders of this user
-    orders = Order.objects.filter(user=user).order_by('-id')  # newest first
-
-    context = {
-        'user': user,   # keep all default user info
-        'orders': orders,
-    }
-    return render(request, 'login/profile.html', context)

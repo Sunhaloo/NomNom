@@ -17,20 +17,19 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
-
-urlpatterns = [
-    # WARNING: the order of "operations" matter
-    path("landing/", include("landing.urls")),
-    path("admin/", admin.site.urls),
-<<<<<<< Updated upstream
-]
-=======
-    path('pastry/', include('pastry.urls')),
-]
-
 from django.conf import settings
 from django.conf.urls.static import static
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
->>>>>>> Stashed changes
+
+urlpatterns = [
+    # WARNING: the order of "operations" matter
+    path("", include("landing.urls")),
+    path("about_us/", include("about_us.urls")),
+    path("login/", include("login.urls")),
+    path("contact/", include("contact.urls")),
+    path("cart/", include("cart.urls")),
+    path("admin/", admin.site.urls),
+    path("pastry/", include("pastry.urls")),
+    path("profile/", include("profile_page.urls")),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

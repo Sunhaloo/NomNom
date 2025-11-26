@@ -1,0 +1,260 @@
+/* HEADER */
+
+/* White background for header, footer, and body */
+body.white-background {
+  background-color: white;
+}
+
+body.white-background header.main_header,
+body.white-background footer.main_footer {
+  background-color: white !important;
+  /* header & footer */
+}
+
+/* Light yellow background */
+body.brown-background {
+  background-color: #e8dbc7;
+}
+
+body.brown-background header.main_header,
+body.brown-background footer.main_footer {
+  background-color: #e8dbc7 !important;
+  /* header & footer */
+}
+
+.header_navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header_navbar img {
+  width: 140px;
+  height: 80px;
+}
+
+.navbar_ul {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.navbar_ul li {
+  display: flex;
+  align-items: center;
+  margin: 15px;
+  font-size: 16px;
+}
+
+.navbar_ul a {
+  display: inline-block;
+  min-width: 50px;
+  text-align: center;
+  padding: 25px;
+  font-family: "Inter", sans-serif;
+  text-decoration: none;
+  color: black;
+  border-radius: 5px;
+}
+
+.navbar_ul a:hover {
+  transition: 0.1s ease;
+  transform: scale(1.1);
+}
+
+.navbar_ul a:active {
+  color: black;
+  transform: translateX(1px) translateY(1px);
+}
+
+.navbar_ul img {
+  width: 16px;
+  height: auto;
+  vertical-align: middle;
+}
+
+/* Grow + shadow on hover */
+.hover-grow-shadow {
+  transition: all 0.3s ease;
+}
+
+.hover-grow-shadow:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Shared hover effect */
+.hover-grow-shadow {
+  display: inline-block;
+  padding: 12px 28px;
+  border-radius: 6px;
+  background-color: #111;
+  /* Button base color */
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+/* Hover animation (grow + shadow) */
+.hover-grow-shadow:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background-color: #333;
+  /* Slightly lighter on hover */
+}
+
+
+/* FOOTER */
+.main_footer {
+  background-color: #ffffff !important;
+  padding: 14px 14px;
+}
+
+.footer_content {
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  padding: 14px 14px;
+}
+
+.footer_logo,
+.footer_contact {
+  display: inline-block;
+  vertical-align: top;
+  margin: 0 30px 20px 30px;
+}
+
+.footer_logo {
+  text-align: center;
+}
+
+.footer_logo img {
+  width: 120px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.footer_contact {
+  text-align: left;
+}
+
+.footer_contact h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  margin-top: 0;
+}
+
+.footer_contact p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #333333;
+}
+
+.footer_contact_email {
+  text-decoration: none;
+  color: #333333;
+}
+
+.footer_social {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.footer_social a {
+  display: inline-block;
+}
+
+.footer_social img {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s ease;
+}
+
+.footer_social img:hover {
+  transform: scale(1.1);
+}
+
+.footer_copyright {
+  font-size: 12px;
+  color: #666666;
+  padding-top: 20px;
+  clear: both;
+}
+
+/* Cart counter and animation */
+.cart-icon-container {
+  position: relative;
+  display: inline-block;
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background-color: #ff4444;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: 'Inter', sans-serif;
+}
+
+.cart-count.hidden {
+  display: none;
+}
+
+/* Flying cart animation */
+@keyframes flyToCart {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: translate(var(--tx), var(--ty)) scale(0.5);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translate(var(--tx), var(--ty)) scale(0.3);
+    opacity: 0;
+  }
+}
+
+.flying-item {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  animation: flyToCart 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.cart-count.bump {
+  animation: cartBump 0.3s ease;
+}
+
+@keyframes cartBump {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.3);
+  }
+}

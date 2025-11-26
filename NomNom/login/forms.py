@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import User
-from django.contrib.auth import get_user_model
 
 
 class LoginForm(AuthenticationForm):
@@ -92,25 +91,3 @@ class PasswordResetForm(forms.Form):
             attrs={"class": "auth-input", "placeholder": "Enter your email"}
         ),
     )
-
-User = get_user_model()
-
-class EditUsernameForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['username']
-        widgets = {
-            'username': forms.TextInput(attrs={'class': 'auth-input', 'placeholder': 'Username'}),
-        }
-
-    def clean_username(self):
-        username = self.cleaned_data['username']
-        qs = User.objects.filter(username=username).exclude(pk=self.instance.pk)
-        if qs.exists():
-            raise forms.ValidationError("This username is already taken.")
-        return username
-
-class EditProfilePicForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['profile_pic']

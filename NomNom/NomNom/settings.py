@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-5ap35n5*r27xi21^*3_gg18viij^+(0#k%b2-1+cba9o3z6wg7"
+SECRET_KEY = os.getenv(
+    "SECRET_KEY", "django-insecure-5ap35n5*r27xi21^*3_gg18viij^+(0#k%b2-1+cba9o3z6wg7"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -33,13 +40,25 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     # add our specific landing page application
     "landing.apps.LandingConfig",
+    # add our specific 'about us' page application
+    "about_us.apps.AboutUsConfig",
+    # add our specific login page application
+    "login.apps.LoginConfig",
+    # add our specific contact page application
+    "contact.apps.ContactConfig",
+    # add our specific cart page application
+    "cart.apps.CartConfig",
+    "pastry.apps.PastryConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "profile_page.apps.ProfilePageConfig",
 ]
+
+AUTH_USER_MODEL = "login.User"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -59,7 +78,7 @@ TEMPLATES = [
         # change the default template location
         # no need to use something like string concatenation or `os.path.join`
         "DIRS": [BASE_DIR / "templates"],
-        # We also want Django to find specific `<application_name>/templates` folder
+        # we also want Django to find specific `<application_name>/templates` folder
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -67,6 +86,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "cart.context_processors.cart_item_count",
             ],
         },
     },
@@ -122,24 +142,28 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-<<<<<<< Updated upstream
-=======
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # global directory of where the static files are found ( in project )
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-
 # redirects on login - used by @login decorator to verify session of logged in user
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/landing/'
-LOGOUT_REDIRECT_URL = '/landing/'
+LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = "/landing/"
+LOGOUT_REDIRECT_URL = "/"
 
->>>>>>> Stashed changes
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL")
