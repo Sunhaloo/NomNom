@@ -194,7 +194,7 @@ Head over into our `templates` _global_ directory and create _some_ HTML files!
 - Create our "_test_" `base.html` file:
 
 ```html
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <!-- tell Django to load the files inside `static` folder -->

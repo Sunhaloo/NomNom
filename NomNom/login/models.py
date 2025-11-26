@@ -12,6 +12,8 @@ class User(AbstractUser):
     street = models.CharField(max_length=120)
     role = models.CharField(max_length=20, default="CUSTOMER")
 
+    # WARNING: need to add profile picture ( related to the `media` folder found in `NomNom/settings.py`)
+
     # overriding role for users who are staff/superuser
     def save(self, *args, **kwargs):
         # check if we have have created a staff or superuser
