@@ -1,13 +1,69 @@
-<!-- call the `base.html` template file -->
 {% extends 'base.html' %}
-
-<!-- load the `login/static/login/style.css` file -->
 {% load static %}
 
-<!-- change the title of the webpage -->
-{% block title %} NomNom Contact {% endblock %}
+{% block title %}Nomnom Contact{% endblock %}
+{% block body_class %}brown-background{% endblock %}
 
-<!-- the actual content for the login page -->
 {% block content %}
-<h4 class="testing">This is inside the contact template</h4>
+<link rel="stylesheet" href="{% static 'contact/style.css' %}">
+
+<div class="contact-page">
+  <div class="contact-container">
+
+    <!-- LEFT SIDE: FORM -->
+    <div class="contact-form">
+      <h1>Contact Us</h1>
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.first_name.id_for_label }}">First name</label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}
+              <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.first_name.errors }}</div>
+            {% endif %}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.last_name.id_for_label }}">Last name</label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}
+              <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.last_name.errors }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.email.id_for_label }}">Email address</label>
+          {{ form.email }}
+          {% if form.email.errors %}
+            <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.email.errors }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.message.id_for_label }}">Your message</label>
+          {{ form.message }}
+          {% if form.message.errors %}
+            <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.message.errors }}</div>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="submit-btn hover-grow-shadow">Submit</button>
+      </form>
+    </div>
+
+    <!-- Right-side image -->
+    <div class="contact-image">
+      <img src="{% static 'contact/images/contact_image.png' %}" alt="Contact Image">
+    </div>
+
+  </div>
+</div>
 {% endblock %}

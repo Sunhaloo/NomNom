@@ -5,9 +5,48 @@
 {% load static %}
 
 <!-- change the title of the webpage -->
-{% block title %} NomNom About Us {% endblock %}
+{% block title %} NomNom Login {% endblock %}
+{% block body_class %}brown-background{% endblock %}
 
 <!-- the actual content for the login page -->
 {% block content %}
-  <h4 class="testing">This is inside the login template</h4>
+<div class="page-shell">
+  <div class="auth-card">
+    <h1 class="auth-title">Login</h1>
+
+    {% if form.non_field_errors %}
+      <div class="error-message" style="color:red; text-align:center;">
+        {% for error in form.non_field_errors %}
+          {{ error }}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'login:login' %}" class="auth-form">
+      {% csrf_token %}
+
+      {{ form.username }}
+      {% if form.username.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.username.errors }}</div>
+      {% endif %}
+
+      {{ form.password }}
+      {% if form.password.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.password.errors }}</div>
+      {% endif %}
+
+      <button type="submit" class="auth-btn">Login</button>
+
+      <p class="muted-center">
+        Don't have an account?
+        <a href="{% url 'login:signup' %}" class="muted-link">Sign Up</a>
+      </p>
+
+      <p class="forget-password">
+        <a href="{% url 'login:forget_passwd' %}" class="muted-link">Forgot Password</a>
+      </p>
+
+    </form>
+  </div>
+</div>
 {% endblock %}

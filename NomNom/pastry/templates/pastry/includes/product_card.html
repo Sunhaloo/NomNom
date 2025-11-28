@@ -1,0 +1,41 @@
+{% load static %}
+<div class="product-card" data-product="{{ product.pastry_name }}">
+    <div class="product-image">
+        {% if product.image %}
+        <img src="{% static product.image %}" alt="{{ product.pastry_name }}">
+        {% else %}
+        <img src="{% static 'images/placeholder.png' %}" alt="{{ product.pastry_name }}">
+        {% endif %}
+    </div>
+    <div class="product-info">
+        <h3 class="product-title">{{ product.pastry_name }}</h3>
+        <div class="price-quantity-row">
+            <div class="product-price">Rs {{ product.pastry_price}}</div>
+            <div class="quantity-selector">
+                <button class="qty-btn qty-minus" onclick="decrementQuantity(event)">−</button>
+                <input type="number" class="qty-input" value="1" min="1" max="99" readonly>
+                <button class="qty-btn qty-plus" onclick="incrementQuantity(event)">+</button>
+            </div>
+        </div>
+        <div class="product-rating">
+            <div class="stars">
+                {% for star in product.stars %}
+                {% if star == 1 %}
+                <i class="fas fa-star"></i>
+                {% elif star == 0.5 %}
+                <i class="fas fa-star-half-alt"></i>
+                {% else %}
+                <i class="far fa-star"></i>
+                {% endif %}
+                {% endfor %}
+            </div>
+            <span class="rating-count">{{ product.rating }} ({{ product.reviews }} reviews)</span>
+        </div>
+        <div class="product-actions">
+            <button class="btn btn-add-cart"
+                onclick="addToCartWithQuantity(event, '{{ product.pastry_name }}', '{{ product.pastry_price }}', '{{ product.image }}', '{{ db_category }}')">Add
+                to Cart</button>
+            <button class="btn btn-review" onclick="openReviewModal('{{ product.pastry_name }}')">Reviews</button>
+        </div>
+    </div>
+</div>

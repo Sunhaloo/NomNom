@@ -1,13 +1,125 @@
-<!-- call the `base.html` template file -->
 {% extends 'base.html' %}
-
-<!-- load the `login/static/login/style.css` file -->
 {% load static %}
 
-<!-- change the title of the webpage -->
-{% block title %} NomNom Cart {% endblock %}
+{% block title %}My Cart - Nomnom{% endblock %}
 
-<!-- the actual content for the cart page -->
+{% block body_class %}white-navbar-brown-bg{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'cart/style.css' %}">
+{% endblock %}
+
 {% block content %}
-<h4 class="testing">This is inside the cart template</h4>
+{% include 'partials/progress_bar.html' %}
+<script> window.currentStep = 1; </script>
+
+<div class="cart-wrapper">
+    <div class="container">
+
+    <main class="main-content">
+        <div class="content-area">
+
+            <!-- CART PAGE -->
+            <section id="cart-page" class="page-section active">
+
+                <div class="cart-items-section">
+
+                    <div class="cart-header">
+                        <a href="/" class="continue-shopping-link">
+                            <i class="fas fa-arrow-left"></i> Continue Shopping
+                        </a>
+                        <h2>My Cart</h2>
+                    </div>
+
+                    <ul class="cart-list" id="cart-list">
+                        <!-- Items inserted dynamically -->
+                    </ul>
+                </div>
+
+                <!-- Order summary -->
+                <aside class="order-summary" id="order-summary">
+
+                    <h2><i class="fas fa-receipt"></i> Order Summary</h2>
+
+                    <div class="summary-row">
+                        <span>Subtotal (<span id="item-count">0</span> items):</span>
+                        <span id="subtotal">Rs.0.00</span>
+                    </div>
+
+                    <div class="delivery-options">
+                        <input type="radio" name="delivery" value="express" id="express" checked>
+                        <label for="express">Express Delivery (Rs.1000.00)</label>
+                        <div class="delivery-info">Delivery scheduled for tomorrow between 10 AM - 2 PM</div>
+
+                        <input type="radio" name="delivery" value="schedule" id="schedule">
+                        <label for="schedule">Schedule for Later (Rs.300.00)</label>
+                        <div class="delivery-info">Select your preferred delivery date</div>
+                    </div>
+
+                    <div class="date-picker-group" id="date-picker-group">
+                        <label for="deliveryDate">Select a Delivery Date:</label>
+                        <input type="date" id="deliveryDate" name="deliveryDate">
+                        <div class="error-message" id="date-error" style="display:none;"></div>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Delivery:</span>
+                        <span id="delivery-cost">Rs.0.00</span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Tax (15%):</span>
+                        <span id="tax-cost">Rs.0.00</span>
+                    </div>
+
+                    <div class="summary-total">
+                        <div class="summary-row">
+                            <span>Total:</span>
+                            <span id="total-cost">Rs.0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons" id="cart-page-actions">
+                        <a href="{% url 'orders:checkout' %}" class="btn btn-primary checkout-btn">
+                            Proceed to Checkout <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </aside>
+
+                <!-- Empty cart -->
+                <div class="empty-cart" id="empty-cart-message">
+                    <i class="fas fa-shopping-cart empty-cart-icon"></i>
+                    <h2>Your Cart is Empty</h2>
+                    <p>Looks like you haven't added any items yet.</p>
+                    <a href="/" class="start-shopping-btn">Start Shopping</a>
+                </div>
+
+                <!-- Purchase summary -->
+                <div class="purchase-summary" id="purchase-summary" style="display:none;">
+                    <h2><i class="fas fa-check-circle"></i> Purchase Summary</h2>
+                    <div id="purchase-details"></div>
+                </div>
+
+            </section>
+
+        </div>
+    </main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+    <i class="fas fa-info-circle"></i>
+    <span class="toast-message" id="toast-message"></span>
+    <button class="toast-close" onclick="this.parentElement.classList.remove('show')">&times;</button>
+</div>
+
+<!-- JS -->
+<script>
+    window.initialCartData = {{ cart_json|safe }};
+    window.deliveryCost = 1000.00;
+</script>
+
+<script src="{% static 'cart/cart.js' %}"></script>
+    </div>
+</div>
 {% endblock %}

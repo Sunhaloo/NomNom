@@ -1,11 +1,15 @@
 from django.urls import path
 from . import views
 
-
-# define the app name here so that Django does not get confused with URLs
-app_name = "cart"
+app_name = 'cart'
 
 urlpatterns = [
-    # our login path
-    path("", views.index, name="cart")
+    path('', views.view_cart, name='cart'),  #view cart
+    path('add/', views.add_to_cart_ajax, name='add_to_cart_ajax'),  #AJAX add to cart
+    path('update/', views.update_cart_quantity, name='update_cart_quantity'),  #AJAX update quantity
+    path('add/<int:pastry_id>/', views.add_to_cart, name='add_to_cart'),  #add a pastry to cart 
+    path('remove/<int:index>/', views.remove_from_cart, name='remove_from_cart'),   #remove a pastry from cart
+    path('clear/', views.clear_cart, name='clear_cart'), # remove all itmes from cart
 ]
+
+

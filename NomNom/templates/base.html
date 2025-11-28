@@ -1,39 +1,56 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <!-- tell Django to load the files inside `static` folder -->
-    {% load static %}
+{% load static %}
 
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- add a global title -->
     <title>{% block title %}NomNom{% endblock %}</title>
 
-    <!-- add our custom 'inter' font -->
+    <!-- Google fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- link the main style sheet found in `static` folder -->
-    <link href="{% static 'landing/style.css' %}" rel="stylesheet" />
-    <link href="{% static 'about_us/style.css' %}" rel="stylesheet" />
-    <link href="{% static 'login/style.css' %}" rel="stylesheet" />
-    <link href="{% static 'contact/style.css' %}" rel="stylesheet" />
-    <link href="{% static 'style.css' %}" rel="stylesheet" />
-  </head>
-  <body>
-    <!-- include the navigation bar at the top of `base.html` file -->
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Global + Section Styles -->
+    <link rel="stylesheet" href="{% static 'global/style.css' %}">
+    <link rel="stylesheet" href="{% static 'landing/style.css' %}">
+    <link rel="stylesheet" href="{% static 'about_us/style.css' %}">
+    <link rel="stylesheet" href="{% static 'login/style.css' %}">
+    <link rel="stylesheet" href="{% static 'contact/style.css' %}">
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="{% block body_class %}{% endblock %}">
+
     {% include 'navbar.html' %}
-    <!-- this should appear from the global `base.html` file -->
-    <h1>Hello World From Global Templates!!!</h1>
 
-    <!-- make sure that each application can override `.html` file -->
-    {% block content %}
-      <!-- applications overridden contents goes here -->
-    {% endblock %}
+    {% block content %}{% endblock %}
 
-    <!-- include the footer at the bottom of `base.html` file -->
     {% include 'footer.html' %}
-  </body>
+
+    <!-- GLOBAL SCRIPTS -->
+    <script src="{% static 'global/login_popup.js' %}"></script>
+    <script src="{% static 'global/cart_helpers.js' %}"></script>
+    <script src="{% static 'global/progress.js' %}"></script>
+
+    <!-- Initialize cart count (Django → JS) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const cartCountElement = document.getElementById('cart-count');
+            const count = {{ cart_item_count|default:0 }};
+
+            if (cartCountElement) {
+                cartCountElement.textContent = count;
+                cartCountElement.classList.toggle('hidden', count === 0);
+            }
+        });
+    </script>
+
+</body>
 </html>

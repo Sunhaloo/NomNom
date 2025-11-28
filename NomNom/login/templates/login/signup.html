@@ -1,0 +1,81 @@
+<!-- call the `base.html` template file -->
+{% extends 'base.html' %}
+
+<!-- load the `login/static/login/style.css` file -->
+{% load static %}
+
+<!-- change the title of the webpage -->
+{% block title %} NomNom Sign Up {% endblock %}
+{% block body_class %}brown-background{% endblock %}
+<!-- the actual content for the login page -->
+{% block content %}
+<div class="page-shell">
+  <div class="auth-card">
+    <h1 class="auth-title">Signup</h1>
+
+    {% if form.non_field_errors %}
+      <div class="error-message" style="color:red; text-align:center;">
+        {% for error in form.non_field_errors %}
+          {{ error }}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="POST" action="{% url 'login:signup' %}" class="auth-form">
+      {% csrf_token %}
+
+      {{ form.username }}
+      {% if form.username.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.username.errors }}</div>
+      {% endif %}
+
+      {{ form.email }}
+      {% if form.email.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.email.errors }}</div>
+      {% endif %}
+
+      {{ form.password1 }}
+      {% if form.password1.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.password1.errors }}</div>
+      {% endif %}
+
+      {{ form.password2 }}
+      {% if form.password2.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.password2.errors }}</div>
+      {% endif %}
+
+      {{ form.first_name }}
+      {% if form.first_name.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.first_name.errors }}</div>
+      {% endif %}
+
+      {{ form.last_name }}
+      {% if form.last_name.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.last_name.errors }}</div>
+      {% endif %}
+
+      {{ form.gender }}
+      {% if form.gender.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.gender.errors }}</div>
+      {% endif %}
+
+      {{ form.region }}
+      {% if form.region.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.region.errors }}</div>
+      {% endif %}
+
+      {{ form.street }}
+      {% if form.street.errors %}
+        <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.street.errors }}</div>
+      {% endif %}
+
+      <button type="submit" class="auth-btn">Signup</button>
+
+      <p class="muted-center">
+        Already have an account?
+        <a href="{% url 'login:login' %}" class="muted-link">Login</a>
+      </p>
+    </form>
+  </div>
+</div>
+{% endblock %}

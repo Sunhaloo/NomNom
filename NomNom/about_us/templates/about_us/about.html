@@ -1,13 +1,57 @@
-<!-- call the `base.html` template file -->
 {% extends 'base.html' %}
-
-<!-- load the `login/static/login/style.css` file -->
 {% load static %}
 
-<!-- change the title of the webpage -->
 {% block title %} NomNom About Us {% endblock %}
 
-<!-- the actual content for the login page -->
+{% block body_class %}white-navbar-brown-bg{% endblock %}
+
 {% block content %}
-  <h4 class="testing">This is inside the about template</h4>
+<section class="about-section">
+
+  <!-- Centered heading -->
+  <h1 style="text-align: center; font-size: 2rem; font-weight: 900; margin-bottom: 3rem;">
+    ABOUT US
+  </h1>
+
+  <!-- First block: image right, text left -->
+  <div class="about-block reverse">
+    <img src="{% static 'about_us/images/about1.png' %}" alt="Our Craft">
+    <div class="about-text">
+      <h2>OUR CRAFT</h2>
+      <p>
+        At Nomnom Express, we believe that great baking starts with simple, wholesome ingredients and a touch of care.
+        From hand-kneading our dough to perfectly timing each bake, every step of our process is guided by passion and
+        precision. Whether it’s a warm loaf, a delicate pastry, or a celebratory cake, we put our heart into creating
+        treats that bring joy to every bite.
+      </p>
+    </div>
+  </div>
+
+  <!-- Second block: image left, text right -->
+  <div class="about-block">
+    <img src="{% static 'about_us/images/about3.png' %}" alt="Our Promise">
+    <div class="about-text">
+      <h2>OUR PROMISE</h2>
+      <p>
+        We promise to deliver freshness and authenticity in everything we bake. By staying true to natural ingredients
+        and artisanal methods passed down for generations, Nomnom Express ensures that every product reflects our
+        dedication to quality, care, and tradition.
+      </p>
+    </div>
+  </div>
+
+  <!-- Third block: image right, text left -->
+  <div class="about-block reverse">
+    <img src="{% static 'about_us/images/about2.png' %}" alt="Our Brand Story">
+    <div class="about-text">
+      <h2>OUR BRAND STORY</h2>
+      <p>
+        For over a century, Nomnom Express has been more than just a bakery, it’s a part of Mauritius’ culinary story.
+        Rooted in family tradition and fueled by innovation, our journey reflects the love of sharing fresh, handcrafted
+        goodness with every household on the island.
+      </p>
+    </div>
+  </div>
+
+</section>
 {% endblock %}
