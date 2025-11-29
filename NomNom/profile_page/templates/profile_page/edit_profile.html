@@ -9,63 +9,83 @@
 
 {% block content %}
 <div class="edit-container">
-    <h2>Edit Profile</h2>
+    <div class="edit-card">
+        <h2 class="edit-title">Edit Profile</h2>
 
-    {% if messages %}
-      {% for m in messages %}
-        <div class="message {{ m.tags }}">{{ m }}</div>
-      {% endfor %}
-    {% endif %}
+        {% if messages %}
+          {% for m in messages %}
+            <div class="message {{ m.tags }} {% if 'error' in m.tags %}error-message{% else %}success-message{% endif %}">
+              {{ m }}
+            </div>
+          {% endfor %}
+        {% endif %}
 
-    <form method="POST" enctype="multipart/form-data" novalidate>
-        {% csrf_token %}
-        <div class="form-row">
-            {{ form.full_name.label_tag }}<br>
-            {{ form.full_name }}
-        </div>
+        <form method="POST" enctype="multipart/form-data" novalidate class="edit-form">
+            {% csrf_token %}
 
-        <div class="form-row">
-            {{ form.first_name.label_tag }}<br>
-            {{ form.first_name }}
-        </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.full_name.label }}</label>
+                {{ form.full_name }}
+                {% if form.full_name.errors %}<div class="form-error">{{ form.full_name.errors }}</div>{% endif %}
+            </div>
 
-        <div class="form-row">
-            {{ form.last_name.label_tag }}<br>
-            {{ form.last_name }}
-        </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.first_name.label }}</label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}<div class="form-error">{{ form.first_name.errors }}</div>{% endif %}
+            </div>
 
-        <div class="form-row">
-            {{ form.email.label_tag }}<br>
-            {{ form.email }}
-        </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.last_name.label }}</label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}<div class="form-error">{{ form.last_name.errors }}</div>{% endif %}
+            </div>
 
-        <div class="form-row">
-            {{ form.username.label_tag }}<br>
-            {{ form.username }}
-        </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.email.label }}</label>
+                {{ form.email }}
+                {% if form.email.errors %}<div class="form-error">{{ form.email.errors }}</div>{% endif %}
+            </div>
 
-        <div class="form-row">
-            {{ form.gender.label_tag }}<br>
-            {{ form.gender }}
-        </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.username.label }}</label>
+                {{ form.username }}
+                {% if form.username.errors %}<div class="form-error">{{ form.username.errors }}</div>{% endif %}
+            </div>
 
-        <div class="form-row">
-            {{ form.region.label_tag }}<br>
-            {{ form.region }}
-        </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.gender.label }}</label>
+                {{ form.gender }}
+                {% if form.gender.errors %}<div class="form-error">{{ form.gender.errors }}</div>{% endif %}
+            </div>
 
-        <div class="form-row">
-            {{ form.street.label_tag }}<br>
-            {{ form.street }}
-        </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.region.label }}</label>
+                {{ form.region }}
+                {% if form.region.errors %}<div class="form-error">{{ form.region.errors }}</div>{% endif %}
+            </div>
 
-        <div class="form-row">
-            {{ form.profile_pic.label_tag }}<br>
-            {{ form.profile_pic }}
-        </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.street.label }}</label>
+                {{ form.street }}
+                {% if form.street.errors %}<div class="form-error">{{ form.street.errors }}</div>{% endif %}
+            </div>
 
-        <button type="submit" class="save-btn">Save Changes</button>
-        <a href="{% url 'profile_page:profile' %}" class="cancel-btn">Cancel</a>
-    </form>
+            <div class="form-group">
+                <label class="form-label">{{ form.profile_pic.label }}</label>
+                {{ form.profile_pic }}
+                {% if form.profile_pic.errors %}<div class="form-error">{{ form.profile_pic.errors }}</div>{% endif %}
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="hover-grow-shadow save-btn">
+                    Save Changes
+                </button>
+                <a href="{% url 'profile_page:profile' %}" class="hover-grow-shadow cancel-btn">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}
