@@ -17,10 +17,11 @@
         {% endif %}
 
         <h2 class="profile-name">
-            {% if user.full_name %}{{ user.full_name }}{% else %}{{ user.username }}{% endif %}
+            {% if user.full_name %}{{ user.full_name }}{% else %}{{ user.first_name }} {{ user.last_name }}{% endif %}
         </h2>
 
         <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
         <p><strong>Gender:</strong> {% if user.gender %}{{ user.get_gender_display }}{% else %}Not provided{% endif %}</p>
         <p><strong>Region:</strong> {{ user.region }}</p>
         <p><strong>Street:</strong> {{ user.street }}</p>

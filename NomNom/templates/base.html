@@ -33,8 +33,13 @@
   </head>
 
   <body class="{% block body_class %}{% endblock %}">
-    {% include 'navbar.html' %} {% block content %}{% endblock %} {% include
-    'footer.html' %}
+
+    {% include 'navbar.html' %}
+
+    {% block content %}
+    {% endblock %}
+
+    {% include 'footer.html' %}
 
     <!-- GLOBAL SCRIPTS -->
     <script src="{% static 'global/login_popup.js' %}"></script>
