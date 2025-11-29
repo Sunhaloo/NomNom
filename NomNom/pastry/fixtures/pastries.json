@@ -1,0 +1,390 @@
+[
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Vanilla Cake",
+      "pastry_category": "CAKE",
+      "pastry_price": "1000.00",
+      "image": "images/vanilla_cake.png",
+      "is_available": true,
+      "flavour": "Vanilla",
+      "filling": "Buttercream",
+      "frosting": "Buttercream",
+      "decoration": "Fresh Fruits",
+      "message": "",
+      "size": "L"
+    }
+  },
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Cheesecake",
+      "pastry_category": "CAKE",
+      "pastry_price": "750.00",
+      "image": "images/cheese_cake.png",
+      "is_available": true,
+      "flavour": "Vanilla Cream Cheese",
+      "filling": "Cream Cheese",
+      "frosting": "",
+      "decoration": "Strawberry Glaze",
+      "message": "",
+      "size": "L"
+    }
+  },
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Mint Cake",
+      "pastry_category": "CAKE",
+      "pastry_price": "500.00",
+      "image": "images/mint_cake.png",
+      "is_available": true,
+      "flavour": "Mint",
+      "filling": "Chocolate Cream",
+      "frosting": "Mint Buttercream",
+      "decoration": "Chocolate Drizzle",
+      "message": "",
+      "size": "L"
+    }
+  },
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Chocolate Cake",
+      "pastry_category": "CAKE",
+      "pastry_price": "1750.00",
+      "image": "images/chocolate_cake.png",
+      "is_available": true,
+      "flavour": "Chocolate",
+      "filling": "Chocolate Ganache",
+      "frosting": "Dark Chocolate",
+      "decoration": "Choco Curls",
+      "message": "",
+      "size": "L"
+    }
+  },
+
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Strawberry Brownie",
+      "pastry_category": "BROWNIE",
+      "pastry_price": "500.00",
+      "image": "images/strawberry_brownie.png",
+      "is_available": true,
+      "flavour": "Chocolate strawberry",
+      "filling": "",
+      "frosting": "Dark Chocolate Glaze",
+      "decoration": "Fresh Strawberries",
+      "message": "",
+      "size": "M"
+    }
+  },
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Coffee Chocolate Nutty Brownie",
+      "pastry_category": "BROWNIE",
+      "pastry_price": "750.00",
+      "image": "images/chocolate_brownie.png",
+      "is_available": true,
+      "flavour": "Chocolate coffee",
+      "filling": "Almond",
+      "frosting": "",
+      "decoration": "",
+      "message": "",
+      "size": "M"
+    }
+  },
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Raspberry Fudgy Brownie",
+      "pastry_category": "BROWNIE",
+      "pastry_price": "850.00",
+      "image": "images/rasberry_brownie.png",
+      "is_available": true,
+      "flavour": "Chocolate Raspberry",
+      "filling": "",
+      "frosting": "Icing Sugar",
+      "decoration": "Raspberry Pieces",
+      "message": "",
+      "size": "M"
+    }
+  },
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Vanilla Brownie",
+      "pastry_category": "BROWNIE",
+      "pastry_price": "600.00",
+      "image": "images/vanilla_brownie.png",
+      "is_available": true,
+      "flavour": "Vanilla",
+      "filling": "",
+      "frosting": "",
+      "decoration": "Rasberry",
+      "message": "",
+      "size": "S"
+    }
+  },
+
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Raspberry Cupcake",
+      "pastry_category": "CUPCAKE",
+      "pastry_price": "450.00",
+      "image": "images/rasberry_cupcake.png",
+      "is_available": true,
+      "flavour": "Raspberry",
+      "filling": "Vanilla Cream",
+      "frosting": "Whipped Cream",
+      "decoration": "Fresh Raspberries",
+      "message": "",
+      "size": "S"
+    }
+  },
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Chocolate Cupcake",
+      "pastry_category": "CUPCAKE",
+      "pastry_price": "900.00",
+      "image": "images/chocolate_cupcake.png",
+      "is_available": true,
+      "flavour": "Chocolate",
+      "filling": "Chocolate Ganache",
+      "frosting": "Dark Chocolate",
+      "decoration": "Cocoa Dust",
+      "message": "",
+      "size": "M"
+    }
+  },
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Oreo Cupcake",
+      "pastry_category": "CUPCAKE",
+      "pastry_price": "500.00",
+      "image": "images/oreo_cupcake.png",
+      "is_available": true,
+      "flavour": "Chocolate",
+      "filling": "Oreo Cream",
+      "frosting": "Oreo Buttercream",
+      "decoration": "Mini Oreo",
+      "message": "",
+      "size": "M"
+    }
+  },
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Strawberry Cupcake",
+      "pastry_category": "CUPCAKE",
+      "pastry_price": "600.00",
+      "image": "images/strawberry_cupcake.png",
+      "is_available": true,
+      "flavour": "Strawberry",
+      "filling": "Strawberry Jam",
+      "frosting": "Buttercream",
+      "decoration": "Pink Swirl Frosting",
+      "message": "",
+      "size": "S"
+    }
+  },
+
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Chocolate Chip Cookie",
+      "pastry_category": "COOKIE",
+      "pastry_price": "450.00",
+      "image": "images/chocolatechip_cookie.png",
+      "is_available": true,
+      "flavour": "Chocolate Chip",
+      "filling": "",
+      "frosting": "",
+      "decoration": "Chocolate Chips",
+      "message": "",
+      "size": "S"
+    }
+  },
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Oat Cookie",
+      "pastry_category": "COOKIE",
+      "pastry_price": "400.00",
+      "image": "images/oat_cookie.png",
+      "is_available": true,
+      "flavour": "Chocolate",
+      "filling": "",
+      "frosting": "",
+      "decoration": "Rolled Oats",
+      "message": "",
+      "size": "S"
+    }
+  },
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Jam cookie ring",
+      "pastry_category": "COOKIE",
+      "pastry_price": "500.00",
+      "image": "images/fruit_cookie.png",
+      "is_available": true,
+      "flavour": "Mixed Fruit",
+      "filling": "Fruit Jam",
+      "frosting": "",
+      "decoration": "Fresh Fruits",
+      "message": "",
+      "size": "S"
+    }
+  },
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Smarties Cookie",
+      "pastry_category": "COOKIE",
+      "pastry_price": "425.00",
+      "image": "images/smarties_cookie.png",
+      "is_available": true,
+      "flavour": "Vanilla",
+      "filling": "",
+      "frosting": "",
+      "decoration": "Smarties",
+      "message": "",
+      "size": "S"
+    }
+  },
+ {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Strawberry Donut",
+      "pastry_category": "DONUT",
+      "pastry_price": "400.00",
+      "image": "images/strawberry_donut.png",
+      "is_available": true,
+      "flavour": "Strawberry",
+      "filling": "Strawberry Jam",
+      "frosting": "Strawberry Glaze",
+      "decoration": "Fresh Strawberry Slice",
+      "message": "",
+      "size": "S"
+    }
+  },
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Chocolate Donut",
+      "pastry_category": "DONUT",
+      "pastry_price": "450.00",
+      "image": "images/chocolate_donut.png",
+      "is_available": true,
+      "flavour": "Chocolate",
+      "filling": "Chocolate Ganache",
+      "frosting": "Dark Chocolate Glaze",
+      "decoration": "Cocoa Dust",
+      "message": "",
+      "size": "S"
+    }
+  },
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Vanilla Donut",
+      "pastry_category": "DONUT",
+      "pastry_price": "425.00",
+      "image": "images/vanilla_donut.png",
+      "is_available": true,
+      "flavour": "Vanilla",
+      "filling": "Vanilla Cream",
+      "frosting": "Vanilla Glaze",
+      "decoration": "Sugar Drizzle",
+      "message": "",
+      "size": "S"
+    }
+  },
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Cinnamon Sugar Donut",
+      "pastry_category": "DONUT",
+      "pastry_price": "350.00",
+      "image": "images/cinnamonsugar_donut.png",
+      "is_available": true,
+      "flavour": "Cinnamon",
+      "filling": "",
+      "frosting": "",
+      "decoration": "Cinnamon Sugar",
+      "message": "",
+      "size": "S"
+    }
+  },
+
+ {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Cranberry Tart",
+      "pastry_category": "TART",
+      "pastry_price": "450.00",
+      "image": "images/cranberry_tart.png",
+      "is_available": true,
+      "flavour": "Cranberry",
+      "filling": "Vanilla Cream",
+      "frosting": "",
+      "decoration": "Fresh Cranberries, strawberry and Mint",
+      "message": "",
+      "size": "S"
+    }
+  },
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Vanilla Tart",
+      "pastry_category": "TART",
+      "pastry_price": "375.00",
+      "image": "images/vanilla_tart.png",
+      "is_available": true,
+      "flavour": "Vanilla",
+      "filling": "Vanilla Custard",
+      "frosting": "",
+      "decoration": "Assorted Berries",
+      "message": "",
+      "size": "S"
+    }
+  },
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Red Fruits Tart",
+      "pastry_category": "TART",
+      "pastry_price": "400.00",
+      "image": "images/redfruit_tart.png",
+      "is_available": true,
+      "flavour": "Mixed Red Fruits",
+      "filling": "Vanilla Custard",
+      "frosting": "",
+      "decoration": "Red Berries Mix",
+      "message": "",
+      "size": "S"
+    }
+  },
+  {
+    "model": "pastry.pastry",
+    "fields": {
+      "pastry_name": "Banana Tart",
+      "pastry_category": "TART",
+      "pastry_price": "350.00",
+      "image": "images/banana_tart.png",
+      "is_available": true,
+      "flavour": "Banana",
+      "filling": "Caramel Cream",
+      "frosting": "",
+      "decoration": "Banana Slices",
+      "message": "",
+      "size": "M"
+    }
+  }
+]
