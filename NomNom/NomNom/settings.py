@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "profile_page.apps.ProfilePageConfig",
 ]
 
 AUTH_USER_MODEL = "login.User"
@@ -145,6 +146,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "static/"
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # global directory of where the static files are found ( in project )
 STATICFILES_DIRS = [

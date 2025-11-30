@@ -12,10 +12,11 @@
       <li><a href="{% url 'landing:landing' %}">Home</a></li>
       <li><a href="{% url 'about_us:about' %}">About Us</a></li>
 
-      {% if user.is_authenticated %} {% if user.is_staff or user.is_superuser %}
+      {% if user.is_authenticated %}
+      <li><a href="{% url 'profile_page:profile' %}">Profile</a></li>
+      {% if user.is_staff or user.is_superuser %}
       <li><a href="/admin/">Admin Page</a></li>
       {% endif %}
-
       <li><a href="{% url 'login:logout' %}">Log Out</a></li>
       {% else %}
       <li><a href="{% url 'login:login' %}">Log in</a></li>

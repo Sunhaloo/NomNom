@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Profile{% endblock %}
+
+{% block extra_css %}
+<link href="{% static 'profile_page/style.css' %}" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+<div class="profile-container">
+    <div class="profile-card">
+        <div class="profile-header">
+            {% if user.profile_pic %}
+                <img src="{{ user.profile_pic.url }}"
+                     class="profile-pic image-hover"
+                     alt="Profile picture">
+            {% else %}
+                <img src="{% static 'images/default_profile.png' %}"
+                     class="profile-pic"
+                     alt="Default profile picture">
+            {% endif %}
+
+            <h2 class="profile-name">
+                {% if user.full_name %}{{ user.full_name }}{% else %}{{ user.first_name }} {{ user.last_name }}{% endif %}
+            </h2>
+        </div>
+
+        <div class="profile-info">
+            <p class="profile-field"><strong>Username:</strong> {{ user.username }}</p>
+            <p class="profile-field"><strong>Email:</strong> {{ user.email }}</p>
+            <p class="profile-field"><strong>Gender:</strong> {% if user.gender %}{{ user.get_gender_display }}{% else %}Not provided{% endif %}</p>
+            <p class="profile-field"><strong>Region:</strong> {{ user.region }}</p>
+            <p class="profile-field"><strong>Street:</strong> {{ user.street }}</p>
+        </div>
+
+        <div class="profile-actions">
+            <a href="{% url 'profile_page:edit' %}" class="hover-grow-shadow edit-btn">
+                Edit Profile
+            </a>
+            <a href="{% url 'profile_page:clear_pfp' %}" class="hover-grow-shadow clear-btn"
+               onclick="return confirm('Clear profile picture?')">
+                Clear Profile Picture
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
