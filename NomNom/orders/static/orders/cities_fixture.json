@@ -1,0 +1,954 @@
+[
+  {
+    "model": "orders.city",
+    "pk": 1,
+    "fields": {
+      "name": "Port Louis"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 2,
+    "fields": {
+      "name": "Curepipe"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 3,
+    "fields": {
+      "name": "Vacoas"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 4,
+    "fields": {
+      "name": "Quatre Bornes"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 5,
+    "fields": {
+      "name": "Rose Hill"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 6,
+    "fields": {
+      "name": "Beau Bassin"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 7,
+    "fields": {
+      "name": "Phoenix"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 8,
+    "fields": {
+      "name": "Grand Baie"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 9,
+    "fields": {
+      "name": "Flic en Flac"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 10,
+    "fields": {
+      "name": "Tamarin"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 11,
+    "fields": {
+      "name": "Mahebourg"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 12,
+    "fields": {
+      "name": "Goodlands"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 13,
+    "fields": {
+      "name": "Triolet"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 14,
+    "fields": {
+      "name": "Rose Belle"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 15,
+    "fields": {
+      "name": "Chemin Grenier"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 16,
+    "fields": {
+      "name": "Riviere du Rempart"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 17,
+    "fields": {
+      "name": "Lallmatie"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 18,
+    "fields": {
+      "name": "Plaine Magnien"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 19,
+    "fields": {
+      "name": "Pailles"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 20,
+    "fields": {
+      "name": "Surinam"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 21,
+    "fields": {
+      "name": "Le Hochet"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 22,
+    "fields": {
+      "name": "Montagne Blanche"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 23,
+    "fields": {
+      "name": "Grand Gaube"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 24,
+    "fields": {
+      "name": "Petit Raffray"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 25,
+    "fields": {
+      "name": "Baie du Tombeau"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 26,
+    "fields": {
+      "name": "Bambous"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 27,
+    "fields": {
+      "name": "Bambous Virieux"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 28,
+    "fields": {
+      "name": "Bananes"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 29,
+    "fields": {
+      "name": "Beau Vallon"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 30,
+    "fields": {
+      "name": "Bel Air Riviere Seche"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 31,
+    "fields": {
+      "name": "Bel Ombre"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 32,
+    "fields": {
+      "name": "Belle Vue Maurel"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 33,
+    "fields": {
+      "name": "Benares"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 34,
+    "fields": {
+      "name": "Bois Cheri"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 35,
+    "fields": {
+      "name": "Bois des Amourettes"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 36,
+    "fields": {
+      "name": "Bon Accueil"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 37,
+    "fields": {
+      "name": "Bramsthan"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 38,
+    "fields": {
+      "name": "Bris\u00c3\u00a9e Verdi\u00c3\u00a8re"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 39,
+    "fields": {
+      "name": "Britannia"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 40,
+    "fields": {
+      "name": "Camp Chapelon"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 41,
+    "fields": {
+      "name": "Camp de Masque"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 42,
+    "fields": {
+      "name": "Camp de Masque Pav\u00c3\u00a9"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 43,
+    "fields": {
+      "name": "Camp Diable"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 44,
+    "fields": {
+      "name": "Camp Ithier"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 45,
+    "fields": {
+      "name": "Camp Thorel"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 46,
+    "fields": {
+      "name": "Cap Malheureux"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 47,
+    "fields": {
+      "name": "Cascavelle"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 48,
+    "fields": {
+      "name": "Case Noyale"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 49,
+    "fields": {
+      "name": "Chamarel"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 50,
+    "fields": {
+      "name": "Chamouny"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 51,
+    "fields": {
+      "name": "Cluny"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 52,
+    "fields": {
+      "name": "Congomah"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 53,
+    "fields": {
+      "name": "Cottage"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 54,
+    "fields": {
+      "name": "Cr\u00c3\u00a8ve Coeur"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 55,
+    "fields": {
+      "name": "D'Epinay"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 56,
+    "fields": {
+      "name": "Dagoti\u00c3\u00a8re"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 57,
+    "fields": {
+      "name": "Dubreuil"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 58,
+    "fields": {
+      "name": "Ecroignard"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 59,
+    "fields": {
+      "name": "Esp\u00c3\u00a9rance Tr\u00c3\u00a9buchet"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 60,
+    "fields": {
+      "name": "Flic en Flac"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 61,
+    "fields": {
+      "name": "Fond du Sac"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 62,
+    "fields": {
+      "name": "Grand Bel Air"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 63,
+    "fields": {
+      "name": "Grand Bois"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 64,
+    "fields": {
+      "name": "Grand Gaube"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 65,
+    "fields": {
+      "name": "Grand River South East"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 66,
+    "fields": {
+      "name": "Grande Retraite"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 67,
+    "fields": {
+      "name": "Grande Riviere Noire"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 68,
+    "fields": {
+      "name": "Gros Cailloux"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 69,
+    "fields": {
+      "name": "L'Avenir"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 70,
+    "fields": {
+      "name": "L'Escalier"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 71,
+    "fields": {
+      "name": "La Flora"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 72,
+    "fields": {
+      "name": "La Gaulette"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 73,
+    "fields": {
+      "name": "La Laura-Malenga"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 74,
+    "fields": {
+      "name": "Lalmatie"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 75,
+    "fields": {
+      "name": "Laventure"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 76,
+    "fields": {
+      "name": "Le Morne"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 77,
+    "fields": {
+      "name": "Long Mountain"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 78,
+    "fields": {
+      "name": "Mare Chicose"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 79,
+    "fields": {
+      "name": "Mare d'Albert"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 80,
+    "fields": {
+      "name": "Mare La Chaux"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 81,
+    "fields": {
+      "name": "Mare Tabac"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 82,
+    "fields": {
+      "name": "Melrose"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 83,
+    "fields": {
+      "name": "Midlands"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 84,
+    "fields": {
+      "name": "Moka"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 85,
+    "fields": {
+      "name": "Montagne Longue"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 86,
+    "fields": {
+      "name": "Morcellement Saint Andre"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 87,
+    "fields": {
+      "name": "New Grove"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 88,
+    "fields": {
+      "name": "Notre Dame"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 89,
+    "fields": {
+      "name": "Nouvelle Decouverte"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 90,
+    "fields": {
+      "name": "Nouvelle France"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 91,
+    "fields": {
+      "name": "Olivia"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 92,
+    "fields": {
+      "name": "Pamplemousses"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 93,
+    "fields": {
+      "name": "Petit Bel Air"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 94,
+    "fields": {
+      "name": "Petit Raffray"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 95,
+    "fields": {
+      "name": "Petite Riviere"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 96,
+    "fields": {
+      "name": "Piton"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 97,
+    "fields": {
+      "name": "Plaine des Papayes"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 98,
+    "fields": {
+      "name": "Plaine des Roches"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 99,
+    "fields": {
+      "name": "Pointe aux Cannoniers"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 100,
+    "fields": {
+      "name": "Pointe aux Piments"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 101,
+    "fields": {
+      "name": "Poste de Flacq"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 102,
+    "fields": {
+      "name": "Poudre d'Or"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 103,
+    "fields": {
+      "name": "Poudre d'Or Hamlet"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 104,
+    "fields": {
+      "name": "Providence"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 105,
+    "fields": {
+      "name": "Quartier Militaire"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 106,
+    "fields": {
+      "name": "Quatre Cocos"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 107,
+    "fields": {
+      "name": "Quatre Soeurs"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 108,
+    "fields": {
+      "name": "Queen Victoria"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 109,
+    "fields": {
+      "name": "Richelieu"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 110,
+    "fields": {
+      "name": "Ripailles"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 111,
+    "fields": {
+      "name": "Riviere des Anguilles"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 112,
+    "fields": {
+      "name": "Riviere des Creoles"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 113,
+    "fields": {
+      "name": "Riviere du Poste"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 114,
+    "fields": {
+      "name": "Riviere du Rempart"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 115,
+    "fields": {
+      "name": "Riviere Noire"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 116,
+    "fields": {
+      "name": "Roche Terre"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 117,
+    "fields": {
+      "name": "Roches Noires"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 118,
+    "fields": {
+      "name": "Saint Aubin"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 119,
+    "fields": {
+      "name": "Saint Hubert"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 120,
+    "fields": {
+      "name": "Saint Julien d'Hotman"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 121,
+    "fields": {
+      "name": "Saint Pierre"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 122,
+    "fields": {
+      "name": "Sebastopol"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 123,
+    "fields": {
+      "name": "Souillac"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 124,
+    "fields": {
+      "name": "Surinam"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 125,
+    "fields": {
+      "name": "Tamarin"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 126,
+    "fields": {
+      "name": "Terre Rouge"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 127,
+    "fields": {
+      "name": "The Vale"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 128,
+    "fields": {
+      "name": "Triolet"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 129,
+    "fields": {
+      "name": "Trois Boutiques"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 130,
+    "fields": {
+      "name": "Trou aux Biches"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 131,
+    "fields": {
+      "name": "Trou d'Eau Douce"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 132,
+    "fields": {
+      "name": "Tyack"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 133,
+    "fields": {
+      "name": "Union Park"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 134,
+    "fields": {
+      "name": "Vale"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 135,
+    "fields": {
+      "name": "Ville Bague"
+    }
+  },
+  {
+    "model": "orders.city",
+    "pk": 136,
+    "fields": {
+      "name": "Wooton"
+    }
+  }
+]

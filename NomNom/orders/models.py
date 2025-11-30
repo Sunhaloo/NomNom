@@ -4,7 +4,7 @@ from pastry.models import Pastry
 
 class Order(models.Model):
     order_id = models.AutoField(primary_key=True)
-    customer_id = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     order_date = models.DateTimeField(auto_now_add=True)
     pickup_date = models.DateTimeField(null=True, blank=True)
     order_status = models.CharField(
@@ -16,7 +16,7 @@ class Order(models.Model):
     is_preorder = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Order {self.order_id} - {self.customer_id.username}"
+        return f"Order {self.order_id} - {self.user_id.username}"
 
     def calculate_total(self):
         total = sum(detail.price * detail.quantity for detail in self.orderdetails.all())
