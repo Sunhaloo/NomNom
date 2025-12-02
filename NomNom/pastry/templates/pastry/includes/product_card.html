@@ -1,5 +1,5 @@
 {% load static %}
-<div class="product-card" data-product="{{ product.pastry_name }}" data-pastry-id="{{ product.id }}"></div>
+<div class="product-card" data-product="{{ product.pastry_name }}" data-pastry-id="{{ product.id }}">
     <div class="product-image">
         {% if product.image %}
         <img src="{% static product.image %}" alt="{{ product.pastry_name }}">
@@ -35,7 +35,7 @@
             <button class="btn btn-add-cart"
                 onclick="addToCartWithQuantity(event, '{{ product.pastry_name }}', '{{ product.pastry_price }}', '{{ product.image }}', '{{ db_category }}')">Add
                 to Cart</button>
-            <button class="btn btn-review" onclick="openReviewModal(event, '{{ product.id }}')">Reviews</button>
+            <button class="btn btn-review" onclick="openReviewModal('{{ product.pastry_name }}')">Reviews</button>
         </div>
     </div>
 </div>
