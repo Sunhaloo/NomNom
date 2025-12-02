@@ -16,8 +16,8 @@ ENV/
 *.log
 db.sqlite3
 db.sqlite3-journal
-/media
-/staticfiles
+media/
+staticfiles/
 
 # IDE
 .vscode/
@@ -33,7 +33,3 @@ Thumbs.db
 # Environment variables
 .env
 .env.local
-
-# Migrations (optional - some teams commit these)
-# */migrations/*.py
-# !*/migrations/__init__.py
