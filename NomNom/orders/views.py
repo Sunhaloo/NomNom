@@ -6,6 +6,7 @@ from django.conf import settings
 
 from cart.models import Cart
 from .models import Order, OrderDetail
+from delivery.models import Delivery
 
 from pathlib import Path
 import json
@@ -97,7 +98,7 @@ def checkout(request):
     # Handle form POST → create the order
     if request.method == "POST":
         order = Order.objects.create(
-            customer=request.user,
+            user=request.user,
             order_date=timezone.now(),
             total_amount=cart.total_price,
             order_status="Pending",
@@ -112,6 +113,54 @@ def checkout(request):
                 price=item.pastry.pastry_price,
                 quantity=item.quantity
             )
+        # Create delivery record from form data
+        # Extract delivery information from form (this needs to come from the checkout form)
+        delivery_address = f"{request.POST.get('firstName', '')} {request.POST.get('lastName', '')}, {request.POST.get('address', '')}, {request.POST.get('city', '')}, {request.POST.get('zip', '')}, {request.POST.get('country', 'Mauritius')}"
+
+        # Determine delivery date (for now, assume next day for express delivery)
+        from datetime import timedelta
+        delivery_date = timezone.now().date() + timedelta(days=1)  # Default to tomorrow
+
+        # Check if delivery date was provided in the form
+        selected_date = request.POST.get('deliveryDate')
+        if selected_date:
+            try:
+                from datetime import datetime
+                delivery_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
+            except ValueError:
+                # If parsing fails, keep the default date
+                pass
+
+        Delivery.objects.create(
+            order=order,
+            address=delivery_address,
+            date=delivery_date,
+            status='Pending'  # Default status
+        )
+        # Create delivery record from form data
+        # Extract delivery information from form (this needs to come from the checkout form)
+        delivery_address = f"{request.POST.get('firstName', '')} {request.POST.get('lastName', '')}, {request.POST.get('address', '')}, {request.POST.get('city', '')}, {request.POST.get('zip', '')}, {request.POST.get('country', 'Mauritius')}"
+
+        # Determine delivery date (for now, assume next day for express delivery)
+        from datetime import timedelta
+        delivery_date = timezone.now().date() + timedelta(days=1)  # Default to tomorrow
+
+        # Check if delivery date was provided in the form
+        selected_date = request.POST.get('deliveryDate')
+        if selected_date:
+            try:
+                from datetime import datetime
+                delivery_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
+            except ValueError:
+                # If parsing fails, keep the default date
+                pass
+
+        Delivery.objects.create(
+            order=order,
+            address=delivery_address,
+            date=delivery_date,
+            status='Pending'  # Default status
+        )
 
         # Clear cart
         cart.items.all().delete()
@@ -126,4 +175,5 @@ def checkout(request):
         "cart_json": cart_json,
         "total": cart.total_price,
         "cities": cities,
+        "user_profile": request.user  # Pass user profile data to template
     })

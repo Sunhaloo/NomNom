@@ -3,6 +3,10 @@
 
 {% block title %}Delivery #{{ delivery.id }}{% endblock %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'delivery/delivery.css' %}">
+{% endblock %}
+
 {% block content %}
 <section class="page-section">
   <div class="container detail-box">
@@ -12,7 +16,7 @@
     <p><strong>Delivery ID:</strong> #{{ delivery.id }}</p>
     <p><strong>Order ID:</strong> #{{ delivery.order.id }}</p>
     <p><strong>Address:</strong> {{ delivery.address }}</p>
-    <p><strong>Status:</strong> 
+    <p><strong>Status:</strong>
       {% if delivery.status == 'Pending' %}
         <span class="badge badge-warning">{{ delivery.status }}</span>
       {% elif delivery.status == 'Done' %}
@@ -31,20 +35,4 @@
     </div>
   </div>
 </section>
-
-<style>
-.detail-box {
-  max-width: 600px;
-  margin: 0 auto;
-  background: #fff8f3;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-}
-.detail-box p { font-size: 1.1rem; margin-bottom: 10px; }
-.actions { margin-top: 20px; }
-.badge-warning { background-color: #f4b400; color: #fff; }
-.badge-success { background-color: #0f9d58; color: #fff; }
-.badge-danger { background-color: #db4437; color: #fff; }
-</style>
 {% endblock %}

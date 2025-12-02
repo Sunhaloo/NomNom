@@ -1,13 +1,7 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block body_class %}brown-background{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'pastry/style.css' %}">
-{% endblock %}
-
-{% block content %}
+{% extends 'base.html' %} {% load static %} {% block body_class
+%}brown-background{% endblock %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'pastry/style.css' %}" />
+{% endblock %} {% block content %}
 <div class="pastry-category-wrapper">
   {% csrf_token %}
   <header class="category-header">
@@ -17,9 +11,21 @@
   </header>
 
   {% if messages %}
-  <div class="messages" style="margin-bottom: 20px; max-width: 1200px; margin: 0 auto;">
+  <div
+    class="messages"
+    style="margin-bottom: 20px; max-width: 1200px; margin: 0 auto"
+  >
     {% for message in messages %}
-    <div class="alert" style="padding: 10px; background: white; border-radius: 5px; margin-bottom: 10px;">{{ message }}
+    <div
+      class="alert"
+      style="
+        padding: 10px;
+        background: white;
+        border-radius: 5px;
+        margin-bottom: 10px;
+      "
+    >
+      {{ message }}
     </div>
     {% endfor %}
   </div>
@@ -31,9 +37,8 @@
       <span>Back</span>
     </a>
     <section class="products">
-      {% for product in products %}
-      {% include 'pastry/includes/product_card.html' %}
-      {% endfor %}
+      {% for product in products %} {% include
+      'pastry/includes/product_card.html' %} {% endfor %}
     </section>
   </main>
 
@@ -52,7 +57,9 @@
               <div class="summary-stars" id="summaryStars">
                 <!-- Stars injected by JS -->
               </div>
-              <div class="summary-count" id="summaryCount">Based on 0 reviews</div>
+              <div class="summary-count" id="summaryCount">
+                Based on 0 reviews
+              </div>
             </div>
           </div>
 
@@ -62,22 +69,29 @@
 
           <div class="add-review">
             <h3>Add Your Review</h3>
-            <form id="reviewForm" data-user-authenticated="{{ request.user.is_authenticated|lower }}"
-              data-username="{{ request.user.username }}">
-              <div class="form-group">
-                <label class="form-label">Rating</label>
-                <div class="rating-input" id="ratingInput">
-                  <i class="fas fa-star star" data-rating="1"></i>
-                  <i class="fas fa-star star" data-rating="2"></i>
-                  <i class="fas fa-star star" data-rating="3"></i>
-                  <i class="fas fa-star star" data-rating="4"></i>
-                  <i class="fas fa-star star" data-rating="5"></i>
-                </div>
+            <!--<p>Debug: product = {{ product }}, product.id = {{ product.id }}</p> -->
+            <form
+              id="reviewForm"
+              method="POST"
+              action="#"
+              data-user-authenticated="{{ request.user.is_authenticated|lower }}"
+              data-username="{{ request.user.username }}"
+            >
+              {% csrf_token %}
+              <div class="rating-input" id="ratingInput">
+                <i class="fas fa-star star" data-rating="1"></i>
+                <i class="fas fa-star star" data-rating="2"></i>
+                <i class="fas fa-star star" data-rating="3"></i>
+                <i class="fas fa-star star" data-rating="4"></i>
+                <i class="fas fa-star star" data-rating="5"></i>
               </div>
-              <div class="form-group">
-                <label class="form-label">Your Review</label>
-                <textarea class="form-control" id="reviewText" rows="4" required></textarea>
-              </div>
+              <textarea
+                id="reviewText"
+                name="comment"
+                rows="4"
+                required
+              ></textarea>
+              <input type="hidden" id="ratingValue" name="rating" value="0" />
               <button type="submit" class="btn-submit">Submit Review</button>
             </form>
           </div>
@@ -90,7 +104,6 @@
   <div id="notification" class="notification">
     <span id="notificationText">Review added successfully!</span>
   </div>
-
 </div>
 
 <script src="{% static 'pastry/script.js' %}"></script>

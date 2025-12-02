@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import User
 from orders.models import Order
 
 class Delivery(models.Model):
@@ -9,6 +8,8 @@ class Delivery(models.Model):
     date = models.DateField()
     #These are temporary placeholders for the actual fields, I dunno how to access them.
 
-    
-    
-# Create your models here.
+    class Meta:
+        verbose_name_plural = "Deliveries"
+
+    def __str__(self):
+        return f"Delivery #{self.id} for Order #{self.order.id}"
