@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     "orders.apps.OrdersConfig",
     # add our specific payment application
     "payments.apps.PaymentsConfig",
-    "review",
+    "review.apps.ReviewConfig",
     "delivery.apps.DeliveryConfig",
     "django.contrib.admin",
     "django.contrib.auth",

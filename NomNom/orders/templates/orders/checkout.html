@@ -9,6 +9,13 @@
     <link rel="stylesheet" href="{% static 'orders/order.css' %}">
 {% endblock %}
 
+{% block extra_js %}
+    <script>
+        // Initialize cart data from backend
+        window.initialCartData = {{ cart_json|safe }};
+    </script>
+{% endblock %}
+
 {% block content %}
 {% include 'partials/progress_bar.html' %}
 <script> window.currentStep = 2; </script>
@@ -29,7 +36,7 @@
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="email">Email Address</label>
-                                <input type="email" id="email" placeholder="aisha@example.com" required>
+                                <input type="email" id="email" value="{{ user_profile.email }}" placeholder="aisha@example.com" required>
                                 <div class="error-message" id="email-error"></div>
                             </div>
 
@@ -49,13 +56,13 @@
 
                             <div class="form-group">
                                 <label for="firstName">First Name</label>
-                                <input type="text" id="firstName" required>
+                                <input type="text" id="firstName" value="{{ user_profile.first_name|default:'' }}" required>
                                 <div class="error-message" id="firstName-error"></div>
                             </div>
 
                             <div class="form-group">
                                 <label for="lastName">Last Name</label>
-                                <input type="text" id="lastName" required>
+                                <input type="text" id="lastName" value="{{ user_profile.last_name|default:'' }}" required>
                                 <div class="error-message" id="lastName-error"></div>
                             </div>
 
@@ -67,7 +74,7 @@
 
                             <div class="form-group">
                                 <label for="city">City / Town</label>
-                                <input type="text" id="city" list="city-list" placeholder="Select or type city" required>
+                                <input type="text" id="city" list="city-list" placeholder="Select or type city" value="{{ user_profile.region|default:'' }}" required>
 
                                 <datalist id="city-list">
                                     {% include 'orders/city_list.html' %}
