@@ -5,4 +5,5 @@ app_name = 'orders'
 
 urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
+    path('confirmation/<int:order_id>/', views.order_confirmation, name='order_confirmation'),
 ]

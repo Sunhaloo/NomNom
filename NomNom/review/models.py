@@ -8,10 +8,10 @@ class Review(models.Model):
     pastry = models.ForeignKey(Pastry, on_delete=models.CASCADE)
     rating = models.IntegerField()
     comment = models.TextField()
-    date = models.DateTimeField(auto_now_add= True)
+    date = models.DateTimeField(auto_now_add=True)
 
-class Meta:
-    unique_together = ('user', 'pastry') 
-    
-def __str__(self):
-    return f"{self.user.username} - {self.rating}"
+    class Meta:
+        unique_together = ('user', 'pastry')
+
+    def __str__(self):
+        return f"{self.user.username} - {self.rating}"

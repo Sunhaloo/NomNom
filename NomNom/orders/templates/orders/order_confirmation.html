@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order Confirmation - Nomnom{% endblock %}
+
+{% block body_class %}white-navbar-brown-bg{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'orders/order.css' %}">
+    <style>
+        .confirmation-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .confirmation-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #8B4513;
+        }
+        
+        .confirmation-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .confirmation-header .order-id {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        .confirmation-content {
+            display: grid;
+            gap: 2rem;
+        }
+        
+        .order-details, .delivery-info {
+            background: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #8B4513;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #d9a384;
+        }
+        
+        .pastry-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .pastry-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .pastry-item:last-child {
+            border-bottom: none;
+        }
+        
+        .pastry-name { font-weight: bold; }
+        .pastry-quantity { color: #666; }
+        .pastry-extra { font-size: 0.9em; color: #777; display: block; }
+        .pastry-price { font-weight: bold; color: #8B4513; }
+        
+        .delivery-address {
+            white-space: pre-line;
+            line-height: 1.6;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.5rem 0;
+            padding: 0.5rem 0;
+        }
+        
+        .summary-total {
+            border-top: 2px solid #d9a384;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .continue-shopping-btn {
+            display: block;
+            width: 200px;
+            margin: 2rem auto 0;
+            text-align: center;
+            background: #8B4513;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .continue-shopping-btn:hover {
+            background: #a0522d;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="confirmation-container">
+    <div class="confirmation-header">
+        <h1>Order Confirmed!</h1>
+        <p class="order-id">Order #{{ order.id }}</p>
+        <p>Thank you for your purchase. Your order details are shown below.</p>
+    </div>
+
+    <div class="confirmation-content">
+        <div class="order-details">
+            <h2 class="section-title">Order Details</h2>
+            <ul class="pastry-list">
+                {% for detail in order_details %}
+                <li class="pastry-item">
+                    <div class="pastry-info">
+                        <span class="pastry-name">{{ detail.pastry.pastry_name }}</span>
+                        <span class="pastry-quantity">× {{ detail.quantity }}</span>
+                        {% if detail.pastry.flavour %}
+                            <span class="pastry-extra">Flavour: {{ detail.pastry.flavour }}</span>
+                        {% endif %}
+                        {% if detail.pastry.size %}
+                            <span class="pastry-extra">Size: {{ detail.pastry.get_size_display }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="pastry-price">Rs.{{ detail.price|floatformat:2 }} each</div>
+                </li>
+                {% endfor %}
+            </ul>
+            
+            <div class="summary-row">
+                <span>Subtotal (Pastries):</span>
+                <span>Rs.{{ order.total_amount|floatformat:2 }}</span>
+            </div>
+
+            <div class="summary-row">
+                <span>Delivery:</span>
+                <span>Free</span>
+            </div>
+
+            <div class="summary-row summary-total">
+                <span>Order Total:</span>
+                <span>Rs.{{ order.total_amount|floatformat:2 }}</span>
+            </div>
+        </div>
+
+        <div class="delivery-info">
+            <h2 class="section-title">Delivery Information</h2>
+            {% if delivery and delivery.address %}
+                <p><strong>Delivery Address:</strong></p>
+                <p class="delivery-address">{{ delivery.address }}</p>
+            {% else %}
+                <p><strong>Delivery Address:</strong></p>
+                <p class="delivery-address">
+                    {% if user_profile.street %}{{ user_profile.street }}{% endif %}
+                    {% if user_profile.region %}, {{ user_profile.region }}{% endif %}
+                </p>
+                <p><em>Address based on your profile information</em></p>
+            {% endif %}
+
+            {% if delivery %}
+                <p><strong>Delivery Date:</strong> {{ delivery.date|date:"F d, Y" }}</p>
+                <p><strong>Delivery Status:</strong> {{ delivery.status }}</p>
+            {% else %}
+                <p><strong>Delivery Date:</strong> Not specified</p>
+                <p><strong>Delivery Status:</strong> Not specified</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <a href="{% url 'landing:landing' %}" class="continue-shopping-btn">Continue Shopping</a>
+</div>
+{% endblock %}

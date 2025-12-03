@@ -54,11 +54,8 @@ INSTALLED_APPS = [
     "orders.apps.OrdersConfig",
     # add our specific payment application
     "payments.apps.PaymentsConfig",
-<<<<<<< HEAD
-=======
     "review.apps.ReviewConfig",
     "delivery.apps.DeliveryConfig",
->>>>>>> origin/milind
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

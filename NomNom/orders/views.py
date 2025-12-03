@@ -115,31 +115,40 @@ def checkout(request):
             )
         # Create delivery record from form data
         # Extract delivery information from form (this needs to come from the checkout form)
-        delivery_address = f"{request.POST.get('firstName', '')} {request.POST.get('lastName', '')}, {request.POST.get('address', '')}, {request.POST.get('city', '')}, {request.POST.get('zip', '')}, {request.POST.get('country', 'Mauritius')}"
+        first_name = request.POST.get('firstName', '').strip()
+        last_name = request.POST.get('lastName', '').strip()
+        street_address = request.POST.get('address', '').strip()
+        city = request.POST.get('city', '').strip()
+        zip_code = request.POST.get('zip', '').strip()
+        country = request.POST.get('country', 'Mauritius').strip()
 
-        # Determine delivery date (for now, assume next day for express delivery)
-        from datetime import timedelta
-        delivery_date = timezone.now().date() + timedelta(days=1)  # Default to tomorrow
+        # If form fields are empty, fallback to user profile information
+        user = request.user
+        if not first_name:
+            first_name = user.first_name
+        if not last_name:
+            last_name = user.last_name
+        if not street_address:
+            street_address = getattr(user, 'street', '')
+        if not city:
+            city = getattr(user, 'region', '')
 
-        # Check if delivery date was provided in the form
-        selected_date = request.POST.get('deliveryDate')
-        if selected_date:
-            try:
-                from datetime import datetime
-                delivery_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
-            except ValueError:
-                # If parsing fails, keep the default date
-                pass
+        # Build address with proper formatting, skipping empty parts
+        address_parts = []
+        if first_name or last_name:
+            name_part = f"{first_name} {last_name}".strip()
+            if name_part:
+                address_parts.append(name_part)
+        if street_address:
+            address_parts.append(street_address)
+        if city:
+            address_parts.append(city)
+        if zip_code:
+            address_parts.append(zip_code)
+        if country:
+            address_parts.append(country)
 
-        Delivery.objects.create(
-            order=order,
-            address=delivery_address,
-            date=delivery_date,
-            status='Pending'  # Default status
-        )
-        # Create delivery record from form data
-        # Extract delivery information from form (this needs to come from the checkout form)
-        delivery_address = f"{request.POST.get('firstName', '')} {request.POST.get('lastName', '')}, {request.POST.get('address', '')}, {request.POST.get('city', '')}, {request.POST.get('zip', '')}, {request.POST.get('country', 'Mauritius')}"
+        delivery_address = ", ".join(address_parts) if address_parts else f"{getattr(user, 'street', 'Address not specified')}, {getattr(user, 'region', 'Region not specified')}"
 
         # Determine delivery date (for now, assume next day for express delivery)
         from datetime import timedelta
@@ -166,7 +175,7 @@ def checkout(request):
         cart.items.all().delete()
 
         messages.success(request, f"Order #{order.id} created successfully!")
-        return redirect('landing:landing')  # Redirect to landing page instead of payment
+        return redirect('orders:order_confirmation', order_id=order.id)
 
     # Render template
     return render(request, 'orders/checkout.html', {
@@ -177,3 +186,27 @@ def checkout(request):
         "cities": cities,
         "user_profile": request.user  # Pass user profile data to template
     })
+
+
+# Order Confirmation View
+@login_required
+def order_confirmation(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    # Get order details (pastries, quantity, price)
+    order_details = order.order_details.all()
+
+    # Get delivery information - get the latest delivery record for the order
+    try:
+        delivery = Delivery.objects.filter(order=order).latest('id')
+    except Delivery.DoesNotExist:
+        delivery = None
+
+    context = {
+        'order': order,
+        'order_details': order_details,
+        'delivery': delivery,
+        'user_profile': request.user  # Include user profile for address fallback
+    }
+
+    return render(request, 'orders/order_confirmation.html', context)
