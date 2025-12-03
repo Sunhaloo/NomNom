@@ -1,0 +1,456 @@
+/* HEADER */
+
+/* White background for header, footer, and body */
+body.white-background {
+  background-color: white;
+}
+
+body.white-background header.main_header,
+body.white-background footer.main_footer {
+  background-color: white !important;
+  /* header & footer */
+}
+
+/* Light yellow background */
+body.brown-background {
+  background-color: #e8dbc7;
+}
+
+body.brown-background header.main_header,
+body.brown-background footer.main_footer {
+  background-color: #e8dbc7 !important;
+  /* header & footer */
+}
+
+/* White navbar and footer with brown background */
+body.white-navbar-brown-bg header.main_header,
+body.white-navbar-brown-bg footer.main_footer {
+  background-color: white !important;
+}
+
+body.white-navbar-brown-bg {
+  background-color: #e8dbc7;
+}
+
+
+.header_navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header_navbar img {
+  width: 140px;
+  height: 80px;
+}
+
+.navbar_ul {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.navbar_ul li {
+  display: flex;
+  align-items: center;
+  margin: 15px;
+  font-size: 16px;
+}
+
+.navbar_ul a {
+  display: inline-block;
+  min-width: 50px;
+  text-align: center;
+  padding: 25px;
+  font-family: "Inter", sans-serif;
+  text-decoration: none;
+  color: black;
+  border-radius: 5px;
+}
+
+.navbar_ul a:hover {
+  transition: 0.1s ease;
+  transform: scale(1.1);
+}
+
+.navbar_ul a:active {
+  color: black;
+  transform: translateX(1px) translateY(1px);
+}
+
+.navbar_ul img {
+  width: 16px;
+  height: auto;
+  vertical-align: middle;
+}
+
+/* Grow + shadow on hover */
+.hover-grow-shadow {
+  transition: all 0.3s ease;
+}
+
+.hover-grow-shadow:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Shared hover effect */
+.hover-grow-shadow {
+  display: inline-block;
+  padding: 12px 28px;
+  border-radius: 6px;
+  background-color: #111;
+  /* Button base color */
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+/* Hover animation (grow + shadow) */
+.hover-grow-shadow:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background-color: #333;
+  /* Slightly lighter on hover */
+}
+
+
+/* FOOTER */
+.main_footer {
+  background-color: #ffffff !important;
+  padding: 14px 14px;
+}
+
+.footer_content {
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  padding: 14px 14px;
+}
+
+.footer_logo,
+.footer_contact {
+  display: inline-block;
+  vertical-align: top;
+  margin: 0 30px 20px 30px;
+}
+
+.footer_logo {
+  text-align: center;
+}
+
+.footer_logo img {
+  width: 120px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.footer_contact {
+  text-align: left;
+}
+
+.footer_contact h3 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  margin-top: 0;
+}
+
+.footer_contact p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #333333;
+}
+
+.footer_contact_email {
+  text-decoration: none;
+  color: #333333;
+}
+
+.footer_social {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.footer_social a {
+  display: inline-block;
+}
+
+.footer_social img {
+  width: 20px;
+  height: 20px;
+  transition: transform 0.2s ease;
+}
+
+.footer_social img:hover {
+  transform: scale(1.1);
+}
+
+.footer_copyright {
+  font-size: 12px;
+  color: #666666;
+  padding-top: 20px;
+  clear: both;
+}
+
+/* Cart counter and animation */
+.cart-icon-container {
+  position: relative;
+  display: inline-block;
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background-color: #ff4444;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: 'Inter', sans-serif;
+}
+
+.cart-count.hidden {
+  display: none;
+}
+
+/* Flying cart animation */
+@keyframes flyToCart {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: translate(var(--tx), var(--ty)) scale(0.5);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translate(var(--tx), var(--ty)) scale(0.3);
+    opacity: 0;
+  }
+}
+
+.flying-item {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  animation: flyToCart 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.cart-count.bump {
+  animation: cartBump 0.3s ease;
+}
+
+@keyframes cartBump {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.3);
+  }
+}
+
+.step-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    max-width: 200px; /* Limit width to prevent label overlap */
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+}
+
+.progress-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 2rem auto;
+    padding: 60px 0 30px 0; /* Add more top padding to accommodate track above circles */
+    position: relative;
+}
+
+.progress-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.progress-track {
+    position: absolute;
+    top: 24px; /* Half of the circle height (48px/2) to center the track */
+    left: 50%;
+    transform: translateX(-50%) scaleX(0.7); /* Center and scale to fit */
+    width: 100%;
+    height: 4px;
+    background: #d2bba3;
+    z-index: 1;
+    border-radius: 10px;
+}
+
+.progress-step {
+    width: 48px;
+    height: 48px;
+    background: #fff;
+    border: 3px solid #d2bba3;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #6b3e26;
+    z-index: 2;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(140, 68, 20, 0.1);
+}
+
+.progress-step i {
+    font-size: 1.2rem;
+    margin: 0;
+    padding: 0;
+}
+
+.progress-step.active {
+    background: #6b3e26;
+    border-color: #6b3e26;
+    color: #fff;
+    transform: scale(1.1);
+}
+
+.progress-step.active i {
+    color: #fff;
+}
+
+.progress-step.completed {
+    background: #a06f45;
+    border-color: #a06f45;
+    color: #fff;
+}
+
+.progress-step.completed i {
+    color: #fff;
+}
+
+.progress-label {
+    margin-top: 0.8rem; /* Proper spacing from the circle */
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #5a3d2a;
+    display: block;
+    width: 100%; /* Make label span the full width of the step-wrapper */
+    word-break: break-word; /* Handle long labels */
+}
+
+.login-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    opacity: 0;
+    transition: opacity .25s ease;
+    backdrop-filter: blur(3px);
+    z-index: 9998;
+}
+
+.login-overlay.show {
+    opacity: 1;
+}
+
+.login-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(.85);
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    width: 380px;
+    text-align: center;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    opacity: 0;
+    transition: all .25s cubic-bezier(.25,.8,.25,1);
+    z-index: 9999;
+}
+
+.login-popup.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.popup-icon {
+    font-size: 48px;
+    color: #6b3e26;
+    margin-bottom: 1rem;
+}
+
+.login-btn {
+    background: #6b3e26;
+    color: white;
+    padding: 0.8rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    display: inline-block;
+    text-decoration: none;
+    margin-top: 1rem;
+    transition: .2s;
+}
+
+.login-btn:hover {
+    background: #542f1e;
+}
+
+.close-btn {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #777;
+    transition: .2s;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+#cart-count.bump {
+    animation: bump .3s ease;
+}
+
+@keyframes bump {
+    0%   { transform: scale(1); }
+    30%  { transform: scale(1.25); }
+    100% { transform: scale(1); }
+}
+

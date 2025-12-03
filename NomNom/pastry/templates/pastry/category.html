@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body_class %}brown-background{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'pastry/style.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="pastry-category-wrapper">
+  {% csrf_token %}
+  <header class="category-header">
+    <div class="header-content">
+      <h1 class="category-title">{{ category_name }}</h1>
+    </div>
+  </header>
+
+  {% if messages %}
+  <div class="messages" style="margin-bottom: 20px; max-width: 1200px; margin: 0 auto;">
+    {% for message in messages %}
+    <div class="alert" style="padding: 10px; background: white; border-radius: 5px; margin-bottom: 10px;">{{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <main class="container">
+    <a href="/#where" class="back-button">
+      <i class="fas fa-arrow-left"></i>
+      <span>Back</span>
+    </a>
+    <section class="products">
+      {% for product in products %}
+      {% include 'pastry/includes/product_card.html' %}
+      {% endfor %}
+    </section>
+  </main>
+
+  <!-- Review modal -->
+  <div id="reviewModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Product Reviews</h2>
+        <span class="close" onclick="closeReviewModal()">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="reviews-container">
+          <div class="review-summary">
+            <div class="summary-rating" id="summaryRating">0</div>
+            <div class="summary-details">
+              <div class="summary-stars" id="summaryStars">
+                <!-- Stars injected by JS -->
+              </div>
+              <div class="summary-count" id="summaryCount">Based on 0 reviews</div>
+            </div>
+          </div>
+
+          <div class="review-list" id="reviewList">
+            <!-- Reviews will be loaded here -->
+          </div>
+
+          <div class="add-review">
+            <h3>Add Your Review</h3>
+            <!--<p>Debug: product = {{ product }}, product.id = {{ product.id }}</p> -->
+            <form id="reviewForm" 
+              method="POST" 
+              action="#" 
+              data-user-authenticated="{{ request.user.is_authenticated|lower }}"
+              data-username="{{ request.user.username }}"> 
+            {% csrf_token %}
+            <div class="rating-input" id="ratingInput">
+                      <i class="fas fa-star star" data-rating="1"></i>
+                      <i class="fas fa-star star" data-rating="2"></i>
+                      <i class="fas fa-star star" data-rating="3"></i>
+                      <i class="fas fa-star star" data-rating="4"></i>
+                      <i class="fas fa-star star" data-rating="5"></i>
+        </div>
+        <textarea id="reviewText" name="comment" rows="4" required></textarea>
+        <input type="hidden" id="ratingValue" name="rating" value="0">
+        <button type="submit" class="btn-submit">Submit Review</button>
+    </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification -->
+  <div id="notification" class="notification">
+    <span id="notificationText">Review added successfully!</span>
+  </div>
+
+</div>
+
+<script src="{% static 'pastry/script.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  {% load static %}
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>{% block title %}NomNom{% endblock %}</title>
+
+    <!-- Google fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Global + Section Styles -->
+    <link rel="stylesheet" href="{% static 'landing/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'about_us/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'login/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'contact/style.css' %}" />
+    <link rel="stylesheet" href="{% static 'style.css' %}" />
+    {% block extra_css %}{% endblock %}
+  </head>
+
+  <body class="{% block body_class %}{% endblock %}">
+
+    {% include 'navbar.html' %}
+
+    {% block content %}
+    {% endblock %}
+
+    {% include 'footer.html' %}
+
+    <!-- GLOBAL SCRIPTS -->
+    <script src="{% static 'global/login_popup.js' %}"></script>
+    <script src="{% static 'global/cart_helpers.js' %}"></script>
+    <script src="{% static 'global/progress.js' %}"></script>
+
+    <!-- Initialize cart count (Django → JS) -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+          const cartCountElement = document.getElementById('cart-count');
+          const count = {{ cart_item_count|default:0 }};
+
+          if (cartCountElement) {
+              cartCountElement.textContent = count;
+              cartCountElement.classList.toggle('hidden', count === 0);
+          }
+      });
+    </script>
+     {% block extra_js %}{% endblock %}
+  </body>
+</html>

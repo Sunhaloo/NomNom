@@ -1,143 +1,195 @@
-> [!WARNING]
-> DO NOT PUSH THE FUCKING PYTHON VIRTUAL ENVIRONMENT ITSELF!!!
+# NomNom Pastry Shop
 
-# Main Branch
-
-## Tracking The Commands I Ran ( Myself )
-
-- Creating the Python Virtual Environment
-
-```bash
-# create the python virtual environment with the name 'Django'
-python -m venv Django
-```
-
-- Source / Activate the Python Virtual Environment
-
-```bash
-# UNIX/LINUX Based Systems
-source bin/activate
-
-# On Windows Based Systems --> something along the lines of
-./Scripts/activate
-```
-
-- Create **my** TMUX environment ( **you don't need to do this** )
-
-```bash
-# create my little TMUX world / environment
-tmux new -s django
-```
-
-### Installing Django On Virtual Environment
-
-- Install 'Django' package using `pip` command
-
-```bash
-# install the latest version of Django
-pip install Django
-```
-
-- Check if 'Django' has been install successfully / correctly
-
-```bash
-# check the version of 'Django' installed
-# running the command below should output something '5.2.6'
-python -m django --version
-```
-
-- Freeze the current dependencies installed
-
-```bash
-pip freeze > requirements.txt
-```
+An e-commerce web application built with Django for a pastry shop. The application allows customers to browse different categories of pastries, customize cakes, add items to their cart, and place orders. The platform also provides user authentication and profile management features.
 
 > [!NOTE]
-> To install modules from the `requirements.txt` file, you need to run the following `pip` command:
+> Resources used while building and learning:
 >
-> ```bash
-> # install the required dependencies from `requirements.txt` file
-> pip install -r requirements.txt
-> ```
+> - Official Django documentation: <https://docs.djangoproject.com/>
+> - Django tutorial series and community examples for e-commerce patterns
+> - HTML/CSS/JavaScript best practices for responsive UI design
+> - All development notes and learning process are documented in `learning.md`
 
-> I suggest you all to install using the `requirements.txt` file as you never know if there might be a version change of Django when we are working!!!
+# Features
 
-- Start the Django 'NomNom' **main** Project
+- Multiple pastry categories (Cakes, Brownies, Donuts, Cookies, Tarts, Cupcakes)
+- Custom cake builder with flavors, fillings, frostings, decorations, and sizing options
+- User authentication and profile management
+- Shopping cart functionality (persistent for authenticated users, session-based for guests)
+- Order management system with history tracking
+- Responsive web design for desktop and mobile devices
+- Admin panel for managing products and orders
+
+# Usage
+
+## Setting Up the Development Environment
+
+1. Clone the repository:
 
 ```bash
-# create the actual Django 'NomNom' project
-# if creation is successfull... change the directory
-django-admin startproject NomNom && cd NomNom
+git clone <repository-url>
 ```
 
-# Create The Main Templates Folder For The Whole Website
-
-- Create a new `templates` directory inside the `NomNom` folder
+2. Navigate to the project directory and create a virtual environment:
 
 ```bash
-# create main templates directory for the whole 'NomNom' website
-mkdir templates
+cd NomNom
+python -m venv venv
 ```
 
-This is how my directory structure looks like:
+3. Activate the virtual environment:
 
-```console
- .
-├──  manage.py
-├──  NomNom
-│   ├──  __init__.py
-│   ├──  asgi.py
-│   ├──  settings.py
-│   ├──  urls.py
-│   └──  wsgi.py
-└──  templates
+- On Linux/Mac:
+
+```bash
+source venv/bin/activate
 ```
 
-# Change Some Of The Settings
+- On Windows:
 
-I am now into the "_other_" 'NomNom' folder and opening the `NomNom/settings.py` file!
-
-## Change Where Main Templates Are Located At
-
-- Let Django know / Provide the path to our _main_ `templates` folder
-
-```python
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        # change the default template location
-        # no need to use something like string concatenation or `os.path.join`
-        "DIRS": [BASE_DIR / "templates"],
-        # We also want Django to find specific `<application_name>/templates` folder
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
-    },
-]
+```bash
+venv\Scripts\activate
 ```
 
-## Change The Time Zone
+4. Install the required dependencies:
 
-Running my `timedatectl` command; I get the following output:
-
-```console
-               Local time: Wed 2025-10-01 16:55:03 +04
-           Universal time: Wed 2025-10-01 12:55:03 UTC
-                 RTC time: Wed 2025-10-01 12:55:03
-                Time zone: Indian/Mauritius (+04, +0400)
-System clock synchronized: yes
-              NTP service: active
-          RTC in local TZ: no
+```bash
+pip install -r requirements.txt
 ```
 
-Therefore we going to change the `TIME_ZONE` variable from 'UTC' to 'Indian/Mauritius'
+5. Create and apply database migrations:
 
-```python
-TIME_ZONE = "Indian/Mauritius"
+```bash
+python manage.py makemigrations
+python manage.py migrate
 ```
+
+6. Populate the database with initial products:
+
+```bash
+python sync_products.py
+```
+
+7. Create a superuser account:
+
+```bash
+python manage.py createsuperuser
+```
+
+8. Configure environment variables by creating a `.env` file in the project root with:
+
+```
+EMAIL_HOST_USER=your_gmail_address
+EMAIL_HOST_PASSWORD=your_gmail_app_password
+DEFAULT_FROM_EMAIL=your_gmail_address
+```
+
+> Create your 'App Password' using the following link: <https://myaccount.google.com/apppasswords>
+
+9. Load data regarding pastries
+
+```bash
+python manage.py loaddata pastry/fixtures/pastries.json
+```
+
+10. Start the development server:
+
+```bash
+python manage.py runserver
+```
+
+The application will be accessible at `http://127.0.0.1:8000/`
+
+## Admin Panel
+
+Access the Django admin panel at `http://127.0.0.1:8000/admin/` using the superuser credentials created in step 7.
+
+## User Registration and Login
+
+New customers can register by clicking on the "Register" link in the navigation bar. Existing users can log in using their credentials.
+
+## Browsing Products
+
+Customers can browse different categories of pastries from the main landing page or through the navigation menu. Each pastry displays its name, price, and image.
+
+## Custom Cake Builder
+
+The cake customization feature allows customers to create personalized cakes by selecting:
+
+- Cake flavor
+- Filling options
+- Frosting type
+- Decorations
+- Size and number of layers
+
+## Shopping Cart
+
+Customers can add items to their shopping cart, update quantities, and remove items as needed. The cart item count is displayed across all pages.
+
+## Order Process
+
+After adding items to the cart, customers can proceed to checkout, enter their shipping information, and complete their order.
+
+## Screenshots
+
+### Frontend
+
+- Landing Page:
+  ![Landing Page](./screenshots/landing_page.png)
+
+- Pastry Categories:
+  ![Pastry Categories](./screenshots/categories.png)
+
+- Custom Cake Builder:
+  ![Custom Cake Builder](./screenshots/cake_builder.png)
+
+- Shopping Cart:
+  ![Shopping Cart](./screenshots/cart.png)
+
+- User Profile:
+  ![User Profile](./screenshots/profile.png)
+
+# Project Structure
+
+```
+NomNom/
+├── about_us/           # About us page application
+├── cart/               # Shopping cart functionality
+├── contact/            # Contact page application
+├── landing/            # Main landing page application
+├── login/              # User authentication and login application
+├── media/              # Uploaded media files (images)
+├── NomNom/             # Main Django project settings
+├── orders/             # Order management application
+├── pastry/             # Pastry catalog and customization
+│   ├── fixtures/       # Data fixtures (JSON files)
+│   ├── migrations/     # Database migration files
+│   ├── static/         # Static files for pastry app
+│   ├── templates/      # Templates for pastry app
+│   ├── models.py       # Pastry data models
+│   └── views.py        # Pastry application views
+├── payments/           # Payment processing application
+├── profile_page/       # User profile management
+├── static/             # Static files (CSS, JS, images)
+├── templates/          # Global HTML templates
+├── .env                # Environment variables
+├── .gitignore          # Git ignore configuration
+├── db.sqlite3          # SQLite database
+├── manage.py           # Django management script
+├── requirements.txt    # Python dependencies
+├── sync_products.py    # Script to populate initial products
+```
+
+# Technologies Used
+
+- Python
+- Django
+- HTML5
+- CSS3
+- JavaScript
+- SQLite (default)
+- Bootstrap (for responsive design)
+
+# Configuration
+
+The application uses environment variables for sensitive information such as the Django secret key and email settings. These should be set up in a `.env` file in the project root as described in the setup instructions.

@@ -1,6 +1,10 @@
-from django.http import HttpResponse
+from django.shortcuts import render
+from pastry.models import Pastry
 
-
-# our very first view
 def index(request):
-    return HttpResponse("Hello World From Index Page")
+    try:
+        fudgy_cake = Pastry.objects.get(pastry_name='Chocolate Cake') 
+    except Pastry.DoesNotExist:
+        fudgy_cake = None
+
+    return render(request, "landing/landing.html", {'fudgy_cake': fudgy_cake})

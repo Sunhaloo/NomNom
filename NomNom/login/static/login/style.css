@@ -1,0 +1,124 @@
+/* layout shell - keeps card centered on page */
+.page-shell {
+  min-height: 70vh;
+  /* push footer down like in mock */
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background-color: #ffffff;
+  font-family: "Poppins", sans-serif;
+  padding-top: 120px;
+  padding-bottom: 150px;
+}
+
+/* the rounded pale card */
+.auth-card {
+  width: 360px;
+  /* card width similar to mock */
+  background: #e9e9e9;
+  /* pale grey */
+  border-radius: 14px;
+  /* round corners */
+  padding: 34px 34px 28px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+/* title */
+.auth-title {
+  margin: 0 0 20px;
+  font-size: 28px;
+  font-weight: 600;
+  color: #222;
+}
+
+/* form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* inputs */
+.auth-input {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+  box-sizing: border-box;
+  font-size: 14px;
+  outline: none;
+  transition:
+    box-shadow 0.12s ease,
+    transform 0.08s ease;
+}
+
+.auth-input:focus {
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
+  transform: translateY(-1px);
+}
+
+/* small helper row (forgot password) */
+.auth-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+/* button */
+.auth-btn {
+  margin-top: 8px;
+  background: #000;
+  color: #fff;
+  border: none;
+  padding: 10px 0;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.06);
+  transition:
+    transform 0.12s ease,
+    background-color 0.12s ease;
+}
+
+.auth-btn:hover {
+  transform: translateY(-2px);
+  background: #111;
+}
+
+/* muted text and links */
+.muted-link {
+  color: #333;
+  font-size: 13px;
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+.muted-link:hover {
+  text-decoration: underline;
+}
+
+/* center small paragraph under button */
+.muted-center {
+  margin-top: 12px;
+  color: #444;
+  font-size: 16px;
+}
+
+.muted-center a {
+  font-size: 16px;
+}
+
+.forget-password {
+  font-size: 14px;
+}
+
+/* responsiveness */
+@media (max-width: 420px) {
+  .auth-card {
+    width: calc(100% - 40px);
+    padding: 28px 20px;
+  }
+}
