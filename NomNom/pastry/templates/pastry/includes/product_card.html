@@ -1,5 +1,5 @@
 {% load static %}
-<div class="product-card" data-product="{{ product.pastry_name }}">
+<div class="product-card" data-product="{{ product.pastry_name }}" data-pastry-id="{{ product.id }}">
     <div class="product-image">
         {% if product.image %}
         <img src="{% static product.image %}" alt="{{ product.pastry_name }}">

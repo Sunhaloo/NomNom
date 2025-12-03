@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Update Delivery Status{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'delivery/delivery.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="page-section">
+  <div class="container">
+    <div class="update-form">
+      <h2><i class="fas fa-truck"></i> Update Delivery Status</h2>
+
+      <p><strong>Delivery ID:</strong> #{{ delivery.id }}</p>
+      <p><strong>Order ID:</strong> #{{ delivery.order.id }}</p>
+      <p><strong>Current Status:</strong>
+        {% if delivery.status == 'Pending' %}
+          <span class="badge badge-warning">{{ delivery.status }}</span>
+        {% elif delivery.status == 'Done' %}
+          <span class="badge badge-success">{{ delivery.status }}</span>
+        {% else %}
+          <span class="badge badge-danger">{{ delivery.status }}</span>
+        {% endif %}
+      </p>
+      <p><strong>Address:</strong> {{ delivery.address }}</p>
+
+      <form method="post" style="margin-top: 20px;">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label for="status"><strong>New Status:</strong></label>
+          <select name="status" id="status" class="form-control" required>
+            <option value="Pending" {% if delivery.status == 'Pending' %}selected{% endif %}>Pending</option>
+            <option value="Done" {% if delivery.status == 'Done' %}selected{% endif %}>Done</option>
+            <option value="Failed" {% if delivery.status == 'Failed' %}selected{% endif %}>Failed</option>
+          </select>
+        </div>
+
+        <div class="buttons">
+          <a href="{% url 'delivery:delivery_detail' delivery.id %}" class="btn btn-secondary">Cancel</a>
+          <button type="submit" class="btn btn-primary">Update Status</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

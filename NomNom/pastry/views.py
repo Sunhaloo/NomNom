@@ -1,9 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.db.models import Avg, Count
 from .models import Pastry
-
-
-"""View pastry by category, each of them will have preset values for their variables"""
+from review.models import Review
 
 
 def category_view(request, category):
@@ -11,12 +10,38 @@ def category_view(request, category):
     db_category = category_upper[:-1] if category_upper.endswith("S") else category_upper
     category_display = category.capitalize() + " Menu"
 
-    # fetch pastries dynamically
-    products = Pastry.objects.filter(
+    # fetch pastries dynamically with review aggregations
+    products_with_reviews = Pastry.objects.filter(
         pastry_category=db_category,
         is_available=True,
         is_custom=False
+    ).annotate(
+        avg_rating=Avg('review__rating'),
+        review_count=Count('review')
     )
+
+    # Create a new list of products with the additional properties
+    products = []
+    for product in products_with_reviews:
+        # Calculate stars for display (1 = full star, 0.5 = half star, 0 = empty star)
+        avg_rating = product.avg_rating or 0
+        full_stars = int(avg_rating)
+        has_half_star = (avg_rating % 1) >= 0.5
+        empty_stars = 5 - full_stars - (1 if has_half_star else 0)
+
+        stars = []
+        for i in range(full_stars):
+            stars.append(1)  # Full star
+        if has_half_star:
+            stars.append(0.5)  # Half star
+        for i in range(empty_stars):
+            stars.append(0)  # Empty star
+
+        # Set additional attributes
+        product.stars = stars
+        product.rating = round(avg_rating, 1) if avg_rating else 0
+        product.reviews = product.review_count
+        products.append(product)
 
     context = {
         "category_name": category_display,

@@ -3,6 +3,10 @@
 
 {% block title %}Deliveries{% endblock %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'delivery/delivery.css' %}">
+{% endblock %}
+
 {% block content %}
 <section class="page-section">
   <div class="container">
@@ -51,35 +55,4 @@
     {% endif %}
   </div>
 </section>
-
-<style>
-.section-title {
-  font-size: 1.8rem;
-  margin-bottom: 1.5rem;
-}
-.styled-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.styled-table th, .styled-table td {
-  border-bottom: 1px solid #ddd;
-  padding: 12px 8px;
-  text-align: center;
-}
-.badge {
-  padding: 5px 10px;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  color: white;
-}
-.badge-warning { background-color: #f4b400; }
-.badge-success { background-color: #0f9d58; }
-.badge-danger { background-color: #db4437; }
-.empty-msg {
-  font-size: 1.1rem;
-  color: #666;
-  text-align: center;
-  padding: 20px 0;
-}
-</style>
 {% endblock %}
