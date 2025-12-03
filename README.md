@@ -25,56 +25,75 @@ An e-commerce web application built with Django for a pastry shop. The applicati
 ## Setting Up the Development Environment
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 ```
 
 2. Navigate to the project directory and create a virtual environment:
+
 ```bash
 cd NomNom
 python -m venv venv
 ```
 
 3. Activate the virtual environment:
+
 - On Linux/Mac:
+
 ```bash
 source venv/bin/activate
 ```
+
 - On Windows:
+
 ```bash
 venv\Scripts\activate
 ```
 
 4. Install the required dependencies:
+
 ```bash
 pip install -r requirements.txt
 ```
 
 5. Create and apply database migrations:
+
 ```bash
 python manage.py makemigrations
 python manage.py migrate
 ```
 
 6. Populate the database with initial products:
+
 ```bash
 python sync_products.py
 ```
 
 7. Create a superuser account:
+
 ```bash
 python manage.py createsuperuser
 ```
 
 8. Configure environment variables by creating a `.env` file in the project root with:
+
 ```
-SECRET_KEY=your_secret_key
 EMAIL_HOST_USER=your_gmail_address
 EMAIL_HOST_PASSWORD=your_gmail_app_password
 DEFAULT_FROM_EMAIL=your_gmail_address
 ```
 
-9. Start the development server:
+> Create your 'App Password' using the following link: https://myaccount.google.com/apppasswords
+
+9. Load data regarding pastries
+
+```bash
+python manage.py loaddata pastry/fixtures/pastries.json
+```
+
+10. Start the development server:
+
 ```bash
 python manage.py runserver
 ```
@@ -96,6 +115,7 @@ Customers can browse different categories of pastries from the main landing page
 ## Custom Cake Builder
 
 The cake customization feature allows customers to create personalized cakes by selecting:
+
 - Cake flavor
 - Filling options
 - Frosting type
@@ -150,6 +170,12 @@ NomNom/
 ├── NomNom/             # Main Django project settings
 ├── orders/             # Order management application
 ├── pastry/             # Pastry catalog and customization
+│   ├── fixtures/       # Data fixtures (JSON files)
+│   ├── migrations/     # Database migration files
+│   ├── static/         # Static files for pastry app
+│   ├── templates/      # Templates for pastry app
+│   ├── models.py       # Pastry data models
+│   └── views.py        # Pastry application views
 ├── payments/           # Payment processing application
 ├── profile_page/       # User profile management
 ├── static/             # Static files (CSS, JS, images)
@@ -175,4 +201,3 @@ NomNom/
 # Configuration
 
 The application uses environment variables for sensitive information such as the Django secret key and email settings. These should be set up in a `.env` file in the project root as described in the setup instructions.
-
