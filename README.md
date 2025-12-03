@@ -84,7 +84,7 @@ EMAIL_HOST_PASSWORD=your_gmail_app_password
 DEFAULT_FROM_EMAIL=your_gmail_address
 ```
 
-> Create your 'App Password' using the following link: https://myaccount.google.com/apppasswords
+> Create your 'App Password' using the following link: <https://myaccount.google.com/apppasswords>
 
 9. Load data regarding pastries
 
@@ -148,14 +148,6 @@ After adding items to the cart, customers can proceed to checkout, enter their s
 
 - User Profile:
   ![User Profile](./screenshots/profile.png)
-
-### Admin Panel
-
-- Product Management:
-  ![Admin Products](./screenshots/admin_products.png)
-
-- Order Management:
-  ![Admin Orders](./screenshots/admin_orders.png)
 
 # Project Structure
 
