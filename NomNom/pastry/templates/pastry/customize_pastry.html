@@ -420,7 +420,7 @@
             </div>
             <div class="summary-item">
                 <span>Total</span>
-                <span id="total-price">Rs. 0</span>
+                <span id="total-price">Rs 0</span>
             </div>
             <button class="add-to-cart-btn" id="add-to-cart">
                 <span>🛒</span>
@@ -524,7 +524,7 @@
                 }
 
                 // Calculate total price
-                const totalPrice = document.getElementById('total-price').textContent.replace('Rs. ', '').replace(/,/g, '');
+                const totalPrice = document.getElementById('total-price').textContent.replace('Rs ', '').replace(/,/g, '');
 
                 // Get CSRF token
                 const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
@@ -589,7 +589,7 @@
             if (cakeState.size && cakeState.flavour) {
                 summaryHTML += `<div class="summary-item">
               <span>${cakeState.sizeCm} cm ${cakeState.flavour} Cake</span>
-              <span>Rs. ${cakeState.basePrice.toLocaleString('en-IN')}</span>
+              <span>Rs ${cakeState.basePrice.toLocaleString('en-IN')}</span>
           </div>`;
             }
 
@@ -598,7 +598,7 @@
                 totalPrice += layerCost;
                 summaryHTML += `<div class="summary-item">
               <span>Additional Layers (${cakeState.layers - 1})</span>
-              <span>+ Rs. ${layerCost.toLocaleString('en-IN')}</span>
+              <span>+ Rs ${layerCost.toLocaleString('en-IN')}</span>
           </div>`;
             }
 
@@ -610,7 +610,7 @@
                         totalPrice += price;
                         summaryHTML += `<div class="summary-item">
                       <span>${cakeState[id]} ${id.charAt(0).toUpperCase() + id.slice(1)}</span>
-                      <span>+ Rs. ${price.toLocaleString('en-IN')}</span>
+                      <span>+ Rs ${price.toLocaleString('en-IN')}</span>
                   </div>`;
                     }
                 }
@@ -626,7 +626,7 @@
             }
 
             summaryItems.innerHTML = summaryHTML;
-            document.getElementById('total-price').textContent = `Rs. ${totalPrice.toLocaleString('en-IN')}`;
+            document.getElementById('total-price').textContent = `Rs ${totalPrice.toLocaleString('en-IN')}`;
         }
 
         function showToast(msg) {
