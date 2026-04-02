@@ -138,10 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
         name: (value) => /^[A-Za-z\s]+$/.test(value) ? '' : 'Name must contain only letters.',
         address: (value) => value.trim() ? '' : 'Street address is required.',
         city: (value) => {
-            if (!window.cityList) return ''; // Will validate after JSON loads
-            return window.cityList.map(c => c.toLowerCase()).includes(value.toLowerCase())
-                ? '' 
-                : 'Please select a valid city.';
+            return value.trim() ? '' : 'Please select a valid city.';
         },
 
         zip: (value) => /^\d{5}$/.test(value) ? '' : 'Postal code must be exactly 5 digits.',
