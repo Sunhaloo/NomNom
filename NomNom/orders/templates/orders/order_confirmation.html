@@ -135,14 +135,14 @@
                             <span class="pastry-extra">Size: {{ detail.pastry.get_size_display }}</span>
                         {% endif %}
                     </div>
-                    <div class="pastry-price">Rs.{{ detail.price|floatformat:2 }} each</div>
+                    <div class="pastry-price">Rs {{ detail.price|floatformat:2 }} each</div>
                 </li>
                 {% endfor %}
             </ul>
             
             <div class="summary-row">
                 <span>Subtotal (Pastries):</span>
-                <span>Rs.{{ order.total_amount|floatformat:2 }}</span>
+                <span>Rs {{ order.total_amount|floatformat:2 }}</span>
             </div>
 
             <div class="summary-row">
@@ -152,7 +152,7 @@
 
             <div class="summary-row summary-total">
                 <span>Order Total:</span>
-                <span>Rs.{{ order.total_amount|floatformat:2 }}</span>
+                <span>Rs {{ order.total_amount|floatformat:2 }}</span>
             </div>
         </div>
 
