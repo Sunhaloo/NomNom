@@ -135,10 +135,19 @@ def checkout(request):
 
         # Build address with proper formatting, skipping empty parts
         address_parts = []
-        if first_name or last_name:
-            name_part = f"{first_name} {last_name}".strip()
-            if name_part:
-                address_parts.append(name_part)
+
+        # Prefer the user's full_name from the database; fall back to first + last
+        name_part = None
+        if getattr(user, "full_name", None):
+            name_part = user.full_name.strip()
+        else:
+            combined = f"{first_name} {last_name}".strip()
+            if combined:
+                name_part = combined
+
+        if name_part:
+            address_parts.append(name_part)
+
         if street_address:
             address_parts.append(street_address)
         if city:
