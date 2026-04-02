@@ -13,6 +13,7 @@
     <script>
         // Initialize cart data from backend
         window.initialCartData = {{ cart_json|safe }};
+        window.currentUsername = "{{ user_profile.username }}";
     </script>
 {% endblock %}
 

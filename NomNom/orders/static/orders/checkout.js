@@ -27,6 +27,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressSteps = document.querySelectorAll('.progress-step');
     const progressTrack = document.getElementById('progress-track');
 
+    // Key for storing card details per logged-in user (client-side only)
+    const username = window.currentUsername || 'guest';
+    const CARD_STORAGE_KEY = `nomnom_card_${username}`;
+
+    let savedCard = null;
+    try {
+        const stored = localStorage.getItem(CARD_STORAGE_KEY);
+        if (stored) {
+            savedCard = JSON.parse(stored);
+        }
+    } catch (e) {
+        savedCard = null;
+    }
+
     updateOrderSummary();
 
     // Checkout.js should not handle page navigation if cart.js is also loaded
@@ -172,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- REAL-TIME VALIDATION LISTENERS ---
+    // --- REAL-TIME VALIDATION & FORMATTING LISTENERS ---
     ['email', 'phone', 'firstName', 'lastName', 'address', 'city', 'zip', 'nameOnCard', 'cardNumber'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -209,6 +223,29 @@ document.addEventListener('DOMContentLoaded', () => {
             validateField(id, validator);
         });
     });
+
+    // Populate saved card details when payment page is active
+    function populateSavedCard() {
+        if (!savedCard) return;
+
+        const cardNumberInput = document.getElementById('cardNumber');
+        const nameOnCardInput = document.getElementById('nameOnCard');
+        const expiryInput = document.getElementById('expiry');
+        const saveInfoCheckbox = document.getElementById('save-info');
+
+        if (cardNumberInput && savedCard.cardNumber) {
+            cardNumberInput.value = savedCard.cardNumber;
+        }
+        if (nameOnCardInput && savedCard.nameOnCard) {
+            nameOnCardInput.value = savedCard.nameOnCard;
+        }
+        if (expiryInput && savedCard.expiry) {
+            expiryInput.value = savedCard.expiry;
+        }
+        if (saveInfoCheckbox) {
+            saveInfoCheckbox.checked = true;
+        }
+    }
 
     const toPaymentBtn = document.getElementById('to-payment-btn');
     if (toPaymentBtn) {
@@ -502,6 +539,11 @@ fetch("/static/orders/data/city_zip.json")
             targetPage.classList.add('active');
         }
 
+        // When navigating to the payment page, attempt to prefill saved card details
+        if (pageId === 'payment-page') {
+            populateSavedCard();
+        }
+
         // Update progress bar if it exists
         if (window.updateProgress) {
             window.updateProgress(step);
@@ -527,10 +569,34 @@ fetch("/static/orders/data/city_zip.json")
             // Validate payment fields
             const cardValid = validateField('cardNumber', 'cardNumber') &
                              validateField('nameOnCard', 'name') &
-                             validateField('expiry', 'expiry') &
-                             validateField('cvv', 'cvv');
+                              validateField('expiry', 'expiry') &
+                              validateField('cvv', 'cvv');
 
             if (cardValid) {
+                const saveInfoCheckbox = document.getElementById('save-info');
+
+                // Save or clear card details in localStorage based on checkbox
+                if (saveInfoCheckbox && saveInfoCheckbox.checked) {
+                    const cardDataToSave = {
+                        cardNumber: document.getElementById('cardNumber')?.value || '',
+                        nameOnCard: document.getElementById('nameOnCard')?.value || '',
+                        expiry: document.getElementById('expiry')?.value || ''
+                        // CVV is intentionally NOT stored
+                    };
+
+                    try {
+                        localStorage.setItem(CARD_STORAGE_KEY, JSON.stringify(cardDataToSave));
+                    } catch (e) {
+                        // Ignore storage errors silently
+                    }
+                } else {
+                    try {
+                        localStorage.removeItem(CARD_STORAGE_KEY);
+                    } catch (e) {
+                        // Ignore storage errors silently
+                    }
+                }
+
                 // Create a form and submit it to trigger the Django checkout view
                 const form = document.createElement('form');
                 form.method = 'POST';
