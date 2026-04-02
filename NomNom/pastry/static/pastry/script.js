@@ -226,15 +226,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     const averageRating = data.reviews.length > 0 ? (totalRating / data.reviews.length) : 0;
 
-                    // Update summary
+                    // Update summary in modal
                     document.getElementById('summaryRating').textContent = averageRating.toFixed(1);
                     document.getElementById('summaryCount').textContent = `Based on ${data.reviews.length} reviews`;
 
-                    // Update summary stars
+                    // Update summary stars in modal
                     const summaryStars = document.getElementById('summaryStars');
                     summaryStars.innerHTML = generateStars(averageRating);
 
-                    // Load review list
+                    // Load review list in modal
                     const reviewList = document.getElementById('reviewList');
                     reviewList.innerHTML = '';
 
@@ -267,6 +267,9 @@ document.addEventListener('DOMContentLoaded', function () {
                             text: r.comment
                         }))
                     };
+
+                    // Also update the underlying product card on the page
+                    updateProductCardRating(productName);
                 }
             })
             .catch(error => {
@@ -274,15 +277,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Fallback to cached data if there's an error
                 const productReviews = reviewsData[productName] || { rating: 0, count: 0, reviews: [] };
 
-                // Update summary
+                // Update summary in modal
                 document.getElementById('summaryRating').textContent = productReviews.rating.toFixed(1);
                 document.getElementById('summaryCount').textContent = `Based on ${productReviews.count} reviews`;
 
-                // Update summary stars
+                // Update summary stars in modal
                 const summaryStars = document.getElementById('summaryStars');
                 summaryStars.innerHTML = generateStars(productReviews.rating);
 
-                // Load review list
+                // Load review list in modal
                 const reviewList = document.getElementById('reviewList');
                 reviewList.innerHTML = '';
 
@@ -303,6 +306,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         reviewList.appendChild(reviewItem);
                     });
                 }
+
+                // Keep the product card in sync with whatever data we have
+                updateProductCardRating(productName);
             });
     }
 
