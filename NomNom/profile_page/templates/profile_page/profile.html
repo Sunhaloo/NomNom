@@ -22,7 +22,7 @@
             {% endif %}
 
             <h2 class="profile-name">
-                {% if user.full_name %}{{ user.full_name }}{% else %}{{ user.first_name }} {{ user.last_name }}{% endif %}
+                {{ user.first_name }} {{ user.last_name }}
             </h2>
         </div>
 

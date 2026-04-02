@@ -105,6 +105,19 @@
     color: #555;
 }
 
+/* Ensure form controls (including gender select) have consistent height */
+.edit-form .form-control {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.edit-form select.form-control {
+    min-height: 44px;
+    line-height: 1.3;
+}
+
 .form-error {
     color: #c62828;
     font-size: 0.9rem;
