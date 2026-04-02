@@ -16,10 +16,4 @@ class EditProfileForm(forms.ModelForm):
             "profile_pic": forms.FileInput(attrs={"class": "form-control"}),
         }
 
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        # Keep full_name in sync with first_name + last_name without exposing the field in the form
-        user.full_name = f"{user.first_name} {user.last_name}".strip()
-        if commit:
-            user.save()
-        return user
+    # Rely on User.save() to keep full_name in sync

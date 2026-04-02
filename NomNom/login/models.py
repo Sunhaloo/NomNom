@@ -23,5 +23,11 @@ class User(AbstractUser):
             # if so ==> set their role to "ADMIN" instead of "CUSTOMER"
             self.role = "ADMIN"
 
+        # auto-populate full_name from first_name + last_name
+        first = (self.first_name or "").strip()
+        last = (self.last_name or "").strip()
+        combined = f"{first} {last}".strip()
+        self.full_name = combined or self.full_name
+
         # save the data to the database
         super().save(*args, **kwargs)
