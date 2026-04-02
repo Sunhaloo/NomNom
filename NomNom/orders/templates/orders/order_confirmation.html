@@ -180,6 +180,6 @@
         </div>
     </div>
 
-    <a href="{% url 'landing:landing' %}" class="continue-shopping-btn">Continue Shopping</a>
-</div>
+    <a href="{% url 'landing:landing' %}?order_success=1&amp;order_id={{ order.id }}" class="continue-shopping-btn">Continue Shopping</a>
+  </div>
 {% endblock %}
