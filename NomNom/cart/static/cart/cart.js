@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span>${qty}</span>
                     <button class="qty-plus">+</button>
                 </div>
-                <span class="item-subtotal">Rs.${subtotal}</span>
+                <span class="item-subtotal">Rs ${subtotal}</span>
             </div>
             <button class="remove-item"><i class="fas fa-times"></i></button>
         `;
@@ -112,17 +112,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update cart page summary elements (if they exist)
         if(itemCountSpan) itemCountSpan.textContent = itemCount;
-        if(subtotalSpan) subtotalSpan.textContent = `Rs.${subtotal.toFixed(2)}`;
-        if(deliveryCostSpan) deliveryCostSpan.textContent = `Rs.${deliveryCost.toFixed(2)}`;
-        if(taxCostSpan) taxCostSpan.textContent = `Rs.${tax.toFixed(2)}`;
-        if(totalCostSpan) totalCostSpan.textContent = `Rs.${total.toFixed(2)}`;
+        if(subtotalSpan) subtotalSpan.textContent = `Rs ${subtotal.toFixed(2)}`;
+        if(deliveryCostSpan) deliveryCostSpan.textContent = `Rs ${deliveryCost.toFixed(2)}`;
+        if(taxCostSpan) taxCostSpan.textContent = `Rs ${tax.toFixed(2)}`;
+        if(totalCostSpan) totalCostSpan.textContent = `Rs ${total.toFixed(2)}`;
 
         // Update payment page summary elements (if they exist)
         if(window.paymentItemCountSpan) window.paymentItemCountSpan.textContent = itemCount;
-        if(window.paymentSubtotalSpan) window.paymentSubtotalSpan.textContent = `Rs.${subtotal.toFixed(2)}`;
-        if(window.paymentDeliveryCostSpan) window.paymentDeliveryCostSpan.textContent = `Rs.${deliveryCost.toFixed(2)}`;
-        if(window.paymentTaxCostSpan) window.paymentTaxCostSpan.textContent = `Rs.${tax.toFixed(2)}`;
-        if(window.paymentTotalCostSpan) window.paymentTotalCostSpan.textContent = `Rs.${total.toFixed(2)}`;
+        if(window.paymentSubtotalSpan) window.paymentSubtotalSpan.textContent = `Rs ${subtotal.toFixed(2)}`;
+        if(window.paymentDeliveryCostSpan) window.paymentDeliveryCostSpan.textContent = `Rs ${deliveryCost.toFixed(2)}`;
+        if(window.paymentTaxCostSpan) window.paymentTaxCostSpan.textContent = `Rs ${tax.toFixed(2)}`;
+        if(window.paymentTotalCostSpan) window.paymentTotalCostSpan.textContent = `Rs ${total.toFixed(2)}`;
     }
 
     function formatDate(dateString) {
