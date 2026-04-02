@@ -174,7 +174,7 @@ def checkout(request):
         # Clear cart
         cart.items.all().delete()
 
-        messages.success(request, f"Order #{order.id} created successfully!")
+        # Redirect straight to confirmation page without a global success toast
         return redirect('orders:order_confirmation', order_id=order.id)
 
     # Render template

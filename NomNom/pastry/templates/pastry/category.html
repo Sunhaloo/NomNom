@@ -63,11 +63,11 @@
           <div class="add-review">
             <h3>Add Your Review</h3>
             <!--<p>Debug: product = {{ product }}, product.id = {{ product.id }}</p> -->
-            <form id="reviewForm" 
-              method="POST" 
-              action="#" 
+            <form id="reviewForm"
+              method="POST"
+              action="#"
               data-user-authenticated="{{ request.user.is_authenticated|lower }}"
-              data-username="{{ request.user.username }}"> 
+              data-username="{{ request.user.username }}">
             {% csrf_token %}
             <div class="rating-input" id="ratingInput">
                       <i class="fas fa-star star" data-rating="1"></i>
