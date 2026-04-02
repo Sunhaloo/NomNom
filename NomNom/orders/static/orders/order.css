@@ -112,6 +112,19 @@
     box-shadow: 0 0 0 2px rgba(111, 78, 55, 0.2);
 }
 
+/* Inline field error messages under inputs */
+.error-message {
+    display: none; /* JS toggles this to block when invalid */
+    color: #c62828; /* match red error tone */
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+.error-message::before {
+    content: "* ";
+    font-weight: bold;
+}
+
 .checkbox-group {
     display: flex;
     align-items: center;
@@ -256,6 +269,41 @@
     margin-top: 2rem;
     padding-top: 2rem;
     border-top: 2px solid var(--primary-light-brown);
+}
+
+/* --- Checkout toast notification (validation / info) --- */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #c62828; /* red error tone */
+    color: #fff;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    font-size: 0.95rem;
+}
+
+.toast.show {
+    transform: translateX(0);
+}
+
+.toast-message {
+    flex-grow: 1;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: 1.2rem;
 }
 
 .summary-total .summary-row {

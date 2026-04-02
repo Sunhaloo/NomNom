@@ -283,7 +283,7 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  width: 270px;
+  width: 320px;
   padding: 15px 24px !important;
   font-size: 1.2rem;
 }
@@ -358,5 +358,10 @@ body {
 
   .qty-selector {
     margin: 0 auto;
+  }
+
+  .checkout-btn {
+    width: 100%;
+    max-width: 320px;
   }
 }
