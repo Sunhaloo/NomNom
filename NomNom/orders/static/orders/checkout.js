@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- REAL-TIME VALIDATION LISTENERS ---
-    ['email', 'phone', 'firstName', 'lastName', 'address', 'city', 'zip', 'nameOnCard'].forEach(id => {
+    ['email', 'phone', 'firstName', 'lastName', 'address', 'city', 'zip', 'nameOnCard', 'cardNumber'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
 
@@ -184,6 +184,18 @@ document.addEventListener('DOMContentLoaded', () => {
             // For phone, allow typing but validate on input
             if (id === 'phone') {
                 el.value = el.value.replace(/[^0-9]/g, '');
+            }
+
+            // For card number, auto-format as "XXXX XXXX XXXX XXXX"
+            if (id === 'cardNumber') {
+                // Strip all non-digits and limit to 16 digits
+                let digits = el.value.replace(/\D/g, '').slice(0, 16);
+
+                // Group into chunks of 4
+                const groups = digits.match(/.{1,4}/g) || [];
+
+                // Join with spaces for display
+                el.value = groups.join(' ');
             }
             // Check validity to clear error, but don't show new error
             const errorEl = document.getElementById(`${id}-error`);
