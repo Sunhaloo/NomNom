@@ -39,6 +39,9 @@ def index(request):
                 # If email sending fails, still save the message and show an error
                 messages.error(request, f"Your message was sent but we couldn't send a confirmation email. Error: {str(e)}")
                 return redirect('contact:contact')
+        else:
+            # Form contains validation errors (e.g., invalid email); surface a toast
+            messages.error(request, "Please correct the errors in the form.")
     else:
         form = ContactForm()
 
