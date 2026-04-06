@@ -4,7 +4,6 @@
 *.so
 .Python
 __pycache__/
-<<<<<<< HEAD
 *.pyc
 
 # Virtual Environment
@@ -34,10 +33,3 @@ Thumbs.db
 # Environment variables
 .env
 .env.local
-
-# Migrations (optional - some teams commit these)
-# */migrations/*.py
-# !*/migrations/__init__.py
-=======
-.env
->>>>>>> harsh
