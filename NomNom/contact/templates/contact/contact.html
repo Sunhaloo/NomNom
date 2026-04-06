@@ -13,12 +13,14 @@
     <!-- LEFT SIDE: FORM -->
     <div class="contact-form">
       <h1>Contact Us</h1>
+
+      {# Hidden container to expose Django messages to JavaScript for toasts #}
       {% if messages %}
-        {% for message in messages %}
-          <div class="alert alert-{{ message.tags }}">
-            {{ message }}
-          </div>
-        {% endfor %}
+        <div id="django-messages" style="display: none;">
+          {% for message in messages %}
+            <span class="django-message" data-tags="{{ message.tags|default:'' }}">{{ message }}</span>
+          {% endfor %}
+        </div>
       {% endif %}
       <form method="post">
         {% csrf_token %}
@@ -66,4 +68,15 @@
 
   </div>
 </div>
+
+<!-- Toast notification for contact page -->
+<div class="toast" id="toast">
+  <span class="toast-message" id="toast-message"></span>
+  <button class="toast-close" onclick="this.parentElement.classList.remove('show')">&times;</button>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'contact/contact.js' %}"></script>
 {% endblock %}
