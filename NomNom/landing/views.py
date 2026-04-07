@@ -4,7 +4,7 @@ from pastry.models import Pastry
 
 def index(request):
     try:
-        fudgy_cake = Pastry.objects.get(pastry_name="Chocolate Cake")
+        fudgy_cake = Pastry.objects.get(pastry_name="Fudgy McFudgecake")
     except Pastry.DoesNotExist:
         fudgy_cake = None
 
