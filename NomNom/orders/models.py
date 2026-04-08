@@ -11,7 +11,11 @@ class Order(models.Model):
     pickup_date = models.DateTimeField(null=True, blank=True)
     order_status = models.CharField(
         max_length=20,
-        choices=[("Pending", "Pending"), ("Paid", "Paid")],
+        choices=[
+            ("Pending", "Pending"),
+            ("Paid", "Paid"),
+            ("Cancelled", "Cancelled"),
+        ],
         default="Pending",
     )
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
