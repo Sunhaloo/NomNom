@@ -1,12 +1,15 @@
+from django.db import transaction
+from django.contrib.auth import get_user_model
+
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.db import transaction
+from rest_framework.views import APIView
 
 from orders.models import Order
 from delivery.models import Delivery
 from payments.models import Payment
-from .serializers import OrderSerializer, DeliverySerializer
+from .serializers import DeliverySerializer, OrderSerializer, UserProfileSerializer
 
 
 class OrderViewSet(viewsets.ReadOnlyModelViewSet):
@@ -114,3 +117,18 @@ class DeliveryViewSet(viewsets.ReadOnlyModelViewSet):
             },
             status=status.HTTP_200_OK,
         )
+
+
+class CurrentUserView(APIView):
+    """Read-only profile endpoint for the authenticated user.
+
+    - GET /api/v1/users/me/:
+        returns a minimal profile with name and address parts that the
+        mobile app can use for things like Google Maps integration.
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        serializer = UserProfileSerializer(request.user)
+        return Response(serializer.data)
