@@ -1,3 +1,5 @@
+from django.contrib.auth import get_user_model
+
 from rest_framework import serializers
 
 from orders.models import Order
@@ -46,4 +48,18 @@ class DeliverySerializer(serializers.ModelSerializer):
             "date",
             "status",
             "order",
+        ]
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        # get the data from the 'login_user' table
+        model = get_user_model()
+        # fields to be accessible through the API
+        fields = [
+            "id",
+            "full_name",
+            "street",
+            "region",
         ]
