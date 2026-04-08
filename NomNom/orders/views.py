@@ -7,6 +7,7 @@ from django.conf import settings
 from cart.models import Cart
 from .models import Order, OrderDetail
 from delivery.models import Delivery
+from payments.models import Payment
 
 from pathlib import Path
 import json
@@ -177,8 +178,20 @@ def checkout(request):
             order=order,
             address=delivery_address,
             date=delivery_date,
-            status='Pending'  # Default status
+            status="Pending",  # Default status
         )
+
+        # Record payment for this order and mark it as paid.
+        # For this assignment, we treat a successful checkout as a successful card payment.
+        Payment.objects.create(
+            order=order,
+            payment_method="Card",
+            amount=order.total_amount,
+            payment_status="Paid",
+        )
+
+        order.order_status = "Paid"
+        order.save(update_fields=["order_status"])
 
         # Clear cart
         cart.items.all().delete()
