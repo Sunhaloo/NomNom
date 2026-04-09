@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.contrib import messages
 from django.utils import timezone
 from django.conf import settings
+from decimal import Decimal
 
 from cart.models import Cart
 from .models import Order, OrderDetail
@@ -197,14 +199,27 @@ def checkout(request):
         cart.items.all().delete()
 
         # Redirect straight to confirmation page without a global success toast
-        return redirect('orders:order_confirmation', order_id=order.id)
+        return JsonResponse({
+            "success": True,
+            "order_id": order.id
+        })
+    
+    item_count = sum(item.quantity for item in cart_items)
+    total = cart.total_price
+    tax = total * Decimal('0.15')
+    delivery_cost = Decimal('1000.00')
+    grand_total = total + tax + delivery_cost
 
     # Render template
     return render(request, 'orders/checkout.html', {
         "cart": cart,
         "cart_items": cart_items,
         "cart_json": cart_json,
-        "total": cart.total_price,
+        "item_count": item_count,
+        "total": total,
+        "tax": tax,
+        "delivery": delivery_cost,
+        "grand_total": grand_total,
         "cities": cities,
         "user_profile": request.user  # Pass user profile data to template
     })
@@ -220,15 +235,25 @@ def order_confirmation(request, order_id):
 
     # Get delivery information - get the latest delivery record for the order
     try:
-        delivery = Delivery.objects.filter(order=order).latest('id')
+        #delivery = Delivery.objects.filter(order=order).latest('id')
+        delivery = Delivery.objects.filter(order=order).first()
     except Delivery.DoesNotExist:
         delivery = None
+
+    subtotal = order.total_amount
+    tax = subtotal * Decimal('0.15')
+    delivery_cost = Decimal('1000.00')
+    grand_total = subtotal + tax + delivery_cost    
 
     context = {
         'order': order,
         'order_details': order_details,
         'delivery': delivery,
-        'user_profile': request.user  # Include user profile for address fallback
+        'user_profile': request.user,  # Include user profile for address fallback
+        'subtotal': subtotal,
+        'tax': tax,
+        'delivery_cost': delivery_cost,
+        'grand_total': grand_total
     }
 
     return render(request, 'orders/order_confirmation.html', context)

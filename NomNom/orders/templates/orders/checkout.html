@@ -12,8 +12,15 @@
 {% block extra_js %}
     <script>
         // Initialize cart data from backend
-        window.initialCartData = {{ cart_json|safe }};
-        window.currentUsername = "{{ user_profile.username }}";
+        //window.initialCartData = {{ cart_json|safe }};
+        window.orderData = { 
+            subtotal: {{ total }},
+            tax: {{ total }} * 0.15, 
+            item_count: {{ item_count }},
+            delivery : 0,
+            total: {{ total }} + ({{ total }} * 0.15)
+        };
+        //window.currentUsername = "{{ user_profile.username }}";
     </script>
 {% endblock %}
 
@@ -159,26 +166,26 @@
                         <h2><i class="fas fa-receipt"></i> Order Summary</h2>
 
                         <div class="summary-row">
-                            <span>Subtotal (<span id="payment-item-count">0</span> items):</span>
-                            <span id="payment-subtotal">Rs 0.00</span>
+                            <span>Subtotal ({{ item_count }} items):</span>
+                            <span>Rs {{ total|floatformat:2 }}</span>
                         </div>
 
                         <div class="summary-row">
                             <span>Delivery:</span>
-                            <span id="payment-delivery-cost">Rs 0.00</span>
+                            <span>Rs {{ delivery|floatformat:2 }}</span>
                         </div>
 
                         <div class="summary-row">
                             <span>Tax (15%):</span>
-                            <span id="payment-tax-cost">Rs 0.00</span>
+                            <span>Rs {{ tax|floatformat:2 }}</span>
                         </div>
 
-                        <div class="summary-total">
-                            <div class="summary-row">
-                                <span>Total:</span>
-                                <span id="payment-total-cost">Rs 0.00</span>
-                            </div>
+                        <div class="summary-row summary-total">
+                            <span>Total:</span>
+                            <span>Rs {{ grand_total|floatformat:2 }}</span>
                         </div>
+                    
+
 
                         <div class="action-buttons">
                             <button class="btn btn-secondary" id="back-to-info-btn">
@@ -208,7 +215,12 @@
     <button class="toast-close" onclick="this.parentElement.classList.remove('show')">&times;</button>
 </div>
 
-<!-- JS -->
-    <script src="{% static 'orders/checkout.js' %}"></script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Modular JS -->
+<script src="{% static 'orders/checkout-validation.js' %}"></script>
+<script src="{% static 'orders/checkout-ui.js' %}"></script>
+<script src="{% static 'orders/checkout-ajax.js' %}"></script>
 
 {% endblock %}
