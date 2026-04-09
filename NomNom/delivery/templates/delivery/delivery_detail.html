@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delivery #{{ delivery.id }}{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'delivery/delivery.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="page-section">
+  <div class="container detail-box">
+    <h2><i class="fas fa-box"></i> Delivery Details</h2>
+    <hr>
+
+    <p><strong>Delivery ID:</strong> #{{ delivery.id }}</p>
+    <p><strong>Order ID:</strong> #{{ delivery.order.id }}</p>
+    <p><strong>Address:</strong> {{ delivery.address }}</p>
+    <p><strong>Status:</strong>
+      {% if delivery.status == 'Pending' %}
+        <span class="badge badge-warning">{{ delivery.status }}</span>
+      {% elif delivery.status == 'Done' %}
+        <span class="badge badge-success">{{ delivery.status }}</span>
+      {% else %}
+        <span class="badge badge-danger">{{ delivery.status }}</span>
+      {% endif %}
+    </p>
+    <p><strong>Delivery Date:</strong> {{ delivery.date|date:"d M Y" }}</p>
+
+    <div class="actions">
+      <a href="{% url 'delivery:delivery_list' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back to List</a>
+      {% if user.is_staff %}
+        <a href="{% url 'delivery:update_delivery_status' delivery.id %}" class="btn btn-primary">Update Status</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -4,10 +4,50 @@
 <!-- tell Django to load the files inside `static` folder -->
 {% load static %}
 
+{% block extra_css %}
+<style>
+  .order-toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #2e7d32;
+    color: #fff;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transform: translateX(120%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    font-size: 0.95rem;
+  }
+
+  .order-toast.show {
+    transform: translateX(0);
+  }
+
+  .order-toast-message {
+    flex-grow: 1;
+  }
+
+  .order-toast-close {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: 1.2rem;
+  }
+</style>
+{% endblock %}
+
 <!-- modify the tab name for our landing page -->
 {% block title %}
 Landing Page
 {% endblock %}
+
+{% block body_class %}white-navbar-brown-bg{% endblock %}
 
 <!-- content that will be found inside the `landing.html` page specifically -->
 {% block content %}
@@ -15,12 +55,14 @@ Landing Page
 <section class="hero">
   <img src="{% static 'landing/images/fudgy.png' %}" alt="Fudgy McFudgecake">
   <div class="hero-text">
-    <h2>Bestseller of the month!</h2>
+    <h2>Bestseller Of All Time!</h2>
     <h1>Fudgy McFudgecake</h1>
-    {% csrf_token %}
-    <button class="hover-grow-shadow"
-      onclick="addFudgyToCart(event, '{{ fudgy_cake.pastry_name }}', {{ fudgy_cake.pastry_price }}, '{{ fudgy_cake.image }}', '{{ fudgy_cake.pastry_category }}')">Order
-      Now</button>
+    {% if fudgy_cake %}
+      {% csrf_token %}
+      <button class="hover-grow-shadow"
+        onclick="addFudgyToCart(event, '{{ fudgy_cake.pastry_name }}', '{{ fudgy_cake.pastry_price }}', '{{ fudgy_cake.image }}', '{{ fudgy_cake.pastry_category }}')">Order
+        Now</button>
+    {% endif %}
   </div>
 </section>
 
@@ -174,9 +216,74 @@ Landing Page
 
           // Trigger flying animation
           createFlyingAnimation(btn);
+        } else if (data && !data.success) {
+          // Surface backend error via existing order toast
+          var toast = document.getElementById('order-toast');
+          var messageEl = document.getElementById('order-toast-message');
+          if (toast && messageEl) {
+            messageEl.textContent = data.message || 'Could not add item to cart.';
+            toast.classList.add('show');
+            setTimeout(function () {
+              toast.classList.remove('show');
+            }, 3000);
+          }
         }
       })
-      .catch(error => console.error('Error:', error));
+      .catch(error => {
+        console.error('Error:', error);
+        var toast = document.getElementById('order-toast');
+        var messageEl = document.getElementById('order-toast-message');
+        if (toast && messageEl) {
+          messageEl.textContent = 'Something went wrong. Please try again.';
+          toast.classList.add('show');
+          setTimeout(function () {
+            toast.classList.remove('show');
+          }, 3000);
+        }
+      });
   }
+</script>
+
+<div class="order-toast" id="order-toast">
+  <span class="order-toast-message" id="order-toast-message">
+    {% if order_id %}
+      Order #{{ order_id }} created successfully!
+    {% else %}
+      Your order was placed successfully!
+    {% endif %}
+  </span>
+  <button class="order-toast-close" onclick="this.parentElement.classList.remove('show')">
+    &times;
+  </button>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var shouldShow = {{ order_success|yesno:"true,false" }};
+    if (!shouldShow) {
+      return;
+    }
+
+    var toast = document.getElementById('order-toast');
+    if (!toast) return;
+
+    toast.classList.add('show');
+    setTimeout(function () {
+      toast.classList.remove('show');
+    }, 3000);
+
+    if (window.history && window.history.replaceState) {
+      try {
+        var url = new URL(window.location.href);
+        url.searchParams.delete('order_success');
+        url.searchParams.delete('order_id');
+        var newSearch = url.searchParams.toString();
+        var newUrl = url.pathname + (newSearch ? '?' + newSearch : '');
+        window.history.replaceState({}, '', newUrl);
+      } catch (e) {
+        // ignore errors in older browsers
+      }
+    }
+  });
 </script>
 {% endblock %}

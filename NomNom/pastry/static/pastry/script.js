@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let currentProductName = '';
     let selectedRating = 0;
+    let isSubmittingReview = false; // Flag to prevent multiple submissions
 
     // Quantity control functions
     window.incrementQuantity = function (event) {
@@ -37,11 +38,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // Get the button that was clicked
         const clickedButton = event.target.closest('.btn-add-cart');
 
-        // Create flying animation
-        if (clickedButton) {
-            createFlyingAnimation(clickedButton);
-        }
-
         // Get CSRF token
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 
@@ -63,12 +59,12 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => {
                 if (response.status === 403 || response.status === 401) {
                     // If user not logged in, show login prompt
+                    // Don't show animation for unauthenticated users
                     showLoginPrompt();
                     return Promise.reject('Not authenticated');
                 }
 
-                // Only show animation if logged in
-                const clickedButton = event.target.closest('.btn-add-cart');
+                // Only show animation if logged in and request was successful
                 if (clickedButton) {
                     createFlyingAnimation(clickedButton);
                 }
@@ -95,9 +91,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     window.addToCart = function (productName, productPrice, productImage) {
-        // Get the button that was clicked
-        const clickedButton = event.target.closest('.btn-add-cart');
-
         // Get CSRF token
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 
@@ -118,14 +111,13 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => {
                 if (response.status === 403 || response.status === 401) {
                     // If user not logged in, show login prompt
+                    // Don't show animation for unauthenticated users
                     showLoginPrompt();
                     return Promise.reject('Not authenticated');
                 }
 
-                // Only show animation if logged in
-                if (clickedButton) {
-                    createFlyingAnimation(clickedButton);
-                }
+                // Note: We can't show animation here since we don't have an event context
+                // Animation is typically shown when called from an event handler
 
                 return response.json();
             })
@@ -207,40 +199,117 @@ document.addEventListener('DOMContentLoaded', function () {
         document.body.style.overflow = 'auto';
     };
 
-    // Load product reviews
+    // Load product reviews from server
     function loadProductReviews(productName) {
-        // Default to empty structure if not found
-        const productReviews = reviewsData[productName] || { rating: 0, count: 0, reviews: [] };
-
-        // Update summary
-        document.getElementById('summaryRating').textContent = productReviews.rating.toFixed(1);
-        document.getElementById('summaryCount').textContent = `Based on ${productReviews.count} reviews`;
-
-        // Update summary stars
-        const summaryStars = document.getElementById('summaryStars');
-        summaryStars.innerHTML = generateStars(productReviews.rating);
-
-        // Load review list
-        const reviewList = document.getElementById('reviewList');
-        reviewList.innerHTML = '';
-
-        if (productReviews.reviews.length === 0) {
-            reviewList.innerHTML = '<div class="review-item">No reviews yet. Be the first reviewer!</div>';
-        } else {
-            productReviews.reviews.forEach(review => {
-                const reviewItem = document.createElement('div');
-                reviewItem.className = 'review-item';
-                reviewItem.innerHTML = `
-            <div class="review-header">
-              <div class="reviewer-name">${review.name}</div>
-              <div class="review-date">${review.date}</div>
-            </div>
-            <div class="review-rating">${generateStars(review.rating)}</div>
-            <div class="review-text">${review.text}</div>
-          `;
-                reviewList.appendChild(reviewItem);
-            });
+        // Find the pastry ID for this product name
+        const productCard = document.querySelector(`.product-card[data-product="${productName}"]`);
+        if (!productCard) {
+            console.error('Could not find product card for', productName);
+            return;
         }
+
+        const pastryId = productCard.getAttribute('data-pastry-id');
+        if (!pastryId) {
+            console.error('Could not find pastry ID for', productName);
+            return;
+        }
+
+        // Fetch reviews from the server
+        fetch(`/review/get/${pastryId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.reviews) {
+                    // Calculate average rating
+                    let totalRating = 0;
+                    if (data.reviews.length > 0) {
+                        totalRating = data.reviews.reduce((sum, review) => sum + review.rating, 0);
+                    }
+                    const averageRating = data.reviews.length > 0 ? (totalRating / data.reviews.length) : 0;
+
+                    // Update summary in modal
+                    document.getElementById('summaryRating').textContent = averageRating.toFixed(1);
+                    document.getElementById('summaryCount').textContent = `Based on ${data.reviews.length} reviews`;
+
+                    // Update summary stars in modal
+                    const summaryStars = document.getElementById('summaryStars');
+                    summaryStars.innerHTML = generateStars(averageRating);
+
+                    // Load review list in modal
+                    const reviewList = document.getElementById('reviewList');
+                    reviewList.innerHTML = '';
+
+                    if (data.reviews.length === 0) {
+                        reviewList.innerHTML = '<div class="review-item">No reviews yet. Be the first reviewer!</div>';
+                    } else {
+                        data.reviews.forEach(review => {
+                            const reviewItem = document.createElement('div');
+                            reviewItem.className = 'review-item';
+                            reviewItem.innerHTML = `
+                        <div class="review-header">
+                          <div class="reviewer-name">${review.user}</div>
+                          <div class="review-date">${review.date}</div>
+                        </div>
+                        <div class="review-rating">${generateStars(review.rating)}</div>
+                        <div class="review-text">${review.comment}</div>
+                      `;
+                            reviewList.appendChild(reviewItem);
+                        });
+                    }
+
+                    // Update the local cache with server data
+                    reviewsData[productName] = {
+                        rating: averageRating,
+                        count: data.reviews.length,
+                        reviews: data.reviews.map(r => ({
+                            name: r.user,
+                            rating: r.rating,
+                            date: r.date,
+                            text: r.comment
+                        }))
+                    };
+
+                    // Also update the underlying product card on the page
+                    updateProductCardRating(productName);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading reviews:', error);
+                // Fallback to cached data if there's an error
+                const productReviews = reviewsData[productName] || { rating: 0, count: 0, reviews: [] };
+
+                // Update summary in modal
+                document.getElementById('summaryRating').textContent = productReviews.rating.toFixed(1);
+                document.getElementById('summaryCount').textContent = `Based on ${productReviews.count} reviews`;
+
+                // Update summary stars in modal
+                const summaryStars = document.getElementById('summaryStars');
+                summaryStars.innerHTML = generateStars(productReviews.rating);
+
+                // Load review list in modal
+                const reviewList = document.getElementById('reviewList');
+                reviewList.innerHTML = '';
+
+                if (productReviews.reviews.length === 0) {
+                    reviewList.innerHTML = '<div class="review-item">No reviews yet. Be the first reviewer!</div>';
+                } else {
+                    productReviews.reviews.forEach(review => {
+                        const reviewItem = document.createElement('div');
+                        reviewItem.className = 'review-item';
+                        reviewItem.innerHTML = `
+                    <div class="review-header">
+                      <div class="reviewer-name">${review.name}</div>
+                      <div class="review-date">${review.date}</div>
+                    </div>
+                    <div class="review-rating">${generateStars(review.rating)}</div>
+                    <div class="review-text">${review.text}</div>
+                  `;
+                        reviewList.appendChild(reviewItem);
+                    });
+                }
+
+                // Keep the product card in sync with whatever data we have
+                updateProductCardRating(productName);
+            });
     }
 
     // Generate star rating HTML
@@ -315,53 +384,90 @@ document.addEventListener('DOMContentLoaded', function () {
         reviewForm.addEventListener('submit', function (e) {
             e.preventDefault();
 
+            // Prevent multiple submissions
+            if (isSubmittingReview) {
+                return; // Already submitting, ignore additional clicks
+            }
+
+            isSubmittingReview = true; // Set flag to prevent multiple submissions
+
             // Check if user is logged in
             const isAuthenticated = this.dataset.userAuthenticated === 'true';
             if (!isAuthenticated) {
                 showLoginPrompt('You must login and purchase this item to submit a review.');
+                isSubmittingReview = false; // Reset flag
                 return;
             }
 
             if (selectedRating === 0) {
                 showNotification('Please select a rating', 'error');
+                isSubmittingReview = false; // Reset flag
                 return;
             }
 
-            const name = this.dataset.username; // Get username from data attribute
             const text = document.getElementById('reviewText').value;
-            // Format date as dd/mm/yyyy
-            const today = new Date();
-            const date = String(today.getDate()).padStart(2, '0') + '/' +
-                String(today.getMonth() + 1).padStart(2, '0') + '/' +
-                today.getFullYear();
+            const pastryName = currentProductName; // Use the current product name
 
-            // Add new review to data
-            if (!reviewsData[currentProductName]) {
-                reviewsData[currentProductName] = { rating: 0, count: 0, reviews: [] };
+            // Get the pastry ID by searching the page for it
+            const productCard = document.querySelector(`.product-card[data-product="${pastryName}"]`);
+            if (!productCard) {
+                showNotification('Error: Could not find pastry information', 'error');
+                isSubmittingReview = false; // Reset flag
+                return;
             }
-            const productReviews = reviewsData[currentProductName];
 
-            const newReview = { name, rating: selectedRating, date, text };
-            productReviews.reviews.unshift(newReview);
+            const pastryId = productCard.getAttribute('data-pastry-id');
+            if (!pastryId) {
+                showNotification('Error: Could not find pastry ID', 'error');
+                isSubmittingReview = false; // Reset flag
+                return;
+            }
 
-            // Recalculate average rating
-            const totalRating = productReviews.reviews.reduce((sum, review) => sum + review.rating, 0);
-            productReviews.rating = totalRating / productReviews.reviews.length;
-            productReviews.count++;
+            // Get CSRF token
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 
-            // Update product card rating
-            updateProductCardRating(currentProductName);
+            // Make AJAX request to backend
+            fetch(`/review/add/${pastryId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken || ''
+                },
+                body: JSON.stringify({
+                    rating: selectedRating,
+                    comment: text
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message, 'success');
 
-            // Reload reviews
-            loadProductReviews(currentProductName);
+                    // Reset form
+                    reviewForm.reset();
+                    selectedRating = 0;
+                    updateRatingStars(0);
 
-            // Reset form
-            this.reset();
-            selectedRating = 0;
-            updateRatingStars(0);
+                    // Reload reviews to show the new one
+                    setTimeout(() => {
+                        loadProductReviews(currentProductName);
+                    }, 1000);
 
-            // Show success notification
-            showNotification('Your review has been added successfully!', 'success');
+                    // Close the modal after successful submission
+                    setTimeout(() => {
+                        closeReviewModal();
+                    }, 1500); // Close after 1.5 seconds to allow user to see the success message
+                } else {
+                    showNotification(data.error || 'Failed to submit review', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error submitting review', 'error');
+            })
+            .finally(() => {
+                isSubmittingReview = false; // Always reset the flag
+            });
         });
     }
 

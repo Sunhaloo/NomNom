@@ -1,0 +1,159 @@
+
+.page-section {
+  padding: 2rem 1rem;
+  background-color: #fff8f3;
+  min-height: 80vh;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+
+.section-title, h2 {
+  color: #3e2723;
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.styled-table th {
+  background-color: #795548;
+  color: #fff;
+  text-align: center;
+  padding: 12px;
+  font-weight: 600;
+}
+
+.styled-table td {
+  text-align: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  color: #333;
+}
+
+.styled-table tr:nth-child(even) {
+  background-color: #faf3ee;
+}
+
+
+.badge {
+  padding: 6px 12px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.badge-warning {
+  background-color: #f4b400;
+}
+
+.badge-success {
+  background-color: #0f9d58;
+}
+
+.badge-danger {
+  background-color: #db4437;
+}
+
+
+.btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #fff;
+  font-weight: 600;
+  display: inline-block;
+  transition: background-color 0.2s ease;
+}
+
+.btn-primary {
+  background-color: #6d4c41;
+}
+
+.btn-primary:hover {
+  background-color: #5d4037;
+}
+
+.btn-secondary {
+  background-color: #a1887f;
+}
+
+.btn-secondary:hover {
+  background-color: #8d6e63;
+}
+
+
+.detail-box {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.detail-box p {
+  font-size: 1.05rem;
+  margin: 0.75rem 0;
+  color: #333;
+}
+
+
+.update-form {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.update-form select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.update-form .buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+
+.empty-msg {
+  font-size: 1.1rem;
+  text-align: center;
+  color: #555;
+  margin-top: 2rem;
+}
+
+
+@media (max-width: 768px) {
+  .styled-table th, .styled-table td {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+
+  .update-form, .detail-box {
+    width: 90%;
+  }
+}

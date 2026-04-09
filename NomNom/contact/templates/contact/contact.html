@@ -10,33 +10,51 @@
 <div class="contact-page">
   <div class="contact-container">
 
-    <!-- Left-side form -->
+    <!-- LEFT SIDE: FORM -->
     <div class="contact-form">
       <h1>Contact Us</h1>
-      <form action="#" method="post">
+
+      {# Hidden container to expose Django messages to JavaScript for toasts #}
+      {% if messages %}
+        <div id="django-messages" style="display: none;">
+          {% for message in messages %}
+            <span class="django-message" data-tags="{{ message.tags|default:'' }}">{{ message }}</span>
+          {% endfor %}
+        </div>
+      {% endif %}
+      <form method="post">
         {% csrf_token %}
         <div class="form-row">
           <div class="form-group">
-            <label for="first-name">First name *</label>
-            <input type="text" id="first-name" name="first-name" placeholder="Aisha" required pattern="[A-Za-z\s]+"
-              title="Name should only contain letters">
+            <label for="{{ form.first_name.id_for_label }}">First name</label>
+            {{ form.first_name }}
+            {% if form.first_name.errors %}
+              <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.first_name.errors }}</div>
+            {% endif %}
           </div>
           <div class="form-group">
-            <label for="last-name">Last name *</label>
-            <input type="text" id="last-name" name="last-name" placeholder="Ramjahn" required pattern="[A-Za-z\s]+"
-              title="Name should only contain letters">
+            <label for="{{ form.last_name.id_for_label }}">Last name</label>
+            {{ form.last_name }}
+            {% if form.last_name.errors %}
+              <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.last_name.errors }}</div>
+            {% endif %}
           </div>
         </div>
 
         <div class="form-group">
-          <label for="email">Email address *</label>
-          <input type="email" id="email" name="email" placeholder="aisha@gmail.com" required>
+          <label for="{{ form.email.id_for_label }}">Email address</label>
+          {{ form.email }}
+          {% if form.email.errors %}
+            <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.email.errors }}</div>
+          {% endif %}
         </div>
 
         <div class="form-group">
-          <label for="message">Your message *</label>
-          <textarea id="message" name="message" rows="4" placeholder="Enter your question or message" required
-            minlength="10"></textarea>
+          <label for="{{ form.message.id_for_label }}">Your message</label>
+          {{ form.message }}
+          {% if form.message.errors %}
+            <div class="error-message" style="color:red; font-size: 0.8em;">{{ form.message.errors }}</div>
+          {% endif %}
         </div>
 
         <button type="submit" class="submit-btn hover-grow-shadow">Submit</button>
@@ -50,4 +68,15 @@
 
   </div>
 </div>
+
+<!-- Toast notification for contact page -->
+<div class="toast" id="toast">
+  <span class="toast-message" id="toast-message"></span>
+  <button class="toast-close" onclick="this.parentElement.classList.remove('show')">&times;</button>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'contact/contact.js' %}"></script>
 {% endblock %}
