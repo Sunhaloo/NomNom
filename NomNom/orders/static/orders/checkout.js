@@ -1,31 +1,26 @@
-// Checkout/Order-specific JavaScript functionality
+// Checkout/Order-specific JavaScript functionality (jQuery-enhanced)
 
-document.addEventListener('DOMContentLoaded', () => {
+$(function () {
     let cartData = window.initialCartData || [];
-    let deliveryCost = window.deliveryCost || 700.00;  // Use window.deliveryCost if available, otherwise default
+    let deliveryCost = window.deliveryCost || 700.0; // Use window.deliveryCost if available, otherwise default
     const TAX_RATE = 0.15; // 15% tax for Mauritius
 
-    const orderSummary = document.getElementById('order-summary');
-    const deliveryOptions = document.getElementsByName('delivery');
-    const deliveryDateInput = document.getElementById('deliveryDate');
-    const datePickerGroup = document.getElementById('date-picker-group');
-    const itemCountSpan = document.getElementById('item-count');
-    const subtotalSpan = document.getElementById('subtotal');
-    const deliveryCostSpan = document.getElementById('delivery-cost');
-    const taxCostSpan = document.getElementById('tax-cost');
-    const totalCostSpan = document.getElementById('total-cost');
+    const $orderSummary = $('#order-summary');
+    const $deliveryOptions = $('input[name="delivery"]');
+    const $deliveryDateInput = $('#deliveryDate');
+    const $datePickerGroup = $('#date-picker-group');
+    const $itemCountSpan = $('#item-count');
+    const $subtotalSpan = $('#subtotal');
+    const $deliveryCostSpan = $('#delivery-cost');
+    const $taxCostSpan = $('#tax-cost');
+    const $totalCostSpan = $('#total-cost');
 
-    
     // Payment page summary elements (for checkout)
     window.paymentItemCountSpan = document.getElementById('payment-item-count');
     window.paymentSubtotalSpan = document.getElementById('payment-subtotal');
     window.paymentDeliveryCostSpan = document.getElementById('payment-delivery-cost');
     window.paymentTaxCostSpan = document.getElementById('payment-tax-cost');
     window.paymentTotalCostSpan = document.getElementById('payment-total-cost');
-
-    const pages = document.querySelectorAll('.page-section');
-    const progressSteps = document.querySelectorAll('.progress-step');
-    const progressTrack = document.getElementById('progress-track');
 
     // Key for storing card details per logged-in user (client-side only)
     const username = window.currentUsername || 'guest';
@@ -47,100 +42,99 @@ document.addEventListener('DOMContentLoaded', () => {
     // Let cart.js handle the page navigation; checkout.js just enhances functionality
 
     function updateOrderSummary() {
-        const subtotal = cartData.reduce((total, item) => total + (item.price * (item.quantity || 1)), 0);
+        const subtotal = cartData.reduce((total, item) => total + item.price * (item.quantity || 1), 0);
         const itemCount = cartData.reduce((total, item) => total + (item.quantity || 1), 0);
         const tax = subtotal * TAX_RATE;
         const total = subtotal + deliveryCost + tax;
 
         // Update cart page summary elements (if they exist)
-        if(itemCountSpan) itemCountSpan.textContent = itemCount;
-        if(subtotalSpan) subtotalSpan.textContent = `Rs ${subtotal.toFixed(2)}`;
-        if(deliveryCostSpan) deliveryCostSpan.textContent = `Rs ${deliveryCost.toFixed(2)}`;
-        if(taxCostSpan) taxCostSpan.textContent = `Rs ${tax.toFixed(2)}`;
-        if(totalCostSpan) totalCostSpan.textContent = `Rs ${total.toFixed(2)}`;
+        if ($itemCountSpan.length) $itemCountSpan.text(itemCount);
+        if ($subtotalSpan.length) $subtotalSpan.text(`Rs ${subtotal.toFixed(2)}`);
+        if ($deliveryCostSpan.length) $deliveryCostSpan.text(`Rs ${deliveryCost.toFixed(2)}`);
+        if ($taxCostSpan.length) $taxCostSpan.text(`Rs ${tax.toFixed(2)}`);
+        if ($totalCostSpan.length) $totalCostSpan.text(`Rs ${total.toFixed(2)}`);
 
         // Update payment page summary elements (if they exist)
-        if(window.paymentItemCountSpan) window.paymentItemCountSpan.textContent = itemCount;
-        if(window.paymentSubtotalSpan) window.paymentSubtotalSpan.textContent = `Rs ${subtotal.toFixed(2)}`;
-        if(window.paymentDeliveryCostSpan) window.paymentDeliveryCostSpan.textContent = `Rs ${deliveryCost.toFixed(2)}`;
-        if(window.paymentTaxCostSpan) window.paymentTaxCostSpan.textContent = `Rs ${tax.toFixed(2)}`;
-        if(window.paymentTotalCostSpan) window.paymentTotalCostSpan.textContent = `Rs ${total.toFixed(2)}`;
+        if (window.paymentItemCountSpan) window.paymentItemCountSpan.textContent = itemCount;
+        if (window.paymentSubtotalSpan) window.paymentSubtotalSpan.textContent = `Rs ${subtotal.toFixed(2)}`;
+        if (window.paymentDeliveryCostSpan) window.paymentDeliveryCostSpan.textContent = `Rs ${deliveryCost.toFixed(2)}`;
+        if (window.paymentTaxCostSpan) window.paymentTaxCostSpan.textContent = `Rs ${tax.toFixed(2)}`;
+        if (window.paymentTotalCostSpan) window.paymentTotalCostSpan.textContent = `Rs ${total.toFixed(2)}`;
     }
 
-    deliveryOptions.forEach(option => {
-        option.addEventListener('change', (event) => {
-            if (event.target.value === 'express') {
-                deliveryCost = 700.00;
-                if(datePickerGroup) datePickerGroup.classList.remove('show');
-            } else if (event.target.value === 'schedule') {
-                deliveryCost = 300.00;
-                if(datePickerGroup) datePickerGroup.classList.add('show');
-                // Set minimum date to 2 days from today
+    // Delivery option changes (used on pages that include delivery radios)
+    if ($deliveryOptions.length) {
+        $deliveryOptions.on('change', function () {
+            const value = $(this).val();
+            if (value === 'express') {
+                deliveryCost = 700.0;
+                if ($datePickerGroup.length) $datePickerGroup.removeClass('show');
+            } else if (value === 'schedule') {
+                deliveryCost = 300.0;
+                if ($datePickerGroup.length) $datePickerGroup.addClass('show');
                 const minDate = new Date();
                 minDate.setDate(minDate.getDate() + 2);
                 const minDateStr = minDate.toISOString().split('T')[0];
-                if(deliveryDateInput) deliveryDateInput.min = minDateStr;
-                if(deliveryDateInput) deliveryDateInput.disabled = false;
+                if ($deliveryDateInput.length) {
+                    $deliveryDateInput.attr('min', minDateStr).prop('disabled', false);
+                }
             } else {
-                // Default
                 const tomorrow = new Date();
                 tomorrow.setDate(tomorrow.getDate() + 1);
-                if(deliveryDateInput) deliveryDateInput.min = tomorrow.toISOString().split('T')[0];
+                if ($deliveryDateInput.length) {
+                    $deliveryDateInput.attr('min', tomorrow.toISOString().split('T')[0]);
+                }
             }
             updateOrderSummary();
         });
-    });
+    }
 
-    // Handle date selection
-    if(deliveryDateInput) {
-        deliveryDateInput.addEventListener('change', (event) => {
-            const selectedDate = new Date(event.target.value);
+    // Handle date selection (used on cart page when delivery date exists)
+    if ($deliveryDateInput.length) {
+        $deliveryDateInput.on('change', function () {
+            const selectedDate = new Date($(this).val());
             const minDate = new Date();
             minDate.setDate(minDate.getDate() + 2);
             minDate.setHours(0, 0, 0, 0);
 
             if (selectedDate < minDate) {
                 showToast('Please select a delivery date at least 2 days from today');
-                document.getElementById('date-error').style.display = 'none';
+                $('#date-error').hide();
                 return;
             }
-            // Clear error if valid
-            document.getElementById('date-error').style.display = 'none';
+            $('#date-error').hide();
         });
 
         // Initialize date picker min date
         const minDate = new Date();
         minDate.setDate(minDate.getDate() + 2);
         const minDateStr = minDate.toISOString().split('T')[0];
-        deliveryDateInput.min = minDateStr;
-        deliveryDateInput.disabled = true; // Disabled by default until schedule is selected
+        $deliveryDateInput.attr('min', minDateStr).prop('disabled', true);
     }
 
-    // Page Navigation Listeners
-    const toInfoBtn = document.getElementById('to-info-btn');
-    if (toInfoBtn) {
-        toInfoBtn.addEventListener('click', () => {
+    // Page Navigation Listeners (used on cart-page variant)
+    const $toInfoBtn = $('#to-info-btn');
+    if ($toInfoBtn.length) {
+        $toInfoBtn.on('click', function () {
             if (cartData.length > 0) {
-                // Validate date if scheduled
-                const scheduleRadio = document.getElementById('schedule');
-                if (scheduleRadio && scheduleRadio.checked) {
-                    if (!deliveryDateInput.value) {
+                const $scheduleRadio = $('#schedule');
+                if ($scheduleRadio.length && $scheduleRadio.prop('checked')) {
+                    if (!$deliveryDateInput.val()) {
                         showToast('Please select a delivery date before proceeding.');
-                        document.getElementById('date-error').textContent = 'Please select a delivery date.';
-                        document.getElementById('date-error').style.display = 'block';
+                        $('#date-error').text('Please select a delivery date.').show();
                         return;
                     }
                 }
                 showPage('info-page', 2);
             } else {
-                showToast("Your cart is empty!");
+                showToast('Your cart is empty!');
             }
         });
     }
 
-    const backToCartBtn = document.getElementById('back-to-cart-btn');
-    if (backToCartBtn) {
-        backToCartBtn.addEventListener('click', () => {
+    const $backToCartBtn = $('#back-to-cart-btn');
+    if ($backToCartBtn.length) {
+        $backToCartBtn.on('click', function () {
             showPage('cart-page', 1);
         });
     }
@@ -171,55 +165,51 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function validateField(fieldId, validatorName) {
-        const input = document.getElementById(fieldId);
-        const errorEl = document.getElementById(`${fieldId}-error`);
-        if (!input || !errorEl) return false;
+        const $input = $('#' + fieldId);
+        const $errorEl = $('#' + fieldId + '-error');
+        if (!$input.length || !$errorEl.length) return false;
 
-        const errorMessage = validators[validatorName](input.value);
+        const value = $input.val();
+        const errorMessage = validators[validatorName](value);
         if (errorMessage) {
-            errorEl.textContent = errorMessage;
-            errorEl.style.display = 'block';
+            $errorEl.text(errorMessage).show();
             return false;
-        } else {
-            errorEl.style.display = 'none';
-            return true;
         }
+        $errorEl.hide();
+        return true;
     }
 
     // --- REAL-TIME VALIDATION & FORMATTING LISTENERS ---
     ['email', 'phone', 'firstName', 'lastName', 'address', 'city', 'zip', 'nameOnCard', 'cardNumber'].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
+        const $el = $('#' + id);
+        if (!$el.length) return;
 
         let validator = id;
         if (id === 'firstName' || id === 'lastName' || id === 'nameOnCard') validator = 'name';
 
-        el.addEventListener('input', () => {
-            // For phone, allow typing but validate on input
+        $el.on('input', function () {
+            let val = $(this).val();
+
             if (id === 'phone') {
-                el.value = el.value.replace(/[^0-9]/g, '');
+                val = val.replace(/[^0-9]/g, '');
+                $(this).val(val);
             }
 
-            // For card number, auto-format as "XXXX XXXX XXXX XXXX"
             if (id === 'cardNumber') {
-                // Strip all non-digits and limit to 16 digits
-                let digits = el.value.replace(/\D/g, '').slice(0, 16);
-
-                // Group into chunks of 4
+                let digits = val.replace(/\D/g, '').slice(0, 16);
                 const groups = digits.match(/.{1,4}/g) || [];
-
-                // Join with spaces for display
-                el.value = groups.join(' ');
+                $(this).val(groups.join(' '));
+                val = $(this).val();
             }
-            // Check validity to clear error, but don't show new error
-            const errorEl = document.getElementById(`${id}-error`);
-            const errorMessage = validators[validator](el.value);
+
+            const $errorEl = $('#' + id + '-error');
+            const errorMessage = validators[validator](val);
             if (!errorMessage) {
-                errorEl.style.display = 'none';
+                $errorEl.hide();
             }
         });
 
-        el.addEventListener('blur', () => {
+        $el.on('blur', function () {
             validateField(id, validator);
         });
     });
@@ -247,11 +237,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    const toPaymentBtn = document.getElementById('to-payment-btn');
-    if (toPaymentBtn) {
-        toPaymentBtn.addEventListener('click', () => {
+    const $toPaymentBtn = $('#to-payment-btn');
+    if ($toPaymentBtn.length) {
+        $toPaymentBtn.on('click', function () {
             const contactValid = validateField('email', 'email') & validateField('phone', 'phone');
-            const addressValid = validateField('firstName', 'name') &
+            const addressValid =
+                validateField('firstName', 'name') &
                 validateField('lastName', 'name') &
                 validateField('address', 'address') &
                 validateField('city', 'city') &
@@ -265,85 +256,79 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const backToInfoBtn = document.getElementById('back-to-info-btn');
-    if (backToInfoBtn) {
-        backToInfoBtn.addEventListener('click', () => {
+    const $backToInfoBtn = $('#back-to-info-btn');
+    if ($backToInfoBtn.length) {
+        $backToInfoBtn.on('click', function () {
             showPage('info-page', 2);
         });
     }
 
     function showToast(message) {
-        const toast = document.getElementById('toast');
-        const toastMessage = document.getElementById('toast-message');
-        if(toast && toastMessage) {
-            toastMessage.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+        const $toast = $('#toast');
+        const $toastMessage = $('#toast-message');
+        if ($toast.length && $toastMessage.length) {
+            $toastMessage.text(message);
+            $toast.addClass('show');
+            setTimeout(() => $toast.removeClass('show'), 3000);
         }
     }
 
     // --- CART ITEM MANIPULATION (Quantity updates, removal) ---
-    const cartList = document.getElementById('cart-list');
-    if(cartList) {
-        cartList.addEventListener('click', (event) => {
-            const itemCard = event.target.closest('.cart-item-card');
-            if (!itemCard) return;
-            const itemIndex = parseInt(itemCard.dataset.index);
+    const $cartList = $('#cart-list');
+    if ($cartList.length) {
+        $cartList.on('click', '.cart-item-card .qty-plus, .cart-item-card .qty-minus, .cart-item-card .remove-item, .cart-item-card .remove-item i', function () {
+            const $itemCard = $(this).closest('.cart-item-card');
+            if (!$itemCard.length) return;
+            const itemIndex = parseInt($itemCard.data('index'), 10);
             const item = cartData[itemIndex];
             if (!item) return;
 
-            if (event.target.classList.contains('qty-plus')) {
+            if ($(this).hasClass('qty-plus')) {
                 const newQuantity = (item.quantity || 1) + 1;
                 updateQuantityInBackend(itemIndex, newQuantity);
-            } else if (event.target.classList.contains('qty-minus')) {
+            } else if ($(this).hasClass('qty-minus')) {
                 if ((item.quantity || 1) > 1) {
                     const newQuantity = (item.quantity || 1) - 1;
                     updateQuantityInBackend(itemIndex, newQuantity);
                 }
-            } else if (event.target.classList.contains('remove-item') || event.target.parentElement.classList.contains('remove-item')) {
-                // Redirect to Django backend to remove item
+            } else if ($(this).closest('.remove-item').length) {
                 window.location.href = `/cart/remove/${itemIndex}/`;
             }
         });
     }
 
-    // Function to update quantity in backend via AJAX
+    // Function to update quantity in backend via AJAX (jQuery)
     function updateQuantityInBackend(index, quantity) {
-        fetch('/cart/update/', {
+        $.ajax({
+            url: '/cart/update/',
             method: 'POST',
+            contentType: 'application/json',
             headers: {
-                'Content-Type': 'application/json',
                 'X-CSRFToken': getCookie('csrftoken')
             },
-            body: JSON.stringify({
-                index: index,
-                quantity: quantity
-            })
-        })
-            .then(response => response.json())
-            .then(data => {
+            data: JSON.stringify({ index: index, quantity: quantity }),
+            success: function (data) {
                 if (data.success) {
-                    // Update local cart data
                     cartData[index].quantity = quantity;
-                    renderCart(); // Re-render the cart with updated data
+                    renderCart();
 
-                    // Update cart count in navbar
-                    const cartCountElement = document.getElementById('cart-count');
-                    if (cartCountElement) {
-                        cartCountElement.textContent = data.cart_count;
+                    const $cartCountElement = $('#cart-count');
+                    if ($cartCountElement.length) {
+                        $cartCountElement.text(data.cart_count);
                         if (data.cart_count === 0) {
-                            cartCountElement.classList.add('hidden');
+                            $cartCountElement.addClass('hidden');
                         } else {
-                            cartCountElement.classList.remove('hidden');
+                            $cartCountElement.removeClass('hidden');
                         }
                     }
                 } else {
                     showToast('Failed to update quantity');
                 }
-            })
-            .catch(error => {
+            },
+            error: function () {
                 showToast('Error updating quantity');
-            });
+            }
+        });
     }
 
     // Helper function to get CSRF token
@@ -364,34 +349,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to render cart items (for when cart items are shown on checkout page)
     function renderCart() {
-        const cartList = document.getElementById('cart-list');
-        if (!cartList) return; // Only render if cart list exists on this page
+        const $cartListLocal = $('#cart-list');
+        if (!$cartListLocal.length) return; // Only render if cart list exists on this page
 
-        cartList.innerHTML = '';
-        const cartPage = document.getElementById('cart-page');
+        $cartListLocal.empty();
+        const $cartPage = $('#cart-page');
 
         if (cartData.length === 0) {
-            if(cartPage) cartPage.classList.add('empty-state');
-            const orderSummary = document.getElementById('order-summary');
-            if(orderSummary) orderSummary.style.display = 'none';
-            const emptyCartMessage = document.getElementById('empty-cart-message');
-            const cartPageActions = document.getElementById('cart-page-actions');
-            if(emptyCartMessage) emptyCartMessage.style.display = 'block';
-            if(cartPageActions) cartPageActions.style.display = 'none';
-            const cartItemsSection = document.querySelector('.cart-items-section');
-            if(cartItemsSection) cartItemsSection.style.display = 'none'; // Hide header and list
+            if ($cartPage.length) $cartPage.addClass('empty-state');
+            if ($orderSummary.length) $orderSummary.hide();
+            $('#empty-cart-message').show();
+            $('#cart-page-actions').hide();
+            $('.cart-items-section').hide();
         } else {
-            if(cartPage) cartPage.classList.remove('empty-state');
-            const orderSummary = document.getElementById('order-summary');
-            if(orderSummary) orderSummary.style.display = 'block';
-            const emptyCartMessage = document.getElementById('empty-cart-message');
-            if(emptyCartMessage) emptyCartMessage.style.display = 'none';
-            const cartItemsSection = document.querySelector('.cart-items-section');
-            if(cartItemsSection) cartItemsSection.style.display = 'block'; // Show header and list
+            if ($cartPage.length) $cartPage.removeClass('empty-state');
+            if ($orderSummary.length) $orderSummary.show();
+            $('#empty-cart-message').hide();
+            $('.cart-items-section').show();
 
             cartData.forEach((item, index) => {
                 const itemCard = createCartItemHTML(item, index);
-                cartList.appendChild(itemCard);
+                $cartListLocal.append(itemCard);
             });
         }
 
@@ -467,95 +445,64 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- CITY AUTO-FILL POSTAL CODE ---
-fetch("/static/orders/data/city_zip.json")
-    .then(response => {
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        window.cityZipMap = data;
+    $.getJSON('/static/orders/data/city_zip.json')
+        .done(function (data) {
+            window.cityZipMap = data;
 
-        const cityInput = document.getElementById("city");
-        const zipInput = document.getElementById("zip");
+            const $cityInput = $('#city');
+            const $zipInput = $('#zip');
 
-        if (cityInput && zipInput) {
-            // Add event listener for both input and change events to handle typing and selection from datalist
-            cityInput.addEventListener("input", function () {
-                const typed = this.value.trim();
-
-                // Find city that matches (case-insensitive) - first try exact match
-                let matchedCity = null;
-                for (const city in window.cityZipMap) {
-                    if (city.toLowerCase() === typed.toLowerCase()) {
-                        matchedCity = city;
-                        break;
+            if ($cityInput.length && $zipInput.length) {
+                const handleCityChange = function () {
+                    const typed = $(this).val().trim();
+                    let matchedCity = null;
+                    for (const city in window.cityZipMap) {
+                        if (city.toLowerCase() === typed.toLowerCase()) {
+                            matchedCity = city;
+                            break;
+                        }
                     }
-                }
 
-                if (matchedCity) {
-                    zipInput.value = window.cityZipMap[matchedCity];
-                    validateField("zip", "zip");
-                } else {
-                    // Clear zip if no exact match is found
-                    zipInput.value = '';
-                }
-            });
-
-            // Also handle the 'change' event for when user selects from datalist
-            cityInput.addEventListener("change", function () {
-                const selectedCity = this.value.trim();
-
-                // Look for exact match in the cityZipMap, case-insensitive
-                let matchedCity = null;
-                for (const city in window.cityZipMap) {
-                    if (city.toLowerCase() === selectedCity.toLowerCase()) {
-                        matchedCity = city;
-                        break;
+                    if (matchedCity) {
+                        $zipInput.val(window.cityZipMap[matchedCity]);
+                        validateField('zip', 'zip');
+                    } else {
+                        $zipInput.val('');
                     }
-                }
+                };
 
-                if (matchedCity) {
-                    zipInput.value = window.cityZipMap[matchedCity];
-                    validateField("zip", "zip");
-                }
-            });
-        }
-    })
-    .catch(err => console.error("Failed to load city_zip.json:", err));
+                $cityInput.on('input', handleCityChange);
+                $cityInput.on('change', handleCityChange);
+            }
+        })
+        .fail(function (jqXHR, textStatus) {
+            console.error('Failed to load city_zip.json:', textStatus);
+        });
 
 
     // Page navigation function
     function showPage(pageId, step) {
-        // Hide all page sections
-        document.querySelectorAll('.page-section').forEach(section => {
-            section.classList.remove('active');
-        });
+        $('.page-section').removeClass('active');
 
-        // Show the requested page
-        const targetPage = document.getElementById(pageId);
-        if (targetPage) {
-            targetPage.classList.add('active');
+        const $targetPage = $('#' + pageId);
+        if ($targetPage.length) {
+            $targetPage.addClass('active');
         }
 
-        // When navigating to the payment page, attempt to prefill saved card details
         if (pageId === 'payment-page') {
             populateSavedCard();
         }
 
-        // Update progress bar if it exists
         if (window.updateProgress) {
             window.updateProgress(step);
         } else {
-            // Update progress steps manually if global function not available
-            const steps = document.querySelectorAll('.progress-step');
-            steps.forEach((element, index) => {
-                element.classList.remove('active', 'completed');
+            const $steps = $('.progress-step');
+            $steps.removeClass('active completed');
+            $steps.each(function (index) {
                 if (index + 1 < step) {
-                    element.classList.add('completed');
+                    $(this).addClass('completed');
                 } else if (index + 1 === step) {
-                    element.classList.add('active');
+                    $(this).addClass('active');
                 }
             });
         }
@@ -563,24 +510,23 @@ fetch("/static/orders/data/city_zip.json")
     window.showPage = showPage; // Make function globally accessible
 
     // Handle Place Order button click
-    const placeOrderBtn = document.getElementById('place-order-btn');
-    if (placeOrderBtn) {
-        placeOrderBtn.addEventListener('click', () => {
-            // Validate payment fields
-            const cardValid = validateField('cardNumber', 'cardNumber') &
-                             validateField('nameOnCard', 'name') &
-                              validateField('expiry', 'expiry') &
-                              validateField('cvv', 'cvv');
+    const $placeOrderBtn = $('#place-order-btn');
+    if ($placeOrderBtn.length) {
+        $placeOrderBtn.on('click', function () {
+            const cardValid =
+                validateField('cardNumber', 'cardNumber') &
+                validateField('nameOnCard', 'name') &
+                validateField('expiry', 'expiry') &
+                validateField('cvv', 'cvv');
 
             if (cardValid) {
-                const saveInfoCheckbox = document.getElementById('save-info');
+                const $saveInfoCheckbox = $('#save-info');
 
-                // Save or clear card details in localStorage based on checkbox
-                if (saveInfoCheckbox && saveInfoCheckbox.checked) {
+                if ($saveInfoCheckbox.length && $saveInfoCheckbox.prop('checked')) {
                     const cardDataToSave = {
-                        cardNumber: document.getElementById('cardNumber')?.value || '',
-                        nameOnCard: document.getElementById('nameOnCard')?.value || '',
-                        expiry: document.getElementById('expiry')?.value || ''
+                        cardNumber: $('#cardNumber').val() || '',
+                        nameOnCard: $('#nameOnCard').val() || '',
+                        expiry: $('#expiry').val() || ''
                         // CVV is intentionally NOT stored
                     };
 
@@ -597,12 +543,10 @@ fetch("/static/orders/data/city_zip.json")
                     }
                 }
 
-                // Create a form and submit it to trigger the Django checkout view
                 const form = document.createElement('form');
                 form.method = 'POST';
-                form.action = window.location.href; // Current checkout URL
+                form.action = window.location.href;
 
-                // Add CSRF token
                 const csrfToken = getCookie('csrftoken');
                 if (csrfToken) {
                     const csrfInput = document.createElement('input');
