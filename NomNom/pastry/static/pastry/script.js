@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+$(function () {
     const reviewsData = {};
 
     let currentProductName = '';
@@ -9,20 +9,20 @@ document.addEventListener('DOMContentLoaded', function () {
     window.incrementQuantity = function (event) {
         event.preventDefault();
         event.stopPropagation();
-        const input = event.target.parentElement.querySelector('.qty-input');
-        const currentValue = parseInt(input.value);
+        const $input = $(event.target).parent().find('.qty-input');
+        const currentValue = parseInt($input.val(), 10);
         if (currentValue < 99) {
-            input.value = currentValue + 1;
+            $input.val(currentValue + 1);
         }
     };
 
     window.decrementQuantity = function (event) {
         event.preventDefault();
         event.stopPropagation();
-        const input = event.target.parentElement.querySelector('.qty-input');
-        const currentValue = parseInt(input.value);
+        const $input = $(event.target).parent().find('.qty-input');
+        const currentValue = parseInt($input.val(), 10);
         if (currentValue > 1) {
-            input.value = currentValue - 1;
+            $input.val(currentValue - 1);
         }
     };
 
@@ -31,62 +31,58 @@ document.addEventListener('DOMContentLoaded', function () {
         event.preventDefault();
 
         // Get the quantity from the card
-        const card = event.target.closest('.product-card');
-        const quantityInput = card.querySelector('.qty-input');
-        const quantity = parseInt(quantityInput.value);
+        const $card = $(event.target).closest('.product-card');
+        const $quantityInput = $card.find('.qty-input');
+        const quantity = parseInt($quantityInput.val(), 10);
 
         // Get the button that was clicked
-        const clickedButton = event.target.closest('.btn-add-cart');
+        const clickedButton = $(event.target).closest('.btn-add-cart')[0];
 
         // Get CSRF token
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 
         // Send AJAX request to add to cart
-        fetch('/cart/add/', {
+        $.ajax({
+            url: '/cart/add/',
             method: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
             headers: {
-                'Content-Type': 'application/json',
                 'X-CSRFToken': csrftoken || ''
             },
-            body: JSON.stringify({
+            data: JSON.stringify({
                 name: productName,
                 price: productPrice,
                 image: productImage,
                 quantity: quantity,
                 category: productCategory
-            })
-        })
-            .then(response => {
-                if (response.status === 403 || response.status === 401) {
-                    // If user not logged in, show login prompt
-                    // Don't show animation for unauthenticated users
-                    showLoginPrompt();
-                    return Promise.reject('Not authenticated');
-                }
-
+            }),
+            success: function (data, textStatus, jqXHR) {
                 // Only show animation if logged in and request was successful
-                if (clickedButton) {
+                if (jqXHR.status !== 401 && jqXHR.status !== 403 && clickedButton) {
                     createFlyingAnimation(clickedButton);
                 }
 
-                return response.json();
-            })
-            .then(data => {
                 if (data.success) {
                     showNotification(data.message, 'success');
                     // Update cart counter
                     updateCartCount(data.cart_count);
                     // Reset quantity to 1
-                    quantityInput.value = 1;
+                    $quantityInput.val(1);
                 } else {
                     showNotification(data.message || 'Failed to add to cart', 'error');
                 }
-            })
-            .catch(error => {
-                if (error !== 'Not authenticated') {
+            },
+            error: function (jqXHR) {
+                if (jqXHR.status === 401 || jqXHR.status === 403) {
+                    // If user not logged in, show login prompt
+                    // Don't show animation for unauthenticated users
+                    showLoginPrompt();
+                } else {
                     showNotification('Failed to add to cart', 'error');
                 }
-            });
+            }
+        });
     };
 
 
@@ -95,33 +91,27 @@ document.addEventListener('DOMContentLoaded', function () {
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 
         // Send AJAX request to add to cart
-        fetch('/cart/add/', {
+        $.ajax({
+            url: '/cart/add/',
             method: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
             headers: {
-                'Content-Type': 'application/json',
                 'X-CSRFToken': csrftoken || ''
             },
-            body: JSON.stringify({
+            data: JSON.stringify({
                 name: productName,
                 price: productPrice,
                 image: productImage,
                 quantity: 1
-            })
-        })
-            .then(response => {
-                if (response.status === 403 || response.status === 401) {
+            }),
+            success: function (data, textStatus, jqXHR) {
+                if (jqXHR.status === 401 || jqXHR.status === 403) {
                     // If user not logged in, show login prompt
-                    // Don't show animation for unauthenticated users
                     showLoginPrompt();
-                    return Promise.reject('Not authenticated');
+                    return;
                 }
 
-                // Note: We can't show animation here since we don't have an event context
-                // Animation is typically shown when called from an event handler
-
-                return response.json();
-            })
-            .then(data => {
                 if (data.success) {
                     showNotification(data.message, 'success');
                     // Update cart counter
@@ -129,12 +119,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     showNotification(data.message || 'Failed to add to cart', 'error');
                 }
-            })
-            .catch(error => {
-                if (error !== 'Not authenticated') {
+            },
+            error: function (jqXHR) {
+                if (jqXHR.status === 401 || jqXHR.status === 403) {
+                    showLoginPrompt();
+                } else {
                     showNotification('Failed to add to cart', 'error');
                 }
-            });
+            }
+        });
     };
 
     // Function to create flying cart animation (made it global for reuse)
@@ -174,10 +167,10 @@ document.addEventListener('DOMContentLoaded', function () {
     window.openReviewModal = function (productName) {
         currentProductName = productName;
 
-        const modal = document.getElementById('reviewModal');
-        const modalTitle = document.getElementById('modalTitle');
+        const $modal = $('#reviewModal');
+        const $modalTitle = $('#modalTitle');
 
-        modalTitle.textContent = `${productName} Reviews`;
+        $modalTitle.text(`${productName} Reviews`);
 
         // Load product reviews
         loadProductReviews(productName);
@@ -188,15 +181,15 @@ document.addEventListener('DOMContentLoaded', function () {
         updateRatingStars(0);
 
         // Show modal
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
+        $modal.show();
+        $('body').css('overflow', 'hidden');
     };
 
     // Close review modal
     window.closeReviewModal = function () {
-        const modal = document.getElementById('reviewModal');
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
+        const $modal = $('#reviewModal');
+        $modal.hide();
+        $('body').css('overflow', 'auto');
     };
 
     // Load product reviews from server
@@ -215,9 +208,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Fetch reviews from the server
-        fetch(`/review/get/${pastryId}/`)
-            .then(response => response.json())
-            .then(data => {
+        $.getJSON(`/review/get/${pastryId}/`)
+            .done(function (data) {
                 if (data.reviews) {
                     // Calculate average rating
                     let totalRating = 0;
@@ -227,19 +219,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     const averageRating = data.reviews.length > 0 ? (totalRating / data.reviews.length) : 0;
 
                     // Update summary in modal
-                    document.getElementById('summaryRating').textContent = averageRating.toFixed(1);
-                    document.getElementById('summaryCount').textContent = `Based on ${data.reviews.length} reviews`;
+                    $('#summaryRating').text(averageRating.toFixed(1));
+                    $('#summaryCount').text(`Based on ${data.reviews.length} reviews`);
 
                     // Update summary stars in modal
-                    const summaryStars = document.getElementById('summaryStars');
-                    summaryStars.innerHTML = generateStars(averageRating);
+                    const $summaryStars = $('#summaryStars');
+                    $summaryStars.html(generateStars(averageRating));
 
                     // Load review list in modal
-                    const reviewList = document.getElementById('reviewList');
-                    reviewList.innerHTML = '';
+                    const $reviewList = $('#reviewList');
+                    $reviewList.empty();
 
                     if (data.reviews.length === 0) {
-                        reviewList.innerHTML = '<div class="review-item">No reviews yet. Be the first reviewer!</div>';
+                        $reviewList.html('<div class="review-item">No reviews yet. Be the first reviewer!</div>');
                     } else {
                         data.reviews.forEach(review => {
                             const reviewItem = document.createElement('div');
@@ -252,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <div class="review-rating">${generateStars(review.rating)}</div>
                         <div class="review-text">${review.comment}</div>
                       `;
-                            reviewList.appendChild(reviewItem);
+                         $reviewList.append(reviewItem);
                         });
                     }
 
@@ -269,28 +261,28 @@ document.addEventListener('DOMContentLoaded', function () {
                     };
 
                     // Also update the underlying product card on the page
-                    updateProductCardRating(productName);
+                     updateProductCardRating(productName);
                 }
             })
-            .catch(error => {
+            .fail(function (error) {
                 console.error('Error loading reviews:', error);
                 // Fallback to cached data if there's an error
                 const productReviews = reviewsData[productName] || { rating: 0, count: 0, reviews: [] };
 
                 // Update summary in modal
-                document.getElementById('summaryRating').textContent = productReviews.rating.toFixed(1);
-                document.getElementById('summaryCount').textContent = `Based on ${productReviews.count} reviews`;
+                $('#summaryRating').text(productReviews.rating.toFixed(1));
+                $('#summaryCount').text(`Based on ${productReviews.count} reviews`);
 
                 // Update summary stars in modal
-                const summaryStars = document.getElementById('summaryStars');
-                summaryStars.innerHTML = generateStars(productReviews.rating);
+                const $summaryStars = $('#summaryStars');
+                $summaryStars.html(generateStars(productReviews.rating));
 
                 // Load review list in modal
-                const reviewList = document.getElementById('reviewList');
-                reviewList.innerHTML = '';
+                const $reviewList = $('#reviewList');
+                $reviewList.empty();
 
                 if (productReviews.reviews.length === 0) {
-                    reviewList.innerHTML = '<div class="review-item">No reviews yet. Be the first reviewer!</div>';
+                    $reviewList.html('<div class="review-item">No reviews yet. Be the first reviewer!</div>');
                 } else {
                     productReviews.reviews.forEach(review => {
                         const reviewItem = document.createElement('div');
@@ -303,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="review-rating">${generateStars(review.rating)}</div>
                     <div class="review-text">${review.text}</div>
                   `;
-                        reviewList.appendChild(reviewItem);
+                        $reviewList.append(reviewItem);
                     });
                 }
 
@@ -357,23 +349,21 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Handle rating input
-    const stars = document.querySelectorAll('.rating-input .star');
+    const $stars = $('.rating-input .star');
 
-    stars.forEach(star => {
-        star.addEventListener('click', function () {
-            selectedRating = parseInt(this.getAttribute('data-rating'));
-            updateRatingStars(selectedRating);
-        });
-
-        star.addEventListener('mouseenter', function () {
-            const hoverRating = parseInt(this.getAttribute('data-rating'));
-            updateRatingStars(hoverRating);
-        });
+    $stars.on('click', function () {
+        selectedRating = parseInt($(this).data('rating'), 10);
+        updateRatingStars(selectedRating);
     });
 
-    const ratingInput = document.getElementById('ratingInput');
-    if (ratingInput) {
-        ratingInput.addEventListener('mouseleave', function () {
+    $stars.on('mouseenter', function () {
+        const hoverRating = parseInt($(this).data('rating'), 10);
+        updateRatingStars(hoverRating);
+    });
+
+    const $ratingInput = $('#ratingInput');
+    if ($ratingInput.length) {
+        $ratingInput.on('mouseleave', function () {
             updateRatingStars(selectedRating);
         });
     }
@@ -427,52 +417,53 @@ document.addEventListener('DOMContentLoaded', function () {
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 
             // Make AJAX request to backend
-            fetch(`/review/add/${pastryId}/`, {
+            $.ajax({
+                url: `/review/add/${pastryId}/`,
                 method: 'POST',
+                contentType: 'application/json',
+                dataType: 'json',
                 headers: {
-                    'Content-Type': 'application/json',
                     'X-CSRFToken': csrftoken || ''
                 },
-                body: JSON.stringify({
+                data: JSON.stringify({
                     rating: selectedRating,
                     comment: text
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification(data.message, 'success');
+                }),
+                success: function (data) {
+                    if (data.success) {
+                        showNotification(data.message, 'success');
 
-                    // Reset form
-                    reviewForm.reset();
-                    selectedRating = 0;
-                    updateRatingStars(0);
+                        // Reset form
+                        reviewForm.reset();
+                        selectedRating = 0;
+                        updateRatingStars(0);
 
-                    // Reload reviews to show the new one
-                    setTimeout(() => {
-                        loadProductReviews(currentProductName);
-                    }, 1000);
+                        // Reload reviews to show the new one
+                        setTimeout(() => {
+                            loadProductReviews(currentProductName);
+                        }, 1000);
 
-                    // Close the modal after successful submission
-                    setTimeout(() => {
-                        closeReviewModal();
-                    }, 1500); // Close after 1.5 seconds to allow user to see the success message
-                } else {
-                    showNotification(data.error || 'Failed to submit review', 'error');
+                        // Close the modal after successful submission
+                        setTimeout(() => {
+                            closeReviewModal();
+                        }, 1500); // Close after 1.5 seconds to allow user to see the success message
+                    } else {
+                        showNotification(data.error || 'Failed to submit review', 'error');
+                    }
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                    showNotification('Error submitting review', 'error');
+                },
+                complete: function () {
+                    isSubmittingReview = false; // Always reset the flag
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('Error submitting review', 'error');
-            })
-            .finally(() => {
-                isSubmittingReview = false; // Always reset the flag
             });
         });
     }
 
     // Close modal when clicking outside
-    window.addEventListener('click', function (event) {
+    $(window).on('click', function (event) {
         const modal = document.getElementById('reviewModal');
         if (event.target === modal) {
             closeReviewModal();
@@ -481,38 +472,38 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Update rating stars display
     function updateRatingStars(rating) {
-        const stars = document.querySelectorAll('.rating-input .star');
+        const $starsLocal = $('.rating-input .star');
 
-        stars.forEach((star, index) => {
+        $starsLocal.each(function (index) {
             if (index < rating) {
-                star.classList.add('active');
+                $(this).addClass('active');
             } else {
-                star.classList.remove('active');
+                $(this).removeClass('active');
             }
         });
     }
 
     // Show notification
     function showNotification(message, type = 'success') {
-        const notification = document.getElementById('notification');
-        const notificationText = document.getElementById('notificationText');
+        const $notification = $('#notification');
+        const $notificationText = $('#notificationText');
 
-        if (notificationText) {
-            notificationText.textContent = message;
+        if ($notificationText.length) {
+            $notificationText.text(message);
         } else {
-            notification.textContent = message;
+            $notification.text(message);
         }
 
         if (type === 'error') {
-            notification.style.backgroundColor = '#dc3545';
+            $notification.css('background-color', '#dc3545');
         } else {
-            notification.style.backgroundColor = '#5D4037'; // Primary brown
+            $notification.css('background-color', '#5D4037'); // Primary brown
         }
 
-        notification.classList.add('show');
+        $notification.addClass('show');
 
         setTimeout(() => {
-            notification.classList.remove('show');
+            $notification.removeClass('show');
         }, 3000);
     }
 });
