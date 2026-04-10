@@ -168,12 +168,11 @@
         <div class="delivery-info">
             <h2 class="section-title">Delivery Information</h2>
             {% if delivery and delivery.address %}
-                <p><strong>Delivery Address:</strong></p>
-                <p class="delivery-address">{{ delivery.address }}</p>
+                <p class="delivery-address"><strong>Delivery Address:</strong> {{ delivery.address }}</p>
             {% else %}
-                <p><strong>Delivery Address:</strong></p>
                 <p class="delivery-address">
-                    {% if user_profile.street %}{{ user_profile.street }}{% endif %}
+                    <strong>Delivery Address:</strong>
+                    {% if user_profile.street %} {{ user_profile.street }}{% endif %}
                     {% if user_profile.region %}, {{ user_profile.region }}{% endif %}
                 </p>
                 <p><em>Address based on your profile information</em></p>

@@ -110,7 +110,6 @@ def checkout(request):
         street_address = request.POST.get("address", "").strip()
         city = request.POST.get("city", "").strip()
         zip_code = request.POST.get("zip", "").strip()
-        country = request.POST.get("country", "Mauritius").strip()
 
         # If form fields are empty, fallback to user profile information
         user = request.user
@@ -123,20 +122,10 @@ def checkout(request):
         if not city:
             city = getattr(user, "region", "")
 
-        # Build address with proper formatting, skipping empty parts
+        # Build address with proper formatting, skipping empty parts.
+        # We intentionally exclude the recipient name here so Delivery.address
+        # only contains the physical address (street/city/zip) used by the API.
         address_parts = []
-
-        # Prefer the user's full_name from the database; fall back to first + last
-        name_part = None
-        if getattr(user, "full_name", None):
-            name_part = user.full_name.strip()
-        else:
-            combined = f"{first_name} {last_name}".strip()
-            if combined:
-                name_part = combined
-
-        if name_part:
-            address_parts.append(name_part)
 
         if street_address:
             address_parts.append(street_address)
@@ -144,8 +133,6 @@ def checkout(request):
             address_parts.append(city)
         if zip_code:
             address_parts.append(zip_code)
-        if country:
-            address_parts.append(country)
 
         delivery_address = (
             ", ".join(address_parts)
@@ -204,7 +191,7 @@ def checkout(request):
             "cart_json": cart_json,
             "total": cart.total_price,
             "cities": cities,
-            "user_profile": request.user,  # Pass user profile data to template
+            "user_profile": request.user,
         },
     )
 
@@ -227,7 +214,7 @@ def order_confirmation(request, order_id):
         "order": order,
         "order_details": order_details,
         "delivery": delivery,
-        "user_profile": request.user,  # Include user profile for address fallback
+        "user_profile": request.user,
     }
 
     return render(request, "orders/order_confirmation.html", context)
