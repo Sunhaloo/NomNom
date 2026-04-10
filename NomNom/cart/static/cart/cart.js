@@ -1,43 +1,45 @@
-// Cart-specific JavaScript functionality
+// Cart-specific JavaScript functionality (jQuery-enhanced)
 
-document.addEventListener('DOMContentLoaded', () => {
+$(function () {
     let cartData = window.initialCartData || [];
-    let deliveryCost = window.deliveryCost || 700.00;  // Use window.deliveryCost if available, otherwise default
+    let deliveryCost = window.deliveryCost || 700.0;  // Use window.deliveryCost if available, otherwise default
     const TAX_RATE = 0.15; // 15% tax for Mauritius
 
-    const cartList = document.getElementById('cart-list');
-    const emptyCartMessage = document.getElementById('empty-cart-message');
-    const cartPageActions = document.getElementById('cart-page-actions');
-    const itemCountSpan = document.getElementById('item-count');
-    const subtotalSpan = document.getElementById('subtotal');
-    const deliveryCostSpan = document.getElementById('delivery-cost');
-    const taxCostSpan = document.getElementById('tax-cost');
-    const totalCostSpan = document.getElementById('total-cost');
-    const toast = document.getElementById('toast');
-    const toastMessage = document.getElementById('toast-message');
+    const $cartList = $('#cart-list');
+    const $emptyCartMessage = $('#empty-cart-message');
+    const $cartPageActions = $('#cart-page-actions');
+    const $itemCountSpan = $('#item-count');
+    const $subtotalSpan = $('#subtotal');
+    const $deliveryCostSpan = $('#delivery-cost');
+    const $taxCostSpan = $('#tax-cost');
+    const $totalCostSpan = $('#total-cost');
+    const $toast = $('#toast');
+    const $toastMessage = $('#toast-message');
 
     // Render cart items
     renderCart();
 
     function renderCart() {
-        cartList.innerHTML = '';
-        const cartPage = document.getElementById('cart-page');
+        if (!$cartList.length) return;
+
+        $cartList.empty();
+        const $cartPage = $('#cart-page');
 
         if (cartData.length === 0) {
-            cartPage.classList.add('empty-state');
-            document.getElementById('order-summary').style.display = 'none';
-            if(cartPageActions) cartPageActions.style.display = 'none';
-            emptyCartMessage.style.display = 'block';
-            document.querySelector('.cart-items-section').style.display = 'none'; // Hide header and list
+            if ($cartPage.length) $cartPage.addClass('empty-state');
+            $('#order-summary').hide();
+            if ($cartPageActions.length) $cartPageActions.hide();
+            $emptyCartMessage.show();
+            $('.cart-items-section').hide(); // Hide header and list
         } else {
-            cartPage.classList.remove('empty-state');
-            document.getElementById('order-summary').style.display = 'block';
-            emptyCartMessage.style.display = 'none';
-            document.querySelector('.cart-items-section').style.display = 'block'; // Show header and list
+            if ($cartPage.length) $cartPage.removeClass('empty-state');
+            $('#order-summary').show();
+            $emptyCartMessage.hide();
+            $('.cart-items-section').show(); // Show header and list
 
             cartData.forEach((item, index) => {
                 const itemCard = createCartItemHTML(item, index);
-                cartList.appendChild(itemCard);
+                $cartList.append(itemCard);
             });
         }
 
@@ -111,18 +113,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const total = subtotal + deliveryCost + tax;
 
         // Update cart page summary elements (if they exist)
-        if(itemCountSpan) itemCountSpan.textContent = itemCount;
-        if(subtotalSpan) subtotalSpan.textContent = `Rs ${subtotal.toFixed(2)}`;
-        if(deliveryCostSpan) deliveryCostSpan.textContent = `Rs ${deliveryCost.toFixed(2)}`;
-        if(taxCostSpan) taxCostSpan.textContent = `Rs ${tax.toFixed(2)}`;
-        if(totalCostSpan) totalCostSpan.textContent = `Rs ${total.toFixed(2)}`;
+        if ($itemCountSpan.length) $itemCountSpan.text(itemCount);
+        if ($subtotalSpan.length) $subtotalSpan.text(`Rs ${subtotal.toFixed(2)}`);
+        if ($deliveryCostSpan.length) $deliveryCostSpan.text(`Rs ${deliveryCost.toFixed(2)}`);
+        if ($taxCostSpan.length) $taxCostSpan.text(`Rs ${tax.toFixed(2)}`);
+        if ($totalCostSpan.length) $totalCostSpan.text(`Rs ${total.toFixed(2)}`);
 
         // Update payment page summary elements (if they exist)
-        if(window.paymentItemCountSpan) window.paymentItemCountSpan.textContent = itemCount;
-        if(window.paymentSubtotalSpan) window.paymentSubtotalSpan.textContent = `Rs ${subtotal.toFixed(2)}`;
-        if(window.paymentDeliveryCostSpan) window.paymentDeliveryCostSpan.textContent = `Rs ${deliveryCost.toFixed(2)}`;
-        if(window.paymentTaxCostSpan) window.paymentTaxCostSpan.textContent = `Rs ${tax.toFixed(2)}`;
-        if(window.paymentTotalCostSpan) window.paymentTotalCostSpan.textContent = `Rs ${total.toFixed(2)}`;
+        if (window.paymentItemCountSpan) window.paymentItemCountSpan.textContent = itemCount;
+        if (window.paymentSubtotalSpan) window.paymentSubtotalSpan.textContent = `Rs ${subtotal.toFixed(2)}`;
+        if (window.paymentDeliveryCostSpan) window.paymentDeliveryCostSpan.textContent = `Rs ${deliveryCost.toFixed(2)}`;
+        if (window.paymentTaxCostSpan) window.paymentTaxCostSpan.textContent = `Rs ${tax.toFixed(2)}`;
+        if (window.paymentTotalCostSpan) window.paymentTotalCostSpan.textContent = `Rs ${total.toFixed(2)}`;
     }
 
     function formatDate(dateString) {
@@ -133,72 +135,76 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showToast(message) {
-        toastMessage.textContent = message;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
+        if (!$toast.length || !$toastMessage.length) return;
+        $toastMessage.text(message);
+        $toast.addClass('show');
+        setTimeout(() => $toast.removeClass('show'), 3000);
     }
 
     // --- EVENT LISTENERS ---
-    if(cartList) {
-        cartList.addEventListener('click', (event) => {
-            const itemCard = event.target.closest('.cart-item-card');
-            if (!itemCard) return;
-            const itemIndex = parseInt(itemCard.dataset.index);
+    if ($cartList.length) {
+        $cartList.on('click', '.cart-item-card .qty-plus, .cart-item-card .qty-minus, .cart-item-card .remove-item, .cart-item-card .remove-item i', function (event) {
+            const $target = $(event.target);
+            const $itemCard = $target.closest('.cart-item-card');
+            if (!$itemCard.length) return;
+
+            const itemIndex = parseInt($itemCard.data('index'), 10);
             const item = cartData[itemIndex];
             if (!item) return;
 
-            if (event.target.classList.contains('qty-plus')) {
+            if ($target.hasClass('qty-plus')) {
                 const newQuantity = (item.quantity || 1) + 1;
                 updateQuantityInBackend(itemIndex, newQuantity);
-            } else if (event.target.classList.contains('qty-minus')) {
+            } else if ($target.hasClass('qty-minus')) {
                 if ((item.quantity || 1) > 1) {
                     const newQuantity = (item.quantity || 1) - 1;
                     updateQuantityInBackend(itemIndex, newQuantity);
                 }
-            } else if (event.target.classList.contains('remove-item') || event.target.parentElement.classList.contains('remove-item')) {
+            } else if ($target.closest('.remove-item').length) {
                 // Redirect to Django backend to remove item
                 window.location.href = `/cart/remove/${itemIndex}/`;
             }
         });
     }
 
-    // Function to update quantity in backend via AJAX
+    // Function to update quantity in backend via AJAX (jQuery)
     function updateQuantityInBackend(index, quantity) {
-        fetch('/cart/update/', {
+        $.ajax({
+            url: '/cart/update/',
             method: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
             headers: {
-                'Content-Type': 'application/json',
                 'X-CSRFToken': getCookie('csrftoken')
             },
-            body: JSON.stringify({
+            data: JSON.stringify({
                 index: index,
                 quantity: quantity
-            })
-        })
-            .then(response => response.json())
-            .then(data => {
+            }),
+            success: function (data) {
                 if (data.success) {
                     // Update local cart data
                     cartData[index].quantity = quantity;
                     renderCart();
 
                     // Update cart count in navbar
-                    const cartCountElement = document.getElementById('cart-count');
-                    if (cartCountElement) {
-                        cartCountElement.textContent = data.cart_count;
+                    const $cartCountElement = $('#cart-count');
+                    if ($cartCountElement.length) {
+                        $cartCountElement.text(data.cart_count);
                         if (data.cart_count === 0) {
-                            cartCountElement.classList.add('hidden');
+                            $cartCountElement.addClass('hidden');
                         } else {
-                            cartCountElement.classList.remove('hidden');
+                            $cartCountElement.removeClass('hidden');
                         }
                     }
                 } else {
                     showToast('Failed to update quantity');
                 }
-            })
-            .catch(error => {
+            },
+            error: function () {
                 showToast('Error updating quantity');
-            });
+            }
+        });
     }
 
     // Helper function to get CSRF token
