@@ -11,7 +11,7 @@
 }
 
 .cart-wrapper {
-  min-height: calc(100vh - 200px); /* keeps footer at bottom */
+  min-height: calc(100vh - 200px);
   display: flex;
   justify-content: center;
   padding-top: 2rem;
@@ -20,7 +20,7 @@
 
 .cart-wrapper .container {
   width: 100%;
-  max-width: 1200px; /* controls centered width */
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -230,7 +230,8 @@ body {
 .delivery-options label {
   margin-left: 8px;
   cursor: pointer;
-  display: block;
+  display: inline-flex;
+  align-items: center;
   margin-bottom: 0.3rem;
 }
 
@@ -306,7 +307,7 @@ body {
 /* When the cart is empty, use the cart page as a centering container */
 #cart-page.page-section.active.empty-state {
   position: relative;
-  min-height: 60vh; /* ensures some vertical space to center within */
+  min-height: 60vh;
 }
 
 /* Hide normal sections explicitly in empty state (JS also hides them) */
@@ -329,7 +330,7 @@ body {
 }
 
 /* ------------------------- */
-/*   Responsiveness            */
+/*   Responsiveness          */
 /* ------------------------- */
 
 @media (max-width: 992px) {
