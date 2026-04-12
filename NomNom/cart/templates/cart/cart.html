@@ -51,10 +51,13 @@
                         <label for="express">Express Delivery (Rs 1000.00)</label>
                         <div class="delivery-info">Delivery scheduled for tomorrow between 10 AM - 2 PM</div>
 
-                        <input type="radio" name="delivery" value="schedule" id="schedule">
-                        <label for="schedule">Schedule for Later (Rs 300.00)</label>
-                        <div class="delivery-info">Select your preferred delivery date</div>
-                    </div>
+                         <input type="radio" name="delivery" value="schedule" id="schedule">
+                         <label for="schedule">Schedule for Later (Rs 300.00)</label>
+                         <div class="delivery-info">
+                             Delivery will be made a week from now
+                             (<span id="schedule-delivery-date"></span>)
+                         </div>
+                     </div>
 
                     <div class="date-picker-group" id="date-picker-group">
                         <label for="deliveryDate">Select a Delivery Date:</label>

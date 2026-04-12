@@ -1,5 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+
+from common.location import load_cities
 from .models import User
 
 
@@ -40,9 +42,12 @@ class SignupForm(UserCreationForm):
             attrs={"class": "auth-input", "placeholder": "Last Name"}
         ),
     )
-    region = forms.CharField(
-        max_length=80,
-        widget=forms.TextInput(attrs={"class": "auth-input", "placeholder": "Region"}),
+    CITY_CHOICES = [(city, city) for city in load_cities()]
+
+    region = forms.ChoiceField(
+        choices=[("", "Select region")] + CITY_CHOICES,
+        widget=forms.Select(attrs={"class": "auth-input"}),
+        required=True,
     )
     street = forms.CharField(
         max_length=120,
