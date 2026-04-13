@@ -37,6 +37,7 @@ class CurrentUserViewTests(APITestCase):
         data = response.json()
 
         self.assertEqual(data["id"], self.user.id)
-        self.assertEqual(data["full_name"], "Jane Doe")
+        self.assertEqual(data["first_name"], "Jane")
+        self.assertEqual(data["last_name"], "Doe")
         self.assertEqual(data["street"], "123 Main St")
         self.assertEqual(data["region"], "Port Louis")
