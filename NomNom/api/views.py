@@ -2,6 +2,7 @@ from django.db import transaction
 from django.contrib.auth import get_user_model
 
 from rest_framework import permissions, status, viewsets
+from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -132,3 +133,18 @@ class CurrentUserView(APIView):
     def get(self, request, *args, **kwargs):
         serializer = UserProfileSerializer(request.user)
         return Response(serializer.data)
+
+
+class LogoutView(APIView):
+    """Simple token revocation endpoint for mobile/external clients.
+
+    - POST /api/v1/auth/logout/:
+        Deletes all auth tokens for the current user. After this call,
+        any previously issued tokens will no longer authenticate.
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        Token.objects.filter(user=request.user).delete()
+        return Response({"success": True}, status=status.HTTP_200_OK)
