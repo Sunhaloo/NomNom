@@ -82,6 +82,9 @@ $(function () {
   function createCartItemHTML(item, index) {
     const li = document.createElement("li");
     li.className = "cart-item-card";
+    if (item.is_custom) {
+      li.classList.add("custom-cake-card");
+    }
     li.dataset.index = index;
 
     const qty = item.quantity || 1;
@@ -126,7 +129,7 @@ $(function () {
             }
             <div class="item-details">
                 <h3>${item.name}</h3>
-                <p>Rs ${item.price.toFixed(2)}</p>
+                ${item.is_custom ? '<hr class="custom-cake-divider">' : ""}
                 ${customDetailsHTML}
             </div>
             <div class="item-price-qty">
