@@ -478,19 +478,22 @@ $(function () {
               closeReviewModal();
             }, 1500);
           } else {
-            showNotification(
-              data.error ||
-                "You already reviewed this pastry. Cannot add another.",
-              "error",
-            );
+            showNotification(data.error || "Something went wrong.", "error");
           }
         },
-        error: function (error) {
-          console.error("Error:", error);
-          showNotification(
-            "You already reviewed this pastry. Cannot add another.",
-            "error",
-          );
+        error: function (jqXHR) {
+          console.error("Error:", jqXHR);
+
+          const serverMessage =
+            jqXHR.responseJSON && jqXHR.responseJSON.error
+              ? jqXHR.responseJSON.error
+              : null;
+
+          const message =
+            serverMessage ||
+            "Something went wrong while submitting your review. Please try again.";
+
+          showNotification(message, "error");
         },
         complete: function () {
           isSubmittingReview = false;

@@ -46,13 +46,13 @@ def add_review(request, pastry_id):
             return JsonResponse(
                 {
                     "success": False,
-                    "error": "You can only review pastries you have ordered.",
+                    "error": "You need to purchase it to review it!",
                 },
                 status=400,
             )
 
         # Check if the user has already reviewed this pastry - double check before transaction
-        duplicate_msg = "You already reviewed this pastry. Cannot add another."
+        duplicate_msg = "You already reviewed this pastry!"
         if Review.objects.filter(user=user, pastry=pastry).exists():
             return JsonResponse(
                 {
