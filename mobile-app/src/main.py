@@ -1,26 +1,22 @@
+import sys
+import os
+
+# Add src directory to path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 import flet as ft
+from deliveries import DeliveriesPage
 
 
 def main(page: ft.Page):
-    counter = ft.Text("0", size=50, data=0)
+    page.title = "NomNom - Deliveries"
+    page.theme_mode = ft.ThemeMode.LIGHT
+    page.window_width = 500
+    page.window_height = 900
 
-    def increment_click(e):
-        counter.data += 1
-        counter.value = str(counter.data)
-
-    page.floating_action_button = ft.FloatingActionButton(
-        icon=ft.Icons.ADD, on_click=increment_click
-    )
-
-    page.add(
-        ft.SafeArea(
-            expand=True,
-            content=ft.Container(
-                content=counter,
-                alignment=ft.Alignment.CENTER,
-            ),
-        )
-    )
+    # Display deliveries page directly
+    deliveries_page = DeliveriesPage(page)
+    page.add(deliveries_page.build())
 
 
 ft.run(main)
