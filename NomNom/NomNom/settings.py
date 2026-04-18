@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     "review.apps.ReviewConfig",
     # add our specific delivery application
     "delivery.apps.DeliveryConfig",
+    # add our common utilities application
+    "common.apps.CommonConfig",
     # add Django related modules / library
     "django.contrib.admin",
     "django.contrib.auth",

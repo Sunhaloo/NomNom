@@ -1,5 +1,6 @@
 from django.db import transaction
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 from rest_framework import permissions, status, viewsets
 from rest_framework.authtoken.models import Token
@@ -10,7 +11,12 @@ from rest_framework.views import APIView
 from orders.models import Order
 from delivery.models import Delivery
 from payments.models import Payment
+from review.models import Review
+from common.stats import get_business_stats
 from .serializers import DeliverySerializer, OrderSerializer, UserProfileSerializer
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class OrderViewSet(viewsets.ReadOnlyModelViewSet):
@@ -82,6 +88,63 @@ class DeliveryViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
     @action(detail=True, methods=["post"])
+    def confirm_with_photo(self, request, pk=None):
+        """
+        Confirm delivery with photo proof and QR validation
+        
+        Expected: multipart/form-data with 'photo' file
+        Returns: Confirmed delivery or error
+        """
+        delivery = self.get_object()
+        
+        # Validate delivery is pending
+        if delivery.status != "Pending":
+            return Response(
+                {
+                    "error": f"Delivery status is {delivery.status}, not Pending",
+                    "current_status": delivery.status
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Get photo from request
+        photo = request.FILES.get('photo')
+        if not photo:
+            return Response(
+                {"error": "Photo file is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            photo_bytes = photo.read()
+            
+            # TODO: Validate QR code in photo
+            # For now, just accept the photo
+            # In future, mobile app will validate QR before upload
+            
+            # Store photo and mark as done
+            delivery.confirmation_photo = photo_bytes
+            delivery.confirmed_at = timezone.now()
+            delivery.status = "Done"
+            delivery.save()
+            
+            logger.info(f"Delivery {delivery.id} confirmed with photo")
+            
+            return Response({
+                "success": True,
+                "delivery_id": delivery.id,
+                "status": delivery.status,
+                "confirmed_at": delivery.confirmed_at
+            })
+        
+        except Exception as e:
+            logger.error(f"Error confirming delivery: {str(e)}")
+            return Response(
+                {"error": f"Failed to process photo: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @action(detail=True, methods=["post"])
     def cancel(self, request, pk=None):
         delivery = self.get_object()
         order = delivery.order
@@ -148,3 +211,147 @@ class LogoutView(APIView):
     def post(self, request, *args, **kwargs):
         Token.objects.filter(user=request.user).delete()
         return Response({"success": True}, status=status.HTTP_200_OK)
+
+
+class BusinessStatsView(APIView):
+    """Get business statistics - caches on client side
+    
+    - GET /api/v1/stats/:
+        Returns dynamic business statistics
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get(self, request):
+        """Retrieve business statistics"""
+        try:
+            stats = get_business_stats()
+            return Response(stats)
+        except Exception as e:
+            logger.error(f"Error fetching stats: {str(e)}")
+            return Response(
+                {"error": "Failed to fetch statistics"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class TopReviewsView(APIView):
+    """Get top 5-star reviews with text
+    
+    - GET /api/v1/reviews/top-rated/:
+        Returns top 5-star reviews
+    """
+    permission_classes = [permissions.AllowAny]
+    
+    def get(self, request):
+        """Retrieve top 5-star reviews"""
+        try:
+            reviews = Review.objects.filter(
+                rating=5
+            ).exclude(
+                comment__exact=""
+            ).order_by("-date")[:10]
+            
+            # Serialize manually
+            review_data = []
+            for review in reviews:
+                review_data.append({
+                    "id": review.id,
+                    "user_name": f"{review.user.first_name} {review.user.last_name}".strip(),
+                    "rating": review.rating,
+                    "comment": review.comment,
+                    "date": review.date.strftime("%b %d, %Y")
+                })
+            
+            return Response(review_data)
+        except Exception as e:
+            logger.error(f"Error fetching reviews: {str(e)}")
+            return Response(
+                {"error": "Failed to fetch reviews"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class SignupView(APIView):
+    """User registration endpoint for mobile app
+    
+    - POST /api/v1/auth/signup/:
+        Register a new user
+    """
+    permission_classes = [permissions.AllowAny]
+    
+    @transaction.atomic
+    def post(self, request):
+        """
+        Register a new user
+        
+        Expected fields:
+        - username: str
+        - first_name: str
+        - last_name: str
+        - email: str
+        - password: str
+        - phone_number: str (optional)
+        - street: str (optional)
+        - region: str (optional)
+        - gender: str (M/F, optional)
+        """
+        
+        User = get_user_model()
+        
+        # Validate required fields
+        required_fields = ["username", "first_name", "last_name", "email", "password"]
+        missing_fields = [f for f in required_fields if not request.data.get(f)]
+        
+        if missing_fields:
+            return Response(
+                {"error": f"Missing required fields: {', '.join(missing_fields)}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Check if user already exists
+        if User.objects.filter(username=request.data["username"]).exists():
+            return Response(
+                {"error": "Username already exists"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if User.objects.filter(email=request.data["email"]).exists():
+            return Response(
+                {"error": "Email already registered"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            # Create user
+            user = User.objects.create_user(
+                username=request.data["username"],
+                email=request.data["email"],
+                password=request.data["password"],
+                first_name=request.data["first_name"],
+                last_name=request.data["last_name"],
+                phone_number=request.data.get("phone_number", ""),
+                street=request.data.get("street", ""),
+                region=request.data.get("region", ""),
+                gender=request.data.get("gender", ""),
+                role="CUSTOMER"  # Default role for signup
+            )
+            
+            # Generate token
+            token, _ = Token.objects.get_or_create(user=user)
+            
+            logger.info(f"New user registered: {user.username}")
+            
+            return Response({
+                "success": True,
+                "user_id": user.id,
+                "username": user.username,
+                "token": token.key,
+                "message": "User registered successfully"
+            }, status=status.HTTP_201_CREATED)
+        
+        except Exception as e:
+            logger.error(f"Registration error: {str(e)}")
+            return Response(
+                {"error": f"Registration failed: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
