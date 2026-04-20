@@ -3,7 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-from rest_framework.authtoken.views import obtain_auth_token
+#from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
     # WARNING: the order of "operations" matter
@@ -18,6 +18,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("pastry/", include("pastry.urls")),
     path("profile/", include("profile_page.urls")),
-    path("api/v1/auth/token/", obtain_auth_token, name="api-token-auth"),
     path("api/v1/", include("api.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
