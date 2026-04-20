@@ -1,8 +1,8 @@
 from django.db import transaction
-from django.contrib.auth import get_user_model
-from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
-from rest_framework import permissions, status, viewsets
+from rest_framework import permissions, status, viewsets, authentication
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -28,6 +28,10 @@ class OrderViewSet(viewsets.ReadOnlyModelViewSet):
 
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        authentication.TokenAuthentication,
+    ]
 
     def get_queryset(self):
         user = self.request.user
@@ -49,6 +53,10 @@ class DeliveryViewSet(viewsets.ReadOnlyModelViewSet):
 
     serializer_class = DeliverySerializer
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        authentication.TokenAuthentication,
+    ]
 
     def get_queryset(self):
         user = self.request.user
@@ -183,6 +191,7 @@ class DeliveryViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class CurrentUserView(APIView):
     """Read-only profile endpoint for the authenticated user.
 
@@ -192,12 +201,17 @@ class CurrentUserView(APIView):
     """
 
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        authentication.TokenAuthentication,
+    ]
 
     def get(self, request, *args, **kwargs):
         serializer = UserProfileSerializer(request.user)
         return Response(serializer.data)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class LogoutView(APIView):
     """Simple token revocation endpoint for mobile/external clients.
 
@@ -207,12 +221,17 @@ class LogoutView(APIView):
     """
 
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        authentication.TokenAuthentication,
+    ]
 
     def post(self, request, *args, **kwargs):
         Token.objects.filter(user=request.user).delete()
         return Response({"success": True}, status=status.HTTP_200_OK)
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class BusinessStatsView(APIView):
     """Get business statistics - caches on client side
     
@@ -220,6 +239,10 @@ class BusinessStatsView(APIView):
         Returns dynamic business statistics
     """
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        authentication.TokenAuthentication,
+    ]
     
     def get(self, request):
         """Retrieve business statistics"""
@@ -271,6 +294,7 @@ class TopReviewsView(APIView):
             )
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class SignupView(APIView):
     """User registration endpoint for mobile app
     
@@ -341,12 +365,14 @@ class SignupView(APIView):
             
             logger.info(f"New user registered: {user.username}")
             
+            serializer = UserProfileSerializer(user)
+
             return Response({
                 "success": True,
-                "user_id": user.id,
-                "username": user.username,
-                "token": token.key,
-                "message": "User registered successfully"
+                "data": {
+                    "token": token.key,
+                    "user": serializer.data
+                }
             }, status=status.HTTP_201_CREATED)
         
         except Exception as e:
@@ -355,3 +381,53 @@ class SignupView(APIView):
                 {"error": f"Registration failed: {str(e)}"},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class CustomTokenView(APIView):
+    """Custom token endpoint that returns data in format expected by mobile app"""
+    permission_classes = [permissions.AllowAny]
+    
+    def post(self, request):
+        """
+        Login endpoint - returns token and user info
+        
+        Expected fields:
+        - username: str
+        - password: str
+        """
+        from django.contrib.auth import authenticate
+        from rest_framework.authtoken.models import Token
+        
+        username = request.data.get("username")
+        password = request.data.get("password")
+        
+        if not username or not password:
+            return Response(
+                {"error": "Username and password are required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        user = authenticate(request, username=username, password=password)
+        
+        if not user:
+            return Response(
+                {"error": "Invalid credentials"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        
+        token, _ = Token.objects.get_or_create(user=user)
+        serializer = UserProfileSerializer(user)
+
+        
+        return Response({
+            "success": True,
+            "data": {
+                "token": token.key,
+                "user": serializer.data
+            }
+        }, status=status.HTTP_200_OK)
+    
+
+
+ 

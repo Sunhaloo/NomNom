@@ -61,6 +61,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "id",
             "first_name",
             "last_name",
+            "email",
+            "phone_number",
             "street",
             "region",
         ]
