@@ -71,6 +71,7 @@ class Router:
                 self.auth_service,
                 self._on_login_success,
                 self.show_notification,
+                self,
             ).build()
         
         elif self.current_screen == "register":
@@ -78,6 +79,7 @@ class Router:
                 self.auth_service,
                 self._on_signup_success,
                 self.show_notification,
+                self,
             ).build()
         
         elif self.current_screen == "home":
@@ -112,6 +114,10 @@ class Router:
     def _navigate_to(self, screen: str):
         """Navigate to a screen."""
         self.current_screen = screen
+    
+    def navigate(self, screen: str):
+        """Alias for _navigate_to for external calls."""
+        self._navigate_to(screen)
     
     def _navigate_to_delivery_confirmation(self, delivery_id: int):
         """Navigate to delivery confirmation screen."""
