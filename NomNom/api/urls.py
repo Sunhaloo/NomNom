@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from .views import (
     CurrentUserView,
+    CustomTokenView,
     DeliveryViewSet,
     LogoutView,
     OrderViewSet,
@@ -18,6 +19,7 @@ router.register(r"deliveries", DeliveryViewSet, basename="delivery")
 
 urlpatterns = [
     path("", include(router.urls)),
+    path("auth/token/", CustomTokenView.as_view(), name="api-token-auth"),
     path("users/me/", CurrentUserView.as_view(), name="current-user"),
     path("auth/logout/", LogoutView.as_view(), name="api-logout"),
     path("auth/signup/", SignupView.as_view(), name="api-signup"),
