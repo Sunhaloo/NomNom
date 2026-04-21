@@ -42,6 +42,7 @@ class Router:
         # Screen state
         self.current_screen = "login"
         self.current_delivery_id = None
+        self.showing_map = False
         
         # Color scheme
         self.primary_brown = "#8D6E63"

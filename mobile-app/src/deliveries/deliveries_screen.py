@@ -5,6 +5,7 @@ Displays list of deliveries with status filtering and confirmation action.
 
 import flet as ft
 from deliveries.deliveries_service import DeliveriesService
+from deliveries.screens.map_screen import MapScreen
 from common.error_handler import get_user_friendly_message, NetworkError
 
 
@@ -165,8 +166,8 @@ class DeliveriesScreen:
     
     def _load_deliveries(self):
         """Load deliveries from service."""
+        # Don't call update() during build phase - control not on page yet
         self.loading.visible = True
-        self.loading.update()
         
         try:
             result = self.deliveries_service.get_deliveries(
@@ -179,7 +180,6 @@ class DeliveriesScreen:
             self.show_notification(get_user_friendly_message(e), error=True)
         finally:
             self.loading.visible = False
-            self.loading.update()
     
     def _update_deliveries_list(self):
         """Update deliveries list display."""
@@ -209,13 +209,16 @@ class DeliveriesScreen:
     
     def _on_map_click(self, delivery_id):
         """Handle map/location click."""
-        # Open map or show delivery location
+        # Map is integrated in the page, no full-screen needed
         pass
     
     def build(self) -> ft.Container:
         """Build and return deliveries screen UI."""
         self._create_filter_buttons()
         self._load_deliveries()
+        
+        # Create map component
+        map_screen = MapScreen(on_back=None)
         
         return ft.Container(
             expand=True,
@@ -238,17 +241,17 @@ class DeliveriesScreen:
                     
                     ft.Container(height=15),
                     
-                    # Filter buttons
+                    # Map section (top of page)
                     ft.Container(
+                        height=250,
                         padding=ft.padding.symmetric(horizontal=15),
-                        content=self.filter_buttons,
+                        content=map_screen.build(),
                     ),
                     
                     ft.Container(height=15),
                     
                     # Loading indicator
                     ft.Container(
-                        alignment=ft.alignment.center,
                         content=self.loading,
                     ),
                     
