@@ -1,0 +1,91 @@
+"""
+Orders service for the NomNom mobile app.
+Handles fetching user orders.
+"""
+
+from config import ENDPOINTS
+from common.api_client import APIClient
+from common.storage import StorageManager
+from common.error_handler import NetworkError
+
+
+class OrdersService:
+    """Service for fetching and managing orders."""
+    
+    def __init__(self, api_client: APIClient, storage: StorageManager):
+        """
+        Initialize orders service.
+        
+        Args:
+            api_client: APIClient instance
+            storage: StorageManager instance
+        """
+        self.api_client = api_client
+        self.storage = storage
+    
+    def get_orders(
+        self,
+        status: str | None = None,
+        search: str | None = None,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> dict:
+        """
+        Get user orders with optional filtering.
+        
+        Args:
+            status: Filter by order status (pending, processing, delivered, cancelled)
+            search: Search query
+            limit: Max number of orders to return
+            offset: Pagination offset
+            
+        Returns:
+            Dictionary with orders list and pagination info
+            
+        Raises:
+            NetworkError: If request fails
+        """
+        params = {
+            "limit": limit,
+            "offset": offset,
+        }
+        
+        if status:
+            params["status"] = status
+        if search:
+            params["search"] = search
+        
+        try:
+            response = self.api_client.get(ENDPOINTS["orders"], params=params)
+            
+            if response.get("success"):
+                return response.get("data", {})
+            
+            raise NetworkError("Failed to fetch orders.")
+        except Exception as e:
+            raise NetworkError(f"Failed to fetch orders: {str(e)}")
+    
+    def get_order_detail(self, order_id: int) -> dict:
+        """
+        Get detailed information about a single order.
+        
+        Args:
+            order_id: Order ID
+            
+        Returns:
+            Dictionary with order details
+            
+        Raises:
+            NetworkError: If request fails
+        """
+        endpoint = f"{ENDPOINTS['orders']}{order_id}/"
+        
+        try:
+            response = self.api_client.get(endpoint)
+            
+            if response.get("success"):
+                return response.get("data", {})
+            
+            raise NetworkError("Failed to fetch order details.")
+        except Exception as e:
+            raise NetworkError(f"Failed to fetch order details: {str(e)}")
