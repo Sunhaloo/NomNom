@@ -56,6 +56,9 @@ def main(page: ft.Page):
         storage,
     )
     
+    # Store page reference in router for access by screens
+    router.page = page
+    
     # Notification snackbar
     def show_notification(message: str, error: bool = False):
         """Show snackbar notification."""
@@ -84,7 +87,8 @@ def main(page: ft.Page):
     def update_view():
         """Update main view and navigation."""
         # Check authentication and update current screen if needed
-        if not auth_service.is_logged_in() and router.current_screen not in ["login", "register"]:
+        # Allow deliveries page without login (not yet implemented by auth team)
+        if not auth_service.is_logged_in() and router.current_screen not in ["login", "register", "deliveries"]:
             router.current_screen = "login"
         
         # Update main content

@@ -10,8 +10,10 @@ authors = [
 dependencies = [
     "flet>=0.84.0",
     "flet-map>=0.84.0",
+    "flet-geolocator>=0.84.0",
     "requests>=2.31.0",
     "Pillow>=10.0.0",
+    "httpx>=0.24.0",
 ]
 
 [dependency-groups]

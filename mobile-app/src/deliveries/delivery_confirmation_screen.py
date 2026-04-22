@@ -1,6 +1,5 @@
 """
-Delivery confirmation screen for the NomNom mobile app.
-Handles photo capture, QR code validation, and delivery confirmation.
+Delivery confirmation screen - take a photo to prove delivery
 """
 
 import flet as ft
@@ -9,7 +8,7 @@ from common.error_handler import get_user_friendly_message, PhotoUploadError, Ne
 
 
 class DeliveryConfirmationScreen:
-    """Screen for confirming delivery with photo and QR code."""
+    """Screen to confirm a delivery by taking a photo"""
     
     def __init__(
         self,
@@ -19,23 +18,14 @@ class DeliveryConfirmationScreen:
         on_cancel,
         show_notification,
     ):
-        """
-        Initialize delivery confirmation screen.
-        
-        Args:
-            deliveries_service: DeliveriesService instance
-            delivery_id: ID of delivery to confirm
-            on_confirm_success: Callback on successful confirmation
-            on_cancel: Callback when user cancels
-            show_notification: Function to show notifications
-        """
+        """Set up the confirmation screen"""
         self.deliveries_service = deliveries_service
         self.delivery_id = delivery_id
         self.on_confirm_success = on_confirm_success
         self.on_cancel = on_cancel
         self.show_notification = show_notification
         
-        # Color scheme
+        # Colors
         self.primary_brown = "#8D6E63"
         self.light_brown = "#D7CCC8"
         self.lighter_brown = "#EFEBE9"
@@ -43,7 +33,7 @@ class DeliveryConfirmationScreen:
         self.text_light = "#5D4037"
         self.white = "#ffffff"
         
-        # Camera and photo state
+        # Camera setup
         self.camera = ft.CameraPreview(
             on_loaded=self._on_camera_loaded,
         )
@@ -105,11 +95,11 @@ class DeliveryConfirmationScreen:
         )
     
     def _on_camera_loaded(self):
-        """Called when camera is loaded."""
+        """Camera is ready to use"""
         self.is_camera_ready = True
     
     def _on_capture_click(self, e):
-        """Handle capture button click."""
+        """Take a photo when capture button is clicked"""
         if self.is_camera_ready:
             self.photo_path = self.camera.take_picture()
             if self.photo_path:
@@ -128,7 +118,7 @@ class DeliveryConfirmationScreen:
                 self.capture_btn.update()
     
     def _on_retake_click(self, e):
-        """Handle retake button click."""
+        """Go back to camera to take another photo"""
         self.photo_path = None
         self.photo_preview.visible = False
         self.camera_container.visible = True
@@ -144,7 +134,7 @@ class DeliveryConfirmationScreen:
         self.capture_btn.update()
     
     def _on_confirm_delivery(self, e):
-        """Handle confirm delivery click."""
+        """Upload photo and confirm the delivery"""
         if not self.photo_path:
             self.show_notification("Please take a photo first.", error=True)
             return
@@ -171,7 +161,7 @@ class DeliveryConfirmationScreen:
             self.loading_indicator.update()
     
     def build(self) -> ft.Container:
-        """Build and return delivery confirmation screen UI."""
+        """Create the confirmation screen UI"""
         return ft.Container(
             expand=True,
             bgcolor=self.white,
@@ -205,7 +195,7 @@ class DeliveryConfirmationScreen:
                     
                     ft.Container(height=20),
                     
-                    # Camera preview or photo
+                    # Show camera or preview
                     ft.Container(
                         alignment=ft.alignment.center,
                         padding=ft.padding.symmetric(horizontal=15),
@@ -220,7 +210,7 @@ class DeliveryConfirmationScreen:
                     
                     ft.Container(height=20),
                     
-                    # Capture button (circular, centered)
+                    # Camera button in center
                     ft.Container(
                         alignment=ft.alignment.center,
                         content=self.capture_btn,
@@ -228,7 +218,7 @@ class DeliveryConfirmationScreen:
                     
                     ft.Container(height=20),
                     
-                    # Action buttons
+                    # Bottom action buttons
                     ft.Container(
                         padding=ft.padding.symmetric(horizontal=15),
                         content=ft.Column(
