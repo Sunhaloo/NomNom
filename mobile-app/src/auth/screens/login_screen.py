@@ -1,7 +1,3 @@
-"""
-Login screen for the NomNom mobile app.
-"""
-
 import flet as ft
 from auth.auth_service import AuthService
 from common.error_handler import get_user_friendly_message, AuthenticationError, ValidationError, NetworkError
@@ -10,18 +6,12 @@ from common.error_handler import get_user_friendly_message, AuthenticationError,
 class LoginScreen:
     """Login screen with username/password form."""
     
-    def __init__(self, auth_service: AuthService, on_login_success, show_notification):
-        """
-        Initialize login screen.
-        
-        Args:
-            auth_service: AuthService instance
-            on_login_success: Callback when login succeeds
-            show_notification: Function to show error/success notifications
-        """
+    def __init__(self, auth_service: AuthService, on_login_success, show_notification, router=None):
+    
         self.auth_service = auth_service
         self.on_login_success = on_login_success
         self.show_notification = show_notification
+        self.router = router
         
         # Color scheme from CSS
         self.primary_brown = "#8D6E63"
@@ -152,7 +142,8 @@ class LoginScreen:
             ),
         )
     
-    def _navigate_to_signup(self):
-        """Navigate to signup screen (to be connected in router)."""
-        # This will be handled by the router
-        pass
+    def _navigate_to_signup(self, e=None):
+        if self.router:
+            self.router.navigate("signup")
+        else:
+            self.show_notification("Navigation not available", error=True)
