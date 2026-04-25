@@ -29,49 +29,31 @@ class AuthService:
         self.storage = storage
 
     def login(self, username: str, password: str) -> dict:
-        """
-        Login user with username and password.
-
-        Args:
-            username: Username
-            password: Password
-
-        Returns:
-            Dictionary with user info and token
-
-        Raises:
-            ValidationError: If inputs are invalid
-            AuthenticationError: If login fails
-            NetworkError: If request fails
-        """
         if not username or not password:
+            logger.warning("Login attempt with empty credentials")
             raise ValidationError("Username and password are required.")
 
         try:
-            response = self.api_client.post(
-                ENDPOINTS["token"],
+            logger.debug("Login attempt", username=username)
+            result = self.api_client.post(
+                ENDPOINTS["login"],
                 json={"username": username, "password": password},
                 require_auth=False,
             )
 
-            if not response.get("success"):
-                raise AuthenticationError(response.get("message", "Login failed."))
+            if not result.get("success"):
+                raise AuthenticationError(result.get("message", "Login failed."))
 
-            token = response["data"]["token"]
-            user_id = response["data"]["user"]["id"]
+            token = result.get("data", {}).get("token")
+            user_id = result.get("data", {}).get("user", {}).get("id")
+            if token and user_id:
+                self.storage.save_token(token, user_id, username)
 
-            self.storage.save_token(token, user_id, username)
-
-            return {
-                "success": True,
-                "token": token,
-                "user": response["data"]["user"],
-            }
-        except (AuthenticationError, NetworkError):
+            logger.info("Login successful", username=username)
+            return {"success": True, "data": result.get("data", {})}
+        except (AuthenticationError, NetworkError) as e:
+            logger.error("Login failed", username=username, error=str(e))
             raise
-        except Exception as e:
-            raise AuthenticationError(f"Login failed: {str(e)}")
-
     def signup(
         self,
         username: str,
