@@ -207,7 +207,7 @@ class DeliveryConfirmationScreen:
                     
                     # Camera preview or photo
                     ft.Container(
-                        alignment=ft.alignment.center,
+                        alignment=ft.Alignment.CENTER,
                         padding=ft.padding.symmetric(horizontal=15),
                         content=ft.Column(
                             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -222,7 +222,7 @@ class DeliveryConfirmationScreen:
                     
                     # Capture button (circular, centered)
                     ft.Container(
-                        alignment=ft.alignment.center,
+                        alignment=ft.Alignment.CENTER,
                         content=self.capture_btn,
                     ),
                     

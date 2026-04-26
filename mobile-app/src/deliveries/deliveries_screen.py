@@ -186,7 +186,7 @@ class DeliveriesScreen:
         if not self.deliveries:
             self.deliveries_list.controls = [
                 ft.Container(
-                    alignment=ft.alignment.center,
+                    alignment=ft.Alignment.CENTER,
                     padding=40,
                     content=ft.Text(
                         "No deliveries found",
@@ -248,7 +248,7 @@ class DeliveriesScreen:
                     
                     # Loading indicator
                     ft.Container(
-                        alignment=ft.alignment.center,
+                        alignment=ft.Alignment.CENTER,
                         content=self.loading,
                     ),
                     

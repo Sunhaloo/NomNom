@@ -236,7 +236,7 @@ class HomeScreen:
                     
                     # User greeting
                     ft.Container(
-                        padding=ft.padding.symmetric(horizontal=20),
+                        padding=ft.Padding(left=20, right=20, top=0, bottom=0),
                         content=self.user_greeting,
                     ),
                     
@@ -244,13 +244,13 @@ class HomeScreen:
                     
                     # Loading indicator
                     ft.Container(
-                        alignment=ft.alignment.center,
+                        alignment=ft.Alignment.CENTER,
                         content=self.loading,
                     ),
                     
                     # Stats section
                     ft.Container(
-                        padding=ft.padding.symmetric(horizontal=15),
+                        padding=ft.Padding(left=15, right=15, top=0, bottom=0),
                         content=self.stats_column,
                     ),
                     
@@ -258,7 +258,7 @@ class HomeScreen:
                     
                     # Reviews section header
                     ft.Container(
-                        padding=ft.padding.symmetric(horizontal=20),
+                        padding=ft.Padding(left=20, right=20, top=0, bottom=0),
                         content=ft.Text(
                             "Top Reviews",
                             size=18,
@@ -271,7 +271,7 @@ class HomeScreen:
                     
                     # Reviews carousel
                     ft.Container(
-                        padding=ft.padding.symmetric(horizontal=15),
+                        padding=ft.Padding(left=15, right=15, top=0, bottom=0),
                         content=self.reviews_column,
                     ),
                     

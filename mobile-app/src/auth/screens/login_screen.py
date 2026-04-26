@@ -64,8 +64,12 @@ class LoginScreen:
         # Show loading
         self.login_btn.disabled = True
         self.loading_indicator.visible = True
-        self.login_btn.update()
-        self.loading_indicator.update()
+        try:
+            self.login_btn.update()
+            self.loading_indicator.update()
+        except RuntimeError:
+            # Control not yet added to page, skip update
+            pass
         
         try:
             result = self.auth_service.login(username, password)
@@ -76,8 +80,12 @@ class LoginScreen:
         finally:
             self.login_btn.disabled = False
             self.loading_indicator.visible = False
-            self.login_btn.update()
-            self.loading_indicator.update()
+            try:
+                self.login_btn.update()
+                self.loading_indicator.update()
+            except RuntimeError:
+                # Control not yet added to page, skip update
+                pass
     
     def build(self) -> ft.Container:
         """Build and return login screen UI."""

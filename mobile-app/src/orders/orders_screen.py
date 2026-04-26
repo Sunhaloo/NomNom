@@ -169,7 +169,7 @@ class OrdersScreen:
         if not self.orders:
             self.orders_list.controls = [
                 ft.Container(
-                    alignment=ft.alignment.center,
+                    alignment=ft.Alignment.CENTER,
                     padding=40,
                     content=ft.Text(
                         "No orders found",
@@ -239,7 +239,7 @@ class OrdersScreen:
                     
                     # Loading indicator
                     ft.Container(
-                        alignment=ft.alignment.center,
+                        alignment=ft.Alignment.CENTER,
                         content=self.loading,
                     ),
                     
