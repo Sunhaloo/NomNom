@@ -11,6 +11,7 @@ class LoginScreen:
         self.auth_service = auth_service
         self.on_login_success = on_login_success
         self.show_notification = show_notification
+        self.router = router
         
         # Color scheme from CSS
         self.primary_brown = "#8D6E63"

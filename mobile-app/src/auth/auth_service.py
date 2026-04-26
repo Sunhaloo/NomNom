@@ -36,7 +36,7 @@ class AuthService:
         try:
             logger.debug("Login attempt", username=username)
             result = self.api_client.post(
-                ENDPOINTS["login"],
+                ENDPOINTS["token"],
                 json={"username": username, "password": password},
                 require_auth=False,
             )
