@@ -45,6 +45,18 @@ def get_user_friendly_message(error: Exception) -> str:
     Returns:
         User-friendly error message string
     """
+    # If we have a specific message (often from server), prefer showing it.
+    details = str(error).strip()
+    if details and isinstance(
+        error,
+        (
+            AuthenticationError,
+            ValidationError,
+            PhotoUploadError,
+        ),
+    ):
+        return details
+
     error_map = {
         AuthenticationError: "Unable to authenticate. Please check your credentials.",
         ValidationError: "Please check your input and try again.",

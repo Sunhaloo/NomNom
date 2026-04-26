@@ -1,10 +1,13 @@
 from django.db import transaction
+from django.contrib.auth import get_user_model
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework import permissions, status, viewsets, authentication
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import action
+from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -35,7 +38,21 @@ class OrderViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        return Order.objects.filter(user=user).order_by("-order_date")
+        qs = Order.objects.filter(user=user)
+
+        status_param = self.request.query_params.get("status")
+        if status_param:
+            normalized = status_param.strip().lower()
+            status_map = {
+                "pending": "Pending",
+                "paid": "Paid",
+                "cancelled": "Cancelled",
+                "canceled": "Cancelled",
+            }
+            status_value = status_map.get(normalized, status_param.strip())
+            qs = qs.filter(order_status__iexact=status_value)
+
+        return qs.order_by("-order_date")
 
 
 class DeliveryViewSet(viewsets.ReadOnlyModelViewSet):
@@ -64,7 +81,17 @@ class DeliveryViewSet(viewsets.ReadOnlyModelViewSet):
 
         status_param = self.request.query_params.get("status")
         if status_param:
-            qs = qs.filter(status=status_param)
+            normalized = status_param.strip().lower()
+            status_map = {
+                "pending": "Pending",
+                "done": "Done",
+                "delivered": "Done",
+                "failed": "Failed",
+                "cancelled": "Cancelled",
+                "canceled": "Cancelled",
+            }
+            status_value = status_map.get(normalized, status_param.strip())
+            qs = qs.filter(status__iexact=status_value)
         else:
             qs = qs.filter(status="Pending")
 
@@ -95,12 +122,17 @@ class DeliveryViewSet(viewsets.ReadOnlyModelViewSet):
             status=status.HTTP_200_OK,
         )
 
-    @action(detail=True, methods=["post"])
+    @action(
+        detail=True,
+        methods=["post"],
+        url_path="confirm-with-photo",
+        parser_classes=[MultiPartParser, FormParser],
+    )
     def confirm_with_photo(self, request, pk=None):
         """
         Confirm delivery with photo proof and QR validation
         
-        Expected: multipart/form-data with 'photo' file
+        Expected: multipart/form-data with 'photo' or 'confirmation_photo' file
         Returns: Confirmed delivery or error
         """
         delivery = self.get_object()
@@ -116,7 +148,7 @@ class DeliveryViewSet(viewsets.ReadOnlyModelViewSet):
             )
         
         # Get photo from request
-        photo = request.FILES.get('photo')
+        photo = request.FILES.get("photo") or request.FILES.get("confirmation_photo")
         if not photo:
             return Response(
                 {"error": "Photo file is required"},
@@ -399,20 +431,36 @@ class CustomTokenView(APIView):
         from django.contrib.auth import authenticate
         from rest_framework.authtoken.models import Token
         
-        username = request.data.get("username")
-        password = request.data.get("password")
+        username = (request.data.get("username") or "").strip()
+        password = (request.data.get("password") or "").strip()
         
         if not username or not password:
             return Response(
-                {"error": "Username and password are required"},
+                {"success": False, "message": "Username and password are required"},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
         user = authenticate(request, username=username, password=password)
+
+        # Convenience: allow logging in with email in the "username" field.
+        if not user and "@" in username:
+            User = get_user_model()
+            matched = User.objects.filter(email__iexact=username).only("username").first()
+            if matched:
+                user = authenticate(request, username=matched.username, password=password)
         
         if not user:
+            logger.debug(
+                "API token auth failed",
+                extra={
+                    "username_repr": repr(username),
+                    "username_len": len(username),
+                    "username_has_whitespace": any(c.isspace() for c in username),
+                    "content_type": request.META.get("CONTENT_TYPE"),
+                },
+            )
             return Response(
-                {"error": "Invalid credentials"},
+                {"success": False, "message": "Invalid credentials"},
                 status=status.HTTP_401_UNAUTHORIZED
             )
         

@@ -42,7 +42,11 @@ class AuthService:
             )
 
             if not result.get("success"):
-                raise AuthenticationError(result.get("message", "Login failed."))
+                raise AuthenticationError(
+                    result.get("message")
+                    or result.get("error")
+                    or "Login failed."
+                )
 
             token = result.get("data", {}).get("token")
             user_id = result.get("data", {}).get("user", {}).get("id")
