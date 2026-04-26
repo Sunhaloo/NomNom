@@ -154,8 +154,12 @@ class RegisterScreen:
         # Show loading
         self.signup_btn.disabled = True
         self.loading_indicator.visible = True
-        self.signup_btn.update()
-        self.loading_indicator.update()
+        try:
+            self.signup_btn.update()
+            self.loading_indicator.update()
+        except RuntimeError:
+            # Control not yet added to page, skip update
+            pass
         
         try:
             result = self.auth_service.signup(
@@ -173,8 +177,12 @@ class RegisterScreen:
         finally:
             self.signup_btn.disabled = False
             self.loading_indicator.visible = False
-            self.signup_btn.update()
-            self.loading_indicator.update()
+            try:
+                self.signup_btn.update()
+                self.loading_indicator.update()
+            except RuntimeError:
+                # Control not yet added to page, skip update
+                pass
     
     def build(self) -> ft.Container:
         """Build and return signup screen UI."""
