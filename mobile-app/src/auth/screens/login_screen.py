@@ -10,7 +10,7 @@ from common.error_handler import get_user_friendly_message, AuthenticationError,
 class LoginScreen:
     """Login screen with username/password form."""
     
-    def __init__(self, auth_service: AuthService, on_login_success, show_notification):
+    def __init__(self, auth_service: AuthService, on_login_success, show_notification, router=None):
         """
         Initialize login screen.
         
@@ -18,10 +18,12 @@ class LoginScreen:
             auth_service: AuthService instance
             on_login_success: Callback when login succeeds
             show_notification: Function to show error/success notifications
+            router: Router instance for navigation (optional)
         """
         self.auth_service = auth_service
         self.on_login_success = on_login_success
         self.show_notification = show_notification
+        self.router = router
         
         # Color scheme from CSS
         self.primary_brown = "#8D6E63"
@@ -153,6 +155,6 @@ class LoginScreen:
         )
     
     def _navigate_to_signup(self):
-        """Navigate to signup screen (to be connected in router)."""
-        # This will be handled by the router
-        pass
+        """Navigate to signup screen via router."""
+        if self.router:
+            self.router._navigate_to("register")

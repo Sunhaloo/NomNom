@@ -13,7 +13,7 @@ ENDPOINTS = {
     "signup": f"{API_BASE_URL}/auth/signup/",
     "stats": f"{API_BASE_URL}/stats/",
     "reviews": f"{API_BASE_URL}/reviews/top-rated/",
-    "profile": f"{API_BASE_URL}/users/profile/",
+    "profile": f"{API_BASE_URL}/users/me/",
     "orders": f"{API_BASE_URL}/orders/",
     "deliveries": f"{API_BASE_URL}/deliveries/",
     "delivery_confirm": lambda delivery_id: f"{API_BASE_URL}/deliveries/{delivery_id}/confirm-with-photo/",
