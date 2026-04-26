@@ -7,6 +7,25 @@ from delivery.models import Delivery
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    delivery = serializers.SerializerMethodField()
+
+    def get_delivery(self, obj):
+        delivery = (
+            Delivery.objects.filter(order=obj)
+            .order_by("-id")
+            .only("id", "address", "status", "date")
+            .first()
+        )
+        if not delivery:
+            return None
+
+        return {
+            "id": delivery.id,
+            "address": delivery.address,
+            "status": delivery.status,
+            "date": delivery.date.isoformat() if delivery.date else None,
+        }
+
     class Meta:
         # get the data from the 'order' app
         model = Order
@@ -18,6 +37,7 @@ class OrderSerializer(serializers.ModelSerializer):
             "order_status",
             "total_amount",
             "is_preorder",
+            "delivery",
         ]
 
 

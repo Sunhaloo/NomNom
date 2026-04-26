@@ -4,12 +4,11 @@ Handles API requests with automatic token authentication.
 """
 
 import logging
-from urllib import response
 
 import requests
 from typing import Optional, Dict, Any
 from config import API_TIMEOUT, ENDPOINTS
-from common.error_handler import NetworkError, AuthenticationError
+from common.error_handler import NetworkError, AuthenticationError, ValidationError
 from common.storage import StorageManager
 
 logger = logging.getLogger(__name__)
@@ -44,6 +43,42 @@ class APIClient:
         
         token = token_data["auth_token"]
         return {"Authorization": f"Token {token}"}
+
+    def _extract_error_message(self, response) -> str:
+        """
+        Extract a useful error message from a JSON API response.
+
+        Falls back to a short text preview.
+        """
+        try:
+            self._validate_json_response(response)
+            payload = response.json()
+        except Exception:
+            payload = None
+
+        if isinstance(payload, dict):
+            for key in ["message", "error", "detail"]:
+                value = payload.get(key)
+                if isinstance(value, str) and value.strip():
+                    return value.strip()
+
+        return (response.text or "").strip()[:200] or f"HTTP {response.status_code}"
+
+    def _raise_for_http_error(self, response, require_auth: bool) -> None:
+        """
+        Raise domain errors for HTTP status codes while preserving server messages.
+        """
+        if response.status_code < 400:
+            return
+
+        message = self._extract_error_message(response)
+
+        if response.status_code in (401, 403):
+            raise AuthenticationError(message)
+        if response.status_code == 400:
+            raise ValidationError(message)
+
+        raise NetworkError(message)
     
     def _validate_json_response(self, response) -> None:
       """
@@ -95,7 +130,7 @@ class APIClient:
                 headers=headers,
                 timeout=self.timeout,
             )
-            response.raise_for_status()
+            self._raise_for_http_error(response, require_auth=require_auth)
             self._validate_json_response(response)
             return response.json()
         except requests.exceptions.RequestException as e:
@@ -130,7 +165,7 @@ class APIClient:
         if require_auth:
             headers.update(self._get_auth_header())
         
-        logger.debug("POST request", endpoint=endpoint, require_auth=require_auth)
+        logger.debug("POST request to %s (auth=%s)", endpoint, require_auth)
         try:
             response = requests.post(
                 endpoint,
@@ -150,7 +185,7 @@ class APIClient:
                     f"Check API configuration or proxy settings."
                 )
   
-            response.raise_for_status()
+            self._raise_for_http_error(response, require_auth=require_auth)
             self._validate_json_response(response)
             return response.json()
         except requests.exceptions.RequestException as e:
@@ -191,7 +226,7 @@ class APIClient:
                 headers=headers,
                 timeout=self.timeout,
             )
-            response.raise_for_status()
+            self._raise_for_http_error(response, require_auth=require_auth)
             self._validate_json_response(response)
             return response.json()
         except requests.exceptions.RequestException as e:
@@ -232,7 +267,7 @@ class APIClient:
                 headers=headers,
                 timeout=self.timeout,
             )
-            response.raise_for_status()
+            self._raise_for_http_error(response, require_auth=require_auth)
             self._validate_json_response(response)
             return response.json()
         except requests.exceptions.RequestException as e:
