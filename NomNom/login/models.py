@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import RegexValidator
 
 # import the abstract user "class" model
 from django.contrib.auth.models import AbstractUser
@@ -12,6 +13,12 @@ class User(AbstractUser):
     )
     region = models.CharField(max_length=80)
     street = models.CharField(max_length=120)
+    phone_number = models.CharField(
+        max_length=8,
+        blank=True,
+        default="",
+        validators=[RegexValidator(r"^\d{8}$", "Phone number must be exactly 8 digits")],
+    )
     role = models.CharField(max_length=20, default="CUSTOMER")
 
     # Additional fields added by migrations

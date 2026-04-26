@@ -61,6 +61,7 @@ class AuthService:
         email: str,
         first_name: str,
         last_name: str,
+        phone_number: str = "",
     ) -> dict:
         """
         Register new user.
@@ -71,6 +72,7 @@ class AuthService:
             email: Email address
             first_name: First name
             last_name: Last name
+            phone_number: Phone number (optional)
 
         Returns:
             Dictionary with user info and token
@@ -84,15 +86,21 @@ class AuthService:
             raise ValidationError("All fields are required.")
 
         try:
+            signup_data = {
+                "username": username,
+                "password": password,
+                "email": email,
+                "first_name": first_name,
+                "last_name": last_name,
+            }
+            
+            # Add phone_number if provided
+            if phone_number:
+                signup_data["phone_number"] = phone_number
+            
             response = self.api_client.post(
                 ENDPOINTS["signup"],
-                json={
-                    "username": username,
-                    "password": password,
-                    "email": email,
-                    "first_name": first_name,
-                    "last_name": last_name,
-                },
+                json=signup_data,
                 require_auth=False,
             )
 

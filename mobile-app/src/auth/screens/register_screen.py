@@ -65,6 +65,16 @@ class RegisterScreen:
             height=45,
         )
         
+        self.phone_field = ft.TextField(
+            label="Phone Number",
+            hint_text="12345678",
+            keyboard_type=ft.KeyboardType.NUMBER,
+            border_color=self.primary_brown,
+            focused_border_color=self.primary_brown,
+            text_size=14,
+            height=45,
+        )
+        
         self.password_field = ft.TextField(
             label="Password",
             password=True,
@@ -108,11 +118,19 @@ class RegisterScreen:
         email = self.email_field.value.strip()
         first_name = self.first_name_field.value.strip()
         last_name = self.last_name_field.value.strip()
+        phone = self.phone_field.value.strip()
         password = self.password_field.value
         confirm_password = self.confirm_password_field.value
         
         if not all([username, email, first_name, last_name, password, confirm_password]):
-            return False, "All fields are required."
+            return False, "All fields except phone number are required."
+        
+        # Validate phone number if provided (optional field)
+        if phone:
+            if not phone.isdigit():
+                return False, "Phone number must contain only digits."
+            if len(phone) != 8:
+                return False, "Phone number must be exactly 8 digits."
         
         if len(password) < 6:
             return False, "Password must be at least 6 characters."
@@ -146,6 +164,7 @@ class RegisterScreen:
                 email=self.email_field.value.strip(),
                 first_name=self.first_name_field.value.strip(),
                 last_name=self.last_name_field.value.strip(),
+                phone_number=self.phone_field.value.strip(),
             )
             self.show_notification("Sign up successful!", error=False)
             self.on_signup_success(result)
@@ -199,6 +218,7 @@ class RegisterScreen:
                                             self.email_field,
                                             self.first_name_field,
                                             self.last_name_field,
+                                            self.phone_field,
                                             self.password_field,
                                             self.confirm_password_field,
                                             
