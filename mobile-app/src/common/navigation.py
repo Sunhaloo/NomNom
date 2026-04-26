@@ -71,6 +71,7 @@ class Router:
                 self.auth_service,
                 self._on_login_success,
                 self.show_notification,
+                router=self,
             ).build()
         
         elif self.current_screen == "register":
