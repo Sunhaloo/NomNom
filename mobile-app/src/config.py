@@ -3,8 +3,10 @@ Configuration for the NomNom mobile app.
 Contains API endpoints, constants, and shop coordinates.
 """
 
-# API Configuration
-API_BASE_URL = "http://localhost:8000/api/v1"
+import os
+
+# API Configuration (can override with NOMNOM_API_URL environment variable)
+API_BASE_URL = os.getenv("NOMNOM_API_URL", "http://localhost:8000/api/v1")
 API_TIMEOUT = 30  # seconds
 
 # Endpoints
