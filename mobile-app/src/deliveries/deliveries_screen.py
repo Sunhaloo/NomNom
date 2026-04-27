@@ -35,38 +35,51 @@ class DeliveriesScreen:
         # UI containers for each status section
         self.pending_list = ft.Column(
             spacing=10,
+            scroll=ft.ScrollMode.AUTO,
+            expand=True,
             controls=[],
         )
         self.confirmed_list = ft.Column(
             spacing=10,
+            scroll=ft.ScrollMode.AUTO,
+            expand=True,
             controls=[],
         )
         self.canceled_list = ft.Column(
             spacing=10,
+            scroll=ft.ScrollMode.AUTO,
+            expand=True,
             controls=[],
         )
         
         self.loading = ft.ProgressRing(color=self.primary_brown, visible=False)
 
+    def _safe_update(self, control: ft.Control) -> None:
+        """Update a control if it is attached to the page."""
+        try:
+            control.update()
+        except RuntimeError:
+            # Control not yet added to page
+            pass
     
     def _create_delivery_item(self, delivery: dict, status_type: str) -> ft.Container:
         """Build a single delivery card for the list"""
         delivery_id = delivery.get("id", "N/A")
         status = delivery.get("status", "pending").replace("_", " ").title()
-        address = delivery.get("delivery_address", "N/A")
+        address = delivery.get("address", "N/A")
         estimated_eta = delivery.get("estimated_eta", "N/A")
         
         # Card color based on status type
         card_color = {
             "Pending": self.orange,
-            "in_transit": self.green,
+            "Done": self.green,
             "Cancelled": self.red,
         }.get(status_type, self.lighter_brown)
         
         # Light version of the card color for background
         card_bg_color = {
             "Pending": "#FFF3E0",
-            "in_transit": "#E8F5E9",
+            "Done": "#E8F5E9",
             "Cancelled": "#FFEBEE",
         }.get(status_type, self.lighter_brown)
         
@@ -145,6 +158,7 @@ class DeliveriesScreen:
     def _load_deliveries(self):
         """Fetch all deliveries from service"""
         self.loading.visible = True
+        self._safe_update(self.loading)
         try:
             # Fetch pending deliveries
             pending_result = self.deliveries_service.get_deliveries(
@@ -153,9 +167,9 @@ class DeliveriesScreen:
             )
             self.pending_deliveries = pending_result.get("results", [])
             
-            # Fetch in_transit deliveries
+            # Fetch done/confirmed deliveries
             in_transit_result = self.deliveries_service.get_deliveries(
-                status="in_transit",
+                status="Done",
                 limit=50,
             )
             self.confirmed_deliveries = in_transit_result.get("results", [])
@@ -172,11 +186,12 @@ class DeliveriesScreen:
             self.show_notification(get_user_friendly_message(e), error=True)
         finally:
             self.loading.visible = False
+            self._safe_update(self.loading)
     
     def _update_all_lists(self):
         """Refresh all delivery list displays"""
         self._update_list(self.pending_list, self.pending_deliveries, "Pending")
-        self._update_list(self.confirmed_list, self.confirmed_deliveries, "in_transit")
+        self._update_list(self.confirmed_list, self.confirmed_deliveries, "Done")
         self._update_list(self.canceled_list, self.canceled_deliveries, "Cancelled")
     
     def _update_list(self, list_container, deliveries, status_type):
@@ -198,7 +213,7 @@ class DeliveriesScreen:
                 self._create_delivery_item(delivery, status_type) for delivery in deliveries
             ]
         
-        list_container.update()
+        self._safe_update(list_container)
     
     def _on_confirm_click(self, delivery_id):
         """Handle clicking confirm delivery button"""
@@ -234,12 +249,7 @@ class DeliveriesScreen:
                         ft.Container(height=8),
                         ft.Container(
                             expand=True,
-                            content=ft.Column(
-                                expand=True,
-                                scroll=ft.ScrollMode.AUTO,
-                                spacing=10,
-                                controls=[deliveries_list],
-                            ),
+                            content=deliveries_list,
                         ),
                     ],
                     spacing=0,

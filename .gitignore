@@ -33,3 +33,8 @@ Thumbs.db
 # Environment variables
 .env
 .env.local
+
+# NomNom mobile app local state (tokens/cache)
+mobile-app/.nomnom_data/
+mobile-app/.test_nomnom_data/
+mobile-app/**/.nomnom_data/

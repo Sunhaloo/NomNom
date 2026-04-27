@@ -78,6 +78,8 @@ class OrdersScreen:
         # Orders list
         self.orders_list = ft.Column(
             spacing=10,
+            scroll=ft.ScrollMode.AUTO,
+            expand=True,
             controls=[],
         )
 
@@ -86,6 +88,38 @@ class OrdersScreen:
             spacing=10,
             controls=[],
         )
+
+        # Keep a reference to the full details container so we can force-refresh it.
+        self.detail_container = ft.Container(
+            bgcolor=self.lighter_brown,
+            border_radius=10,
+            padding=15,
+            content=ft.Column(
+                spacing=10,
+                controls=[
+                    ft.Text(
+                        "Details About Order",
+                        size=14,
+                        weight="bold",
+                        color=self.text_dark,
+                    ),
+                    ft.Row(
+                        spacing=10,
+                        controls=[
+                            ft.Container(expand=True, content=self.order_id_field),
+                            self.order_id_load_btn,
+                        ],
+                    ),
+                    ft.Container(
+                        alignment=ft.Alignment.CENTER,
+                        content=self.detail_loading,
+                    ),
+                    self.detail_panel_body,
+                ],
+            ),
+        )
+
+        # Render initial state now that detail_container exists
         self._render_selected_order()
 
     def _safe_update(self, control: ft.Control) -> None:
@@ -139,6 +173,7 @@ class OrdersScreen:
             bgcolor=self.lighter_brown,
             border_radius=10,
             padding=15,
+            ink=True,
             on_click=lambda e: self._on_order_click(order_id),
             content=ft.Column(
                 spacing=8,
@@ -266,6 +301,7 @@ class OrdersScreen:
         self._safe_update(self.order_id_field)
 
         self.detail_loading.visible = True
+        self._safe_update(self.detail_panel_body)
         self._safe_update(self.detail_loading)
 
         try:
@@ -290,26 +326,33 @@ class OrdersScreen:
 
     def _render_selected_order(self):
         """Render the inline order details panel."""
+        # detail_container is created during __init__; guard anyway to avoid init-order issues
+        detail_container = getattr(self, "detail_container", None)
+
         if not self.selected_order_id:
             self.detail_panel_body.controls = [
                 ft.Text(
-                    "Select an order to see details.",
+                    "Tap an order below or enter an Order ID to view your receipt.",
                     size=12,
                     color=self.text_light,
                 )
             ]
             self._safe_update(self.detail_panel_body)
+            if detail_container is not None:
+                self._safe_update(detail_container)
             return
 
         if not self.selected_order:
             self.detail_panel_body.controls = [
                 ft.Text(
-                    f"Couldn’t load order #{self.selected_order_id}.",
+                    f"We couldn’t load order #{self.selected_order_id}. Please try again.",
                     size=12,
                     color=self.text_light,
                 )
             ]
             self._safe_update(self.detail_panel_body)
+            if detail_container is not None:
+                self._safe_update(detail_container)
             return
 
         order = self.selected_order
@@ -336,6 +379,41 @@ class OrdersScreen:
         delivery_fee = order.get("delivery_fee", "0.00")
         total = order.get("total_amount", "0.00")
 
+        def section(title: str, icon: str, content: ft.Control) -> ft.Container:
+            return ft.Container(
+                bgcolor=self.white,
+                border_radius=10,
+                padding=12,
+                content=ft.Column(
+                    spacing=8,
+                    controls=[
+                        ft.Row(
+                            spacing=8,
+                            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                            controls=[
+                                ft.Icon(icon, size=18, color=self.primary_brown),
+                                ft.Text(title, size=12, weight="bold", color=self.text_dark),
+                            ],
+                        ),
+                        content,
+                    ],
+                ),
+            )
+
+        def kv_row(label: str, value: str, bold: bool = False) -> ft.Row:
+            return ft.Row(
+                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                controls=[
+                    ft.Text(label, size=11, color=self.text_light),
+                    ft.Text(
+                        value,
+                        size=11 if not bold else 12,
+                        color=self.text_dark if bold else self.text_light,
+                        weight="bold" if bold else None,
+                    ),
+                ],
+            )
+
         # Items list (scrollable)
         item_controls: list[ft.Control] = []
         if items:
@@ -346,21 +424,26 @@ class OrdersScreen:
                 quantity = item.get("quantity", 0)
                 price = item.get("price", "0.00")
                 line_subtotal = item.get("subtotal", None)
+                line_total = (
+                    line_subtotal
+                    if line_subtotal is not None
+                    else (self._money_to_float(quantity) * self._money_to_float(price))
+                )
 
                 item_controls.append(
                     ft.Container(
-                        bgcolor=self.white,
-                        border_radius=8,
-                        padding=10,
+                        bgcolor="#FAFAFA",
+                        border_radius=10,
+                        padding=12,
                         content=ft.Column(
-                            spacing=3,
+                            spacing=6,
                             controls=[
                                 ft.Row(
                                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                                     controls=[
-                                        ft.Text(pastry_name, size=12, color=self.text_dark),
+                                        ft.Text(pastry_name, size=12, color=self.text_dark, weight="bold"),
                                         ft.Text(
-                                            format_currency(line_subtotal if line_subtotal is not None else (self._money_to_float(quantity) * self._money_to_float(price))),
+                                            format_currency(line_total),
                                             size=12,
                                             color=self.text_dark,
                                             weight="w600",
@@ -368,7 +451,7 @@ class OrdersScreen:
                                     ],
                                 ),
                                 ft.Text(
-                                    f"Qty: {quantity} × {format_currency(price)}",
+                                    f"Qty {quantity} • {format_currency(price)} each",
                                     size=11,
                                     color=self.text_light,
                                 ),
@@ -391,7 +474,7 @@ class OrdersScreen:
             delivery_status = delivery.get("status", "")
             delivery_controls = [
                 ft.Text(
-                    f"Address: {delivery.get('address', 'N/A')}",
+                    delivery.get("address", "N/A"),
                     size=11,
                     color=self.text_light,
                     max_lines=2,
@@ -429,78 +512,90 @@ class OrdersScreen:
             ]
 
         self.detail_panel_body.controls = [
-            ft.Row(
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                controls=[
-                    ft.Text(
-                        f"Order #{order_id}",
-                        size=14,
-                        weight="bold",
-                        color=self.text_dark,
-                    ),
-                    ft.Container(
-                        bgcolor=status_color,
-                        border_radius=5,
-                        padding=ft.padding.symmetric(horizontal=10, vertical=5),
-                        content=ft.Text(
-                            status_display,
-                            size=11,
-                            color=self.white,
-                        ),
-                    ),
-                ],
-            ),
-            ft.Text(
-                f"Order date: {format_date(order_date, output_format='%b %d, %Y')}",
-                size=11,
-                color=self.text_light,
-            ),
-            ft.Divider(height=1, color=self.light_brown),
-            ft.Text("Items", size=12, weight="bold", color=self.text_dark),
+            # Summary header
             ft.Container(
-                height=170,
+                bgcolor="#FAFAFA",
+                border_radius=10,
+                padding=12,
                 content=ft.Column(
-                    scroll=ft.ScrollMode.AUTO,
-                    spacing=8,
-                    controls=item_controls,
+                    spacing=10,
+                    controls=[
+                        ft.Row(
+                            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                            controls=[
+                                ft.Text(
+                                    f"Order #{order_id}",
+                                    size=14,
+                                    weight="bold",
+                                    color=self.text_dark,
+                                ),
+                                ft.Container(
+                                    bgcolor=status_color,
+                                    border_radius=5,
+                                    padding=ft.padding.symmetric(horizontal=10, vertical=5),
+                                    content=ft.Text(
+                                        status_display,
+                                        size=11,
+                                        color=self.white,
+                                    ),
+                                ),
+                            ],
+                        ),
+                        ft.Row(
+                            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                            controls=[
+                                ft.Text(
+                                    f"Placed: {format_date(order_date, output_format='%b %d, %Y')}",
+                                    size=11,
+                                    color=self.text_light,
+                                ),
+                                ft.Text(
+                                    f"Total: {format_currency(total)}",
+                                    size=11,
+                                    color=self.text_dark,
+                                    weight="bold",
+                                ),
+                            ],
+                        ),
+                    ],
                 ),
             ),
-            ft.Divider(height=1, color=self.light_brown),
-            ft.Text("Totals", size=12, weight="bold", color=self.text_dark),
-            ft.Row(
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                controls=[
-                    ft.Text("Subtotal", size=11, color=self.text_light),
-                    ft.Text(format_currency(subtotal_value), size=11, color=self.text_light),
-                ],
+            section(
+                "Items",
+                ft.Icons.RECEIPT_LONG,
+                ft.Container(
+                    height=185,
+                    content=ft.Column(
+                        scroll=ft.ScrollMode.AUTO,
+                        spacing=10,
+                        controls=item_controls,
+                    ),
+                ),
             ),
-            ft.Row(
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                controls=[
-                    ft.Text("Tax", size=11, color=self.text_light),
-                    ft.Text(format_currency(tax), size=11, color=self.text_light),
-                ],
+            section(
+                "Totals",
+                ft.Icons.PAYMENTS,
+                ft.Column(
+                    spacing=6,
+                    controls=[
+                        kv_row("Subtotal", format_currency(subtotal_value)),
+                        kv_row("Tax", format_currency(tax)),
+                        kv_row("Delivery fee", format_currency(delivery_fee)),
+                        ft.Divider(height=1, color=self.light_brown),
+                        kv_row("Total", format_currency(total), bold=True),
+                    ],
+                ),
             ),
-            ft.Row(
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                controls=[
-                    ft.Text("Delivery fee", size=11, color=self.text_light),
-                    ft.Text(format_currency(delivery_fee), size=11, color=self.text_light),
-                ],
+            section(
+                "Delivery",
+                ft.Icons.LOCAL_SHIPPING,
+                ft.Column(spacing=8, controls=delivery_controls),
             ),
-            ft.Row(
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                controls=[
-                    ft.Text("Total", size=12, color=self.text_dark, weight="bold"),
-                    ft.Text(format_currency(total), size=12, color=self.text_dark, weight="bold"),
-                ],
-            ),
-            ft.Divider(height=1, color=self.light_brown),
-            ft.Text("Delivery", size=12, weight="bold", color=self.text_dark),
-            *delivery_controls,
         ]
 
         self._safe_update(self.detail_panel_body)
+        if detail_container is not None:
+            self._safe_update(detail_container)
     
     def build(self) -> ft.Container:
         """Build and return orders screen UI."""
@@ -531,34 +626,7 @@ class OrdersScreen:
                     # Details About Order (inline)
                     ft.Container(
                         padding=ft.Padding(left=15, right=15, top=0, bottom=0),
-                        content=ft.Container(
-                            bgcolor=self.lighter_brown,
-                            border_radius=10,
-                            padding=15,
-                            content=ft.Column(
-                                spacing=10,
-                                controls=[
-                                    ft.Text(
-                                        "Details About Order",
-                                        size=14,
-                                        weight="bold",
-                                        color=self.text_dark,
-                                    ),
-                                    ft.Row(
-                                        spacing=10,
-                                        controls=[
-                                            ft.Container(expand=True, content=self.order_id_field),
-                                            self.order_id_load_btn,
-                                        ],
-                                    ),
-                                    ft.Container(
-                                        alignment=ft.Alignment.CENTER,
-                                        content=self.detail_loading,
-                                    ),
-                                    self.detail_panel_body,
-                                ],
-                            ),
-                        ),
+                        content=self.detail_container,
                     ),
                     
                     ft.Container(height=10),
@@ -581,11 +649,7 @@ class OrdersScreen:
                     ft.Container(
                         expand=True,
                         padding=ft.Padding(left=15, right=15, top=0, bottom=0),
-                        content=ft.Column(
-                            expand=True,
-                            scroll=ft.ScrollMode.AUTO,
-                            controls=[self.orders_list],
-                        ),
+                        content=self.orders_list,
                     ),
                 ],
                 spacing=0,

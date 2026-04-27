@@ -34,15 +34,32 @@ class DeliveriesService:
         
         try:
             response = self.api_client.get(ENDPOINTS["deliveries"], params=params)
-            
-            # DRF returns paginated response directly
-            # Response format: {"count": X, "next": URL, "previous": URL, "results": [...]}
+
+            # Support non-paginated list responses: [...]
+            if isinstance(response, list):
+                return {
+                    "count": len(response),
+                    "next": None,
+                    "previous": None,
+                    "results": response,
+                }
+
+            # Paginated response: {"count": X, "next": ..., "previous": ..., "results": [...]}
             if isinstance(response, dict) and "results" in response:
                 return response
-            
-            # Fallback for wrapped responses
-            if response.get("success"):
-                return response.get("data", {})
+
+            # Wrapped responses: {"success": true, "data": ...}
+            if isinstance(response, dict) and response.get("success"):
+                data = response.get("data", {})
+                if isinstance(data, list):
+                    return {
+                        "count": len(data),
+                        "next": None,
+                        "previous": None,
+                        "results": data,
+                    }
+                if isinstance(data, dict):
+                    return data
             
             raise NetworkError("Failed to fetch deliveries.")
         except Exception as e:
