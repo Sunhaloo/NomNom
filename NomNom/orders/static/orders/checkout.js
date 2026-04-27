@@ -217,6 +217,8 @@ $(function () {
     "zip",
     "nameOnCard",
     "cardNumber",
+    "expiry",
+    "cvv",
   ].forEach((id) => {
     const $el = $("#" + id);
     if (!$el.length) return;
@@ -238,6 +240,16 @@ $(function () {
         const groups = digits.match(/.{1,4}/g) || [];
         $(this).val(groups.join(" "));
         val = $(this).val();
+      }
+
+      if (id === "expiry") {
+        let digits = val.replace(/\D/g, "").slice(0, 4);
+        if (digits.length >= 3) {
+          val = digits.slice(0, 2) + "/" + digits.slice(2);
+        } else {
+          val = digits;
+        }
+        $(this).val(val);
       }
 
       const $errorEl = $("#" + id + "-error");

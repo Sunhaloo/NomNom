@@ -19,6 +19,8 @@ class Order(models.Model):
         default="Pending",
     )
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    tax_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    delivery_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     is_preorder = models.BooleanField(default=False)
 
     def __str__(self):

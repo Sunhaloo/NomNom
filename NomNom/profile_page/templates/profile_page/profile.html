@@ -8,6 +8,20 @@
 {% endblock %}
 
 {% block content %}
+
+{% if messages %}
+    <div id="django-messages" style="display: none;">
+        {% for message in messages %}
+            <span class="django-message" data-tags="{{ message.tags|default:'' }}">{{ message }}</span>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div id="profile-toast" class="profile-toast">
+    <span id="profile-toast-message" class="profile-toast-message"></span>
+    <button type="button" class="profile-toast-close" aria-label="Close">&times;</button>
+    </div>
+
 <div class="profile-container">
     <div class="profile-card">
         <div class="profile-header">
@@ -42,7 +56,11 @@
                onclick="return confirm('Clear profile picture?')">
                 Clear Profile Picture
             </a>
-        </div>
-    </div>
-</div>
+         </div>
+     </div>
+ </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'profile_page/profile.js' %}"></script>
 {% endblock %}

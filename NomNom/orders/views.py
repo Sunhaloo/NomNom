@@ -110,6 +110,12 @@ def checkout(request):
         street_address = request.POST.get("address", "").strip()
         city = request.POST.get("city", "").strip()
         zip_code = request.POST.get("zip", "").strip()
+        phone = request.POST.get("phone", "").strip()
+
+        # Update user's phone number if provided and valid
+        if phone:
+            request.user.phone_number = phone
+            request.user.save(update_fields=["phone_number"])
 
         # If form fields are empty, fallback to user profile information
         user = request.user

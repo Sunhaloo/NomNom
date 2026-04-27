@@ -144,6 +144,26 @@ body {
   color: var(--text-light);
 }
 
+/* Divider for custom cake details under the title */
+.cart-item-card .item-details .custom-cake-divider {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 0.5rem 0 0.9rem;
+  width: 100%;
+}
+
+/* Custom cake cards: stack content vertically so the divider spans full width */
+.cart-item-card.custom-cake-card {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.cart-item-card.custom-cake-card .item-price-qty {
+  margin-left: 0;
+  text-align: right;
+  margin-top: 0.75rem;
+}
+
 /* Quantity + Subtotal */
 .item-price-qty {
   margin-left: auto;

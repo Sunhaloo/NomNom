@@ -12,19 +12,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# SECURITY
+# WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv(
     "SECRET_KEY", "django-insecure-5ap35n5*r27xi21^*3_gg18viij^+(0#k%b2-1+cba9o3z6wg7"
 )
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# SECURITY
+# WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = [
     # add our specific landing page application
     "landing.apps.LandingConfig",
@@ -42,8 +43,13 @@ INSTALLED_APPS = [
     "orders.apps.OrdersConfig",
     # add our specific payment application
     "payments.apps.PaymentsConfig",
+    # add our specific review application
     "review.apps.ReviewConfig",
+    # add our specific delivery application
     "delivery.apps.DeliveryConfig",
+    # add our common utilities application
+    "common.apps.CommonConfig",
+    # add Django related modules / library
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -53,14 +59,17 @@ INSTALLED_APPS = [
     "profile_page.apps.ProfilePageConfig",
     # django rest framework ( API endpoints )
     "rest_framework",
+    "rest_framework.authtoken",  # DRF token authentication
     # api availability to mobile and external clients
     "api.apps.ApiConfig",
 ]
 
 # django rest framework configuration
-# INFO: need to be a logged in user to be able to use APIs
+# INFO: APIs are authenticated via DRF tokens for mobile/external clients
+# and Django sessions for the browsable API / web UI.
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
