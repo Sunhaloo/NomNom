@@ -55,8 +55,17 @@ class MapScreen:
             self.page.snack_bar.open = True
             self.page.update()
     
-    async def _handle_get_current_position(self, e):
-        """Fetch and show current GPS location"""
+    def _on_location_click(self, e):
+        """Non-async wrapper for getting current position"""
+        # This will be called from on_click, which doesn't support async
+        # The actual async work will be handled by the page's async context
+        if self.geo and self.page:
+            print("[GEOLOCATION] Location button clicked")
+            # Schedule the async operation on the page's event loop
+            self.page.run_task(self._get_current_position_async)
+    
+    async def _get_current_position_async(self):
+        """Async method to fetch and show current GPS location"""
         if self.geo and self.page:
             try:
                 print("[GEOLOCATION] Requesting current position...")
@@ -72,31 +81,78 @@ class MapScreen:
                             self.current_latitude,
                             self.current_longitude
                         )
-                    self.page.snack_bar = ft.SnackBar(
-                        ft.Text(f"Location: ({p.latitude:.4f}, {p.longitude:.4f})", color=self.white),
-                        bgcolor=self.primary_brown,
-                    )
-                    self.page.snack_bar.open = True
-                    self.page.update()
+                    try:
+                        self.page.snack_bar = ft.SnackBar(
+                            ft.Text(f"Location: ({p.latitude:.4f}, {p.longitude:.4f})", color=self.white),
+                            bgcolor=self.primary_brown,
+                        )
+                        self.page.snack_bar.open = True
+                        self.page.update()
+                    except RuntimeError:
+                        pass
                     print("[GEOLOCATION] Success!")
                 else:
                     print("[GEOLOCATION] No position returned")
+            except PermissionError:
+                print("[GEOLOCATION] Permission denied to access location")
+                if self.page:
+                    try:
+                        self.page.snack_bar = ft.SnackBar(
+                            ft.Text(
+                                "Location permission denied. Please enable in settings.",
+                                color=self.white,
+                            ),
+                            bgcolor="#F44336",
+                        )
+                        self.page.snack_bar.open = True
+                        self.page.update()
+                    except RuntimeError:
+                        pass
             except Exception as ex:
                 print(f"[GEOLOCATION] Error: {str(ex)}")
                 if self.page:
-                    self.page.snack_bar = ft.SnackBar(
-                        ft.Text(f"Error getting location: {str(ex)}", color=self.white),
-                        bgcolor="#F44336",
-                    )
-                    self.page.snack_bar.open = True
-                    self.page.update()
+                    try:
+                        self.page.snack_bar = ft.SnackBar(
+                            ft.Text(f"Error getting location: {str(ex)}", color=self.white),
+                            bgcolor="#F44336",
+                        )
+                        self.page.snack_bar.open = True
+                        self.page.update()
+                    except RuntimeError:
+                        pass
+    
+    def _handle_tile_error(self, e):
+        """Handle tile loading errors with user notification"""
+        print(f"Tile load error: {e.data}")
+        if self.page:
+            try:
+                self.page.snack_bar = ft.SnackBar(
+                    ft.Text(
+                        "Map tiles unavailable. Using fallback server.",
+                        color=self.white,
+                        size=12,
+                    ),
+                    bgcolor="#FF9800",
+                    duration=2000,
+                )
+                self.page.snack_bar.open = True
+                self.page.update()
+            except RuntimeError:
+                # SnackBar might not be added to page yet
+                pass
     
     def build(self, page: ft.Page = None) -> ft.Container:
         """Create the map view"""
         self.page = page
         url_launcher = ft.UrlLauncher()
         
-        async def launch_default(url):
+        def on_attribution_click(e):
+            """Handle attribution click - non-async wrapper"""
+            if self.page:
+                self.page.run_task(self._launch_url_async, "https://www.openstreetmap.org/copyright")
+        
+        async def _launch_url_async(url):
+            """Async function to launch URL"""
             await url_launcher.launch_url(url)
         
         # Set up location tracking
@@ -120,13 +176,12 @@ class MapScreen:
             layers=[
                 ftm.TileLayer(
                     url_template="https://tile.memomaps.de/tilegen/{z}/{x}/{y}.png",
-                    on_image_error=lambda e: print(f"Tile load error: {e.data}"),
+                    fallback_url="https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                    on_image_error=self._handle_tile_error,
                 ),
                 ftm.SimpleAttribution(
                     text="OpenStreetMap contributors",
-                    on_click=lambda e: launch_default(
-                        "https://www.openstreetmap.org/copyright"
-                    )
+                    on_click=on_attribution_click
                 )
             ],
         )
@@ -136,7 +191,7 @@ class MapScreen:
             content=ft.Text("📍 My Location", size=12),
             bgcolor=self.primary_brown,
             color=self.white,
-            on_click=self._handle_get_current_position,
+            on_click=self._on_location_click,
         )
         
         # Main layout with map and controls

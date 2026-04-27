@@ -39,7 +39,11 @@ class CurrentUserViewTests(APITestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        data = response.json()
+        response_data = response.json()
+        
+        # Check for new response format with success wrapper
+        self.assertTrue(response_data["success"])
+        data = response_data["data"]
 
         self.assertEqual(data["id"], self.user.id)
         self.assertEqual(data["first_name"], "Jane")

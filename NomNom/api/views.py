@@ -240,7 +240,7 @@ class CurrentUserView(APIView):
 
     def get(self, request, *args, **kwargs):
         serializer = UserProfileSerializer(request.user)
-        return Response(serializer.data)
+        return Response({"success": True, "data": serializer.data})
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -280,7 +280,7 @@ class BusinessStatsView(APIView):
         """Retrieve business statistics"""
         try:
             stats = get_business_stats()
-            return Response(stats)
+            return Response({"success": True, "data": stats})
         except Exception as e:
             logger.error(f"Error fetching stats: {str(e)}")
             return Response(
@@ -317,7 +317,7 @@ class TopReviewsView(APIView):
                     "date": review.date.strftime("%b %d, %Y")
                 })
             
-            return Response(review_data)
+            return Response({"success": True, "data": review_data})
         except Exception as e:
             logger.error(f"Error fetching reviews: {str(e)}")
             return Response(

@@ -58,20 +58,20 @@ class DeliveriesScreen:
         
         # Card color based on status type
         card_color = {
-            "pending": self.orange,
-            "confirmed": self.green,
-            "canceled": self.red,
-        }.get(status_type.lower(), self.lighter_brown)
+            "Pending": self.orange,
+            "in_transit": self.green,
+            "Cancelled": self.red,
+        }.get(status_type, self.lighter_brown)
         
         # Light version of the card color for background
         card_bg_color = {
-            "pending": "#FFF3E0",
-            "confirmed": "#E8F5E9",
-            "canceled": "#FFEBEE",
-        }.get(status_type.lower(), self.lighter_brown)
+            "Pending": "#FFF3E0",
+            "in_transit": "#E8F5E9",
+            "Cancelled": "#FFEBEE",
+        }.get(status_type, self.lighter_brown)
         
         # Only show confirm button for pending deliveries
-        show_confirm_btn = status_type.lower() == "pending"
+        show_confirm_btn = status_type == "Pending"
         
         return ft.Container(
             bgcolor=card_bg_color,
@@ -143,30 +143,29 @@ class DeliveriesScreen:
         )
     
     def _load_deliveries(self):
-        """Fetch deliveries from the API for all statuses"""
+        """Fetch all deliveries from service"""
         self.loading.visible = True
-        
         try:
             # Fetch pending deliveries
             pending_result = self.deliveries_service.get_deliveries(
-                status="pending",
+                status="Pending",
                 limit=50,
             )
             self.pending_deliveries = pending_result.get("results", [])
             
-            # Fetch confirmed deliveries
-            confirmed_result = self.deliveries_service.get_deliveries(
+            # Fetch in_transit deliveries
+            in_transit_result = self.deliveries_service.get_deliveries(
                 status="in_transit",
                 limit=50,
             )
-            self.confirmed_deliveries = confirmed_result.get("results", [])
+            self.confirmed_deliveries = in_transit_result.get("results", [])
             
-            # Fetch canceled deliveries
-            canceled_result = self.deliveries_service.get_deliveries(
-                status="cancelled",
+            # Fetch cancelled deliveries
+            cancelled_result = self.deliveries_service.get_deliveries(
+                status="Cancelled",
                 limit=50,
             )
-            self.canceled_deliveries = canceled_result.get("results", [])
+            self.canceled_deliveries = cancelled_result.get("results", [])
             
             self._update_all_lists()
         except NetworkError as e:
@@ -176,9 +175,9 @@ class DeliveriesScreen:
     
     def _update_all_lists(self):
         """Refresh all delivery list displays"""
-        self._update_list(self.pending_list, self.pending_deliveries, "pending")
-        self._update_list(self.confirmed_list, self.confirmed_deliveries, "confirmed")
-        self._update_list(self.canceled_list, self.canceled_deliveries, "canceled")
+        self._update_list(self.pending_list, self.pending_deliveries, "Pending")
+        self._update_list(self.confirmed_list, self.confirmed_deliveries, "in_transit")
+        self._update_list(self.canceled_list, self.canceled_deliveries, "Cancelled")
     
     def _update_list(self, list_container, deliveries, status_type):
         """Update a specific delivery list display"""

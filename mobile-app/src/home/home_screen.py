@@ -169,7 +169,7 @@ class HomeScreen:
         self.stats_column.visible = True
         
         # Build review carousel
-        if self.reviews:
+        if self.reviews and len(self.reviews) > 0:
             self.reviews_column.controls = [
                 self._create_review_card(self.reviews[0]),
                 ft.Row(
@@ -192,6 +192,17 @@ class HomeScreen:
                             icon_color=self.primary_brown,
                         ),
                     ],
+                ),
+            ]
+            self.reviews_column.visible = True
+        else:
+            # No reviews available, show empty state
+            self.reviews_column.controls = [
+                ft.Text(
+                    "No reviews available yet",
+                    size=14,
+                    color=self.text_light,
+                    text_align=ft.TextAlign.CENTER,
                 ),
             ]
             self.reviews_column.visible = True

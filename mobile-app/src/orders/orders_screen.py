@@ -149,7 +149,11 @@ class OrdersScreen:
     def _load_orders(self):
         """Load orders from service."""
         self.loading.visible = True
-        self.loading.update()
+        try:
+            self.loading.update()
+        except RuntimeError:
+            # Control not yet added to page
+            pass
         
         try:
             result = self.orders_service.get_orders(
@@ -162,7 +166,11 @@ class OrdersScreen:
             self.show_notification(get_user_friendly_message(e), error=True)
         finally:
             self.loading.visible = False
-            self.loading.update()
+            try:
+                self.loading.update()
+            except RuntimeError:
+                # Control not yet added to page
+                pass
     
     def _update_orders_list(self):
         """Update orders list display."""
