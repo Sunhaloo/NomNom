@@ -25,7 +25,7 @@ def get_business_stats():
         'total_clients': User.objects.filter(role='CUSTOMER').count(),
         'total_purchases': Order.objects.count(),
         'total_satisfied_clients': User.objects.filter(
-            orders__delivery__status='Done'
+            order__delivery__status='Done'
         ).distinct().count(),
         'total_successful_deliveries': Delivery.objects.filter(
             status='Done'

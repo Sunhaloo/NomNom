@@ -35,6 +35,12 @@ class DeliveriesService:
         try:
             response = self.api_client.get(ENDPOINTS["deliveries"], params=params)
             
+            # DRF returns paginated response directly
+            # Response format: {"count": X, "next": URL, "previous": URL, "results": [...]}
+            if isinstance(response, dict) and "results" in response:
+                return response
+            
+            # Fallback for wrapped responses
             if response.get("success"):
                 return response.get("data", {})
             
@@ -49,6 +55,11 @@ class DeliveriesService:
         try:
             response = self.api_client.get(endpoint)
             
+            # Single delivery returns DeliverySerializer directly
+            if isinstance(response, dict) and "id" in response:
+                return response
+            
+            # Fallback for wrapped responses
             if response.get("success"):
                 return response.get("data", {})
             

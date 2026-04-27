@@ -77,8 +77,8 @@ class HomeScreen:
     
     def _create_review_card(self, review: dict) -> ft.Container:
         """Create a review card widget."""
-        text = review.get("text", "No comment")
-        username = review.get("user", {}).get("username", "Anonymous")
+        comment = review.get("comment", "No comment")
+        user_name = review.get("user_name", "Anonymous")
         
         return ft.Container(
             bgcolor=self.white,
@@ -103,14 +103,14 @@ class HomeScreen:
                         ],
                     ),
                     ft.Text(
-                        text,
+                        comment,
                         size=13,
                         color=self.text_dark,
                         max_lines=4,
                         overflow=ft.TextOverflow.ELLIPSIS,
                     ),
                     ft.Text(
-                        f"— {username}",
+                        f"— {user_name}",
                         size=11,
                         color=self.text_light,
                         italic=True,
@@ -130,23 +130,22 @@ class HomeScreen:
     
     def _update_ui(self):
         """Update UI with loaded data."""
-        # User greeting
-        user_name = self.stats.get("user_name", "User")
-        self.user_greeting.value = f"Welcome Back, {user_name}!"
+        # User greeting (business-wide stats, no specific user name)
+        self.user_greeting.value = "Welcome to NomNom!"
         self.user_greeting.visible = True
         
-        # Build stats cards
+        # Build stats cards - display business-wide statistics
         stats_cards = [
             ft.Row(
                 spacing=10,
                 controls=[
                     self._create_stat_card(
-                        "Total Orders",
-                        str(self.stats.get("total_orders", 0)),
+                        "Total Clients",
+                        str(self.stats.get("total_clients", 0)),
                     ),
                     self._create_stat_card(
-                        "Reviews",
-                        str(self.stats.get("total_reviews", 0)),
+                        "Total Purchases",
+                        str(self.stats.get("total_purchases", 0)),
                     ),
                 ],
             ),
@@ -158,8 +157,21 @@ class HomeScreen:
                         str(self.stats.get("total_satisfied_clients", 0)),
                     ),
                     self._create_stat_card(
+                        "Successful Deliveries",
+                        str(self.stats.get("total_successful_deliveries", 0)),
+                    ),
+                ],
+            ),
+            ft.Row(
+                spacing=10,
+                controls=[
+                    self._create_stat_card(
                         "App Downloads",
-                        str(self.stats.get("app_downloads", 0)),
+                        str(self.stats.get("total_downloads", 0)),
+                    ),
+                    self._create_stat_card(
+                        "",
+                        "",
                     ),
                 ],
             ),

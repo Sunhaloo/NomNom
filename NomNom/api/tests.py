@@ -6,8 +6,9 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from orders.models import Order
+from orders.models import Order, OrderDetail
 from delivery.models import Delivery
+from pastry.models import Pastry
 
 
 class CurrentUserViewTests(APITestCase):
@@ -88,6 +89,111 @@ class OrderApiTests(APITestCase):
         self.assertIsInstance(data["delivery"], dict)
         self.assertEqual(data["delivery"]["id"], delivery.id)
         self.assertEqual(data["delivery"]["address"], "123 Main St, Port Louis")
+
+    def test_order_detail_includes_tax_and_delivery_fee(self):
+        """Test that order detail includes tax_amount and delivery_fee fields"""
+        self.assertTrue(self.client.login(username="jane", password="testpass123"))
+
+        order = Order.objects.create(
+            user=self.user,
+            order_status="Paid",
+            total_amount="15.50",
+            tax_amount="1.50",
+            delivery_fee="3.00",
+        )
+        delivery = Delivery.objects.create(
+            order=order,
+            address="123 Main St, Port Louis",
+            date=timezone.now().date(),
+            status="Pending",
+        )
+
+        url = reverse("order-detail", args=[order.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.json()
+        self.assertIn("tax_amount", data)
+        self.assertIn("delivery_fee", data)
+        self.assertEqual(data["tax_amount"], "1.50")
+        self.assertEqual(data["delivery_fee"], "3.00")
+
+    def test_order_detail_includes_items_array(self):
+        """Test that order detail includes items array with pastry information"""
+        from pastry.models import Pastry
+
+        self.assertTrue(self.client.login(username="jane", password="testpass123"))
+
+        # Create a pastry
+        pastry = Pastry.objects.create(
+            pastry_name="Croissant",
+            pastry_category="CAKE",
+            pastry_price="3.50",
+            size="M",
+        )
+
+        # Create an order with order details
+        order = Order.objects.create(
+            user=self.user,
+            order_status="Paid",
+            total_amount="7.00",
+            tax_amount="0.50",
+            delivery_fee="1.00",
+        )
+        OrderDetail.objects.create(
+            order=order,
+            pastry=pastry,
+            quantity=2,
+            price="3.50",
+        )
+
+        delivery = Delivery.objects.create(
+            order=order,
+            address="123 Main St, Port Louis",
+            date=timezone.now().date(),
+            status="Pending",
+        )
+
+        url = reverse("order-detail", args=[order.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.json()
+        self.assertIn("items", data)
+        self.assertIsInstance(data["items"], list)
+        self.assertEqual(len(data["items"]), 1)
+
+        # Check item structure
+        item = data["items"][0]
+        self.assertIn("id", item)
+        self.assertIn("pastry_name", item)
+        self.assertIn("quantity", item)
+        self.assertIn("price", item)
+        self.assertIn("subtotal", item)
+
+        # Check item values
+        self.assertEqual(item["pastry_name"], "Croissant")
+        self.assertEqual(item["quantity"], 2)
+        self.assertEqual(item["price"], "3.50")
+        self.assertEqual(item["subtotal"], "7.00")  # 2 × 3.50
+
+    def test_order_detail_empty_items_array(self):
+        """Test that order without items returns empty items array"""
+        self.assertTrue(self.client.login(username="jane", password="testpass123"))
+
+        order = Order.objects.create(
+            user=self.user,
+            order_status="Paid",
+            total_amount="0.00",
+        )
+
+        url = reverse("order-detail", args=[order.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.json()
+        self.assertIn("items", data)
+        self.assertEqual(data["items"], [])
 
     def test_order_list_status_filter_case_insensitive(self):
         self.assertTrue(self.client.login(username="jane", password="testpass123"))

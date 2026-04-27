@@ -34,7 +34,7 @@ class OrdersService:
         Get user orders with optional filtering.
         
         Args:
-            status: Filter by order status (pending, processing, delivered, cancelled)
+            status: Filter by order status (pending, paid, cancelled)
             search: Search query
             limit: Max number of orders to return
             offset: Pagination offset
@@ -58,6 +58,12 @@ class OrdersService:
         try:
             response = self.api_client.get(ENDPOINTS["orders"], params=params)
             
+            # DRF returns paginated response directly (not wrapped in success/data)
+            # Response format: {"count": X, "next": URL, "previous": URL, "results": [...]}
+            if isinstance(response, dict) and "results" in response:
+                return response
+            
+            # Fallback for wrapped responses
             if response.get("success"):
                 return response.get("data", {})
             
@@ -83,6 +89,11 @@ class OrdersService:
         try:
             response = self.api_client.get(endpoint)
             
+            # Single order returns OrderSerializer directly (not wrapped)
+            if isinstance(response, dict) and "id" in response:
+                return response
+            
+            # Fallback for wrapped responses
             if response.get("success"):
                 return response.get("data", {})
             

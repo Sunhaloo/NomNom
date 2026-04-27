@@ -2,12 +2,36 @@ from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
 
-from orders.models import Order
+from orders.models import Order, OrderDetail
 from delivery.models import Delivery
+
+
+class OrderDetailSerializer(serializers.ModelSerializer):
+    """
+    Serializer for individual order detail items (pastries in an order).
+    Returns pastry information with quantity and price.
+    """
+    pastry_name = serializers.CharField(source='pastry.pastry_name', read_only=True)
+    subtotal = serializers.SerializerMethodField()
+
+    def get_subtotal(self, obj):
+        """Calculate subtotal: quantity × price"""
+        return str(obj.quantity * obj.price)
+
+    class Meta:
+        model = OrderDetail
+        fields = [
+            "id",
+            "pastry_name",
+            "quantity",
+            "price",
+            "subtotal",
+        ]
 
 
 class OrderSerializer(serializers.ModelSerializer):
     delivery = serializers.SerializerMethodField()
+    items = OrderDetailSerializer(source='order_details', many=True, read_only=True)
 
     def get_delivery(self, obj):
         delivery = (
@@ -36,8 +60,11 @@ class OrderSerializer(serializers.ModelSerializer):
             "pickup_date",
             "order_status",
             "total_amount",
+            "tax_amount",
+            "delivery_fee",
             "is_preorder",
             "delivery",
+            "items",
         ]
 
 
