@@ -1,124 +1,102 @@
 """
-Deliveries screen for the NomNom mobile app.
-Displays list of deliveries with status filtering and confirmation action.
+Deliveries page - shows your orders being delivered
 """
 
 import flet as ft
 from deliveries.deliveries_service import DeliveriesService
+from deliveries.screens.map_screen import MapScreen
 from common.error_handler import get_user_friendly_message, NetworkError
 
 
 class DeliveriesScreen:
-    """Deliveries screen with list and status filtering."""
+    """Shows deliveries with map and status sections"""
     
     def __init__(self, deliveries_service: DeliveriesService, show_notification):
-        """
-        Initialize deliveries screen.
-        
-        Args:
-            deliveries_service: DeliveriesService instance
-            show_notification: Function to show notifications
-        """
+        """Set up the deliveries page"""
         self.deliveries_service = deliveries_service
         self.show_notification = show_notification
         
-        # Color scheme
+        # Colors
         self.primary_brown = "#8D6E63"
         self.light_brown = "#D7CCC8"
         self.lighter_brown = "#EFEBE9"
         self.text_dark = "#3E2723"
         self.text_light = "#5D4037"
         self.white = "#ffffff"
+        self.orange = "#FF9800"
+        self.green = "#4CAF50"
+        self.red = "#F44336"
         
-        # Data
-        self.deliveries = []
-        self.current_status_filter = None
+        # Delivery lists by status
+        self.pending_deliveries = []
+        self.confirmed_deliveries = []
+        self.canceled_deliveries = []
         
-        # Loading state
-        self.loading = ft.ProgressRing(color=self.primary_brown, visible=False)
-        
-        # Filter buttons
-        self.filter_buttons = ft.Row(
-            spacing=8,
-            scroll=ft.ScrollMode.AUTO,
-        )
-        
-        # Deliveries list
-        self.deliveries_list = ft.Column(
+        # UI containers for each status section
+        self.pending_list = ft.Column(
             spacing=10,
             controls=[],
         )
-    
-    def _create_filter_buttons(self):
-        """Create filter button row."""
-        statuses = [
-            ("All", None),
-            ("Pending", "pending"),
-            ("In Transit", "in_transit"),
-            ("Delivered", "delivered"),
-            ("Cancelled", "cancelled"),
-        ]
+        self.confirmed_list = ft.Column(
+            spacing=10,
+            controls=[],
+        )
+        self.canceled_list = ft.Column(
+            spacing=10,
+            controls=[],
+        )
         
-        buttons = []
-        for label, status in statuses:
-            buttons.append(
-                ft.FilledButton(
-                    content=ft.Text(label),
-                    bgcolor=self.primary_brown if status == self.current_status_filter else self.lighter_brown,
-                    color=self.white if status == self.current_status_filter else self.text_dark,
-                    on_click=lambda e, s=status: self._apply_filter(s),
-                )
-            )
-        
-        self.filter_buttons.controls = buttons
+        self.loading = ft.ProgressRing(color=self.primary_brown, visible=False)
+
     
-    def _apply_filter(self, status: str | None):
-        """Apply status filter."""
-        self.current_status_filter = status
-        self._create_filter_buttons()
-        self._load_deliveries()
-        self.filter_buttons.update()
-    
-    def _create_delivery_item(self, delivery: dict) -> ft.Container:
-        """Create a delivery list item."""
+    def _create_delivery_item(self, delivery: dict, status_type: str) -> ft.Container:
+        """Build a single delivery card for the list"""
         delivery_id = delivery.get("id", "N/A")
         status = delivery.get("status", "pending").replace("_", " ").title()
         address = delivery.get("delivery_address", "N/A")
         estimated_eta = delivery.get("estimated_eta", "N/A")
         
-        status_color = {
-            "Pending": "#FF9800",
-            "In Transit": "#2196F3",
-            "Delivered": "#4CAF50",
-            "Cancelled": "#F44336",
-        }.get(status, self.text_light)
+        # Card color based on status type
+        card_color = {
+            "pending": self.orange,
+            "confirmed": self.green,
+            "canceled": self.red,
+        }.get(status_type.lower(), self.lighter_brown)
         
-        # Show confirm button only for pending deliveries
-        show_confirm_btn = status.lower() == "pending" or status.lower() == "in transit"
+        # Light version of the card color for background
+        card_bg_color = {
+            "pending": "#FFF3E0",
+            "confirmed": "#E8F5E9",
+            "canceled": "#FFEBEE",
+        }.get(status_type.lower(), self.lighter_brown)
+        
+        # Only show confirm button for pending deliveries
+        show_confirm_btn = status_type.lower() == "pending"
         
         return ft.Container(
-            bgcolor=self.lighter_brown,
+            bgcolor=card_bg_color,
             border_radius=10,
-            padding=15,
+            padding=12,
+            border=ft.border.all(2, card_color),
             content=ft.Column(
-                spacing=8,
+                spacing=6,
                 controls=[
                     ft.Row(
                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                         controls=[
                             ft.Text(
                                 f"Delivery #{delivery_id}",
-                                size=14,
+                                size=13,
                                 weight="bold",
                                 color=self.text_dark,
                             ),
                             ft.Container(
-                                bgcolor=status_color,
+                                bgcolor=card_color,
                                 border_radius=5,
-                                padding=ft.padding.symmetric(horizontal=10, vertical=5),
+                                padding=ft.padding.symmetric(horizontal=8, vertical=3),
                                 content=ft.Text(
-                                    status,
-                                    size=11,
+                                    status_type.title(),
+                                    size=10,
                                     color=self.white,
                                 ),
                             ),
@@ -126,34 +104,35 @@ class DeliveriesScreen:
                     ),
                     ft.Text(
                         f"Address: {address}",
-                        size=12,
+                        size=11,
                         color=self.text_light,
                         max_lines=2,
                         overflow=ft.TextOverflow.ELLIPSIS,
                     ),
                     ft.Text(
                         f"ETA: {estimated_eta}",
-                        size=11,
+                        size=10,
                         color=self.text_light,
                     ),
                     
-                    # Confirm button (visible only for pending/in-transit)
+                    # Action buttons (only for pending)
                     ft.Container(
                         visible=show_confirm_btn,
                         content=ft.Row(
-                            spacing=8,
+                            spacing=6,
                             controls=[
                                 ft.FilledButton(
-                                    content=ft.Text("Confirm with Photo"),
+                                    content=ft.Text("Confirm", size=11),
                                     bgcolor=self.primary_brown,
                                     color=self.white,
-                                    height=40,
+                                    height=36,
                                     expand=True,
                                     on_click=lambda e, did=delivery_id: self._on_confirm_click(did),
                                 ),
                                 ft.IconButton(
                                     icon=ft.Icons.MAP,
                                     icon_color=self.primary_brown,
+                                    icon_size=18,
                                     on_click=lambda e, did=delivery_id: self._on_map_click(did),
                                 ),
                             ],
@@ -164,58 +143,109 @@ class DeliveriesScreen:
         )
     
     def _load_deliveries(self):
-        """Load deliveries from service."""
+        """Fetch deliveries from the API for all statuses"""
         self.loading.visible = True
-        self.loading.update()
         
         try:
-            result = self.deliveries_service.get_deliveries(
-                status=self.current_status_filter,
+            # Fetch pending deliveries
+            pending_result = self.deliveries_service.get_deliveries(
+                status="pending",
                 limit=50,
             )
-            self.deliveries = result.get("results", [])
-            self._update_deliveries_list()
+            self.pending_deliveries = pending_result.get("results", [])
+            
+            # Fetch confirmed deliveries
+            confirmed_result = self.deliveries_service.get_deliveries(
+                status="in_transit",
+                limit=50,
+            )
+            self.confirmed_deliveries = confirmed_result.get("results", [])
+            
+            # Fetch canceled deliveries
+            canceled_result = self.deliveries_service.get_deliveries(
+                status="cancelled",
+                limit=50,
+            )
+            self.canceled_deliveries = canceled_result.get("results", [])
+            
+            self._update_all_lists()
         except NetworkError as e:
             self.show_notification(get_user_friendly_message(e), error=True)
         finally:
             self.loading.visible = False
-            self.loading.update()
     
-    def _update_deliveries_list(self):
-        """Update deliveries list display."""
-        if not self.deliveries:
-            self.deliveries_list.controls = [
+    def _update_all_lists(self):
+        """Refresh all delivery list displays"""
+        self._update_list(self.pending_list, self.pending_deliveries, "pending")
+        self._update_list(self.confirmed_list, self.confirmed_deliveries, "confirmed")
+        self._update_list(self.canceled_list, self.canceled_deliveries, "canceled")
+    
+    def _update_list(self, list_container, deliveries, status_type):
+        """Update a specific delivery list display"""
+        if not deliveries:
+            list_container.controls = [
                 ft.Container(
                     alignment=ft.Alignment.CENTER,
                     padding=40,
                     content=ft.Text(
-                        "No deliveries found",
-                        size=14,
+                        f"No {status_type} deliveries",
+                        size=12,
                         color=self.text_light,
                     ),
                 ),
             ]
         else:
-            self.deliveries_list.controls = [
-                self._create_delivery_item(delivery) for delivery in self.deliveries
+            list_container.controls = [
+                self._create_delivery_item(delivery, status_type) for delivery in deliveries
             ]
         
-        self.deliveries_list.update()
+        list_container.update()
     
     def _on_confirm_click(self, delivery_id):
-        """Handle confirm delivery click."""
-        # Navigate to delivery confirmation screen with camera
+        """Handle clicking confirm delivery button"""
+        # Navigate to camera to take proof photo
         pass
     
     def _on_map_click(self, delivery_id):
-        """Handle map/location click."""
-        # Open map or show delivery location
+        """Handle map button click"""
+        # Map is already visible on the page
         pass
     
-    def build(self) -> ft.Container:
-        """Build and return deliveries screen UI."""
-        self._create_filter_buttons()
+    def build(self, page: ft.Page = None) -> ft.Container:
+        """Create the deliveries screen UI"""
         self._load_deliveries()
+        
+        # Create map component with page reference
+        map_screen = MapScreen(on_back=None)
+        
+        def create_status_section(title: str, deliveries_list) -> ft.Container:
+            """Create a scrollable section for a delivery status"""
+            return ft.Container(
+                height=250,
+                bgcolor=self.white,
+                padding=ft.padding.symmetric(horizontal=15),
+                content=ft.Column(
+                    controls=[
+                        ft.Text(
+                            title,
+                            size=16,
+                            weight="bold",
+                            color=self.text_dark,
+                        ),
+                        ft.Container(height=8),
+                        ft.Container(
+                            expand=True,
+                            content=ft.Column(
+                                expand=True,
+                                scroll=ft.ScrollMode.AUTO,
+                                spacing=10,
+                                controls=[deliveries_list],
+                            ),
+                        ),
+                    ],
+                    spacing=0,
+                ),
+            )
         
         return ft.Container(
             expand=True,
@@ -223,11 +253,10 @@ class DeliveriesScreen:
             content=ft.Column(
                 expand=True,
                 controls=[
-                    ft.Container(height=15),
-                    
-                    # Header
+                    # Fixed Header - NOT scrollable
                     ft.Container(
-                        padding=ft.padding.symmetric(horizontal=20),
+                        height=60,
+                        padding=ft.padding.symmetric(horizontal=20, vertical=15),
                         content=ft.Text(
                             "Deliveries",
                             size=24,
@@ -236,30 +265,46 @@ class DeliveriesScreen:
                         ),
                     ),
                     
-                    ft.Container(height=15),
-                    
-                    # Filter buttons
-                    ft.Container(
-                        padding=ft.padding.symmetric(horizontal=15),
-                        content=self.filter_buttons,
-                    ),
-                    
-                    ft.Container(height=15),
-                    
-                    # Loading indicator
-                    ft.Container(
-                        alignment=ft.Alignment.CENTER,
-                        content=self.loading,
-                    ),
-                    
-                    # Deliveries list
+                    # Everything below is scrollable
                     ft.Container(
                         expand=True,
-                        padding=ft.padding.symmetric(horizontal=15),
                         content=ft.Column(
                             expand=True,
                             scroll=ft.ScrollMode.AUTO,
-                            controls=[self.deliveries_list],
+                            spacing=0,
+                            controls=[
+                                ft.Container(height=15),
+                                
+                                # Map section
+                                ft.Container(
+                                    height=250,
+                                    padding=ft.padding.symmetric(horizontal=15),
+                                    content=map_screen.build(page=page),
+                                ),
+                                
+                                ft.Container(height=15),
+                                
+                                # Pending Deliveries
+                                create_status_section(
+                                    "Pending Deliveries",
+                                    self.pending_list
+                                ),
+                                ft.Container(height=15),
+                                
+                                # Confirmed Deliveries
+                                create_status_section(
+                                    "Confirmed Deliveries",
+                                    self.confirmed_list
+                                ),
+                                ft.Container(height=15),
+                                
+                                # Canceled Deliveries
+                                create_status_section(
+                                    "Canceled Deliveries",
+                                    self.canceled_list
+                                ),
+                                ft.Container(height=20),
+                            ],
                         ),
                     ),
                 ],

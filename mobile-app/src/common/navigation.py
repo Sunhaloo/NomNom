@@ -39,9 +39,14 @@ class Router:
         self.deliveries_service = deliveries_service
         self.storage = storage
         
+        # Page reference (set after router initialization in main.py)
+        self.page = None
+        
         # Screen state
+        # Start with login page
         self.current_screen = "login"
         self.current_delivery_id = None
+        self.showing_map = False
         
         # Color scheme
         self.primary_brown = "#8D6E63"
@@ -98,7 +103,7 @@ class Router:
             return DeliveriesScreen(
                 self.deliveries_service,
                 self.show_notification,
-            ).build()
+            ).build(page=self.page)
         
         elif self.current_screen == "delivery_confirmation":
             return DeliveryConfirmationScreen(
@@ -164,7 +169,8 @@ class Router:
     def build_main_content(self) -> ft.Container:
         """Build main content area."""
         # Check if user is authenticated
-        if not self.auth_service.is_logged_in() and self.current_screen not in ["login", "register"]:
+        # Allow deliveries page without login (not yet implemented by auth team)
+        if not self.auth_service.is_logged_in() and self.current_screen not in ["login", "register", "deliveries"]:
             self.current_screen = "login"
         
         return ft.Container(

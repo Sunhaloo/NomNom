@@ -1,6 +1,5 @@
 """
-Deliveries service for the NomNom mobile app.
-Handles fetching deliveries and confirming delivery with photo.
+Deliveries service - handles orders tracking and photo confirmation
 """
 
 from pathlib import Path
@@ -11,16 +10,10 @@ from common.error_handler import NetworkError, PhotoUploadError, ValidationError
 
 
 class DeliveriesService:
-    """Service for managing deliveries and photo uploads."""
+    """Manages user deliveries and confirmation uploads"""
     
     def __init__(self, api_client: APIClient, storage: StorageManager):
-        """
-        Initialize deliveries service.
-        
-        Args:
-            api_client: APIClient instance
-            storage: StorageManager instance
-        """
+        """Set up service with API and storage access"""
         self.api_client = api_client
         self.storage = storage
     
@@ -30,20 +23,7 @@ class DeliveriesService:
         limit: int = 50,
         offset: int = 0,
     ) -> dict:
-        """
-        Get user deliveries with optional filtering.
-        
-        Args:
-            status: Filter by status (pending, in_transit, delivered, cancelled)
-            limit: Max number of deliveries to return
-            offset: Pagination offset
-            
-        Returns:
-            Dictionary with deliveries list and pagination info
-            
-        Raises:
-            NetworkError: If request fails
-        """
+        """Fetch deliveries, optionally filtered by status"""
         params = {
             "limit": limit,
             "offset": offset,
@@ -63,18 +43,7 @@ class DeliveriesService:
             raise NetworkError(f"Failed to fetch deliveries: {str(e)}")
     
     def get_delivery_detail(self, delivery_id: int) -> dict:
-        """
-        Get detailed information about a single delivery.
-        
-        Args:
-            delivery_id: Delivery ID
-            
-        Returns:
-            Dictionary with delivery details
-            
-        Raises:
-            NetworkError: If request fails
-        """
+        """Get info for a specific delivery"""
         endpoint = f"{ENDPOINTS['deliveries']}{delivery_id}/"
         
         try:
@@ -92,33 +61,17 @@ class DeliveriesService:
         delivery_id: int,
         photo_path: str,
     ) -> dict:
-        """
-        Confirm delivery by uploading photo proof.
-        
-        Args:
-            delivery_id: Delivery ID
-            photo_path: Path to photo file
-            
-        Returns:
-            Dictionary with confirmation result
-            
-        Raises:
-            ValidationError: If photo is invalid
-            PhotoUploadError: If upload fails
-            NetworkError: If request fails
-        """
+        """Upload photo to confirm a delivery"""
         photo_file = Path(photo_path)
         
-        # Validate photo exists
+        # Check if photo file exists
         if not photo_file.exists():
-            raise ValidationError(f"Photo file not found: {photo_path}")
+            raise ValidationError(f"Photo not found: {photo_path}")
         
-        # Validate file size
+        # Make sure photo isn't too large
         file_size_mb = photo_file.stat().st_size / (1024 * 1024)
         if file_size_mb > MAX_PHOTO_SIZE_MB:
-            raise ValidationError(
-                f"Photo size exceeds {MAX_PHOTO_SIZE_MB}MB limit."
-            )
+            raise ValidationError(f"Photo is too large, max is {MAX_PHOTO_SIZE_MB}MB")
         
         try:
             endpoint = ENDPOINTS["delivery_confirm"](delivery_id)
@@ -149,21 +102,10 @@ class DeliveriesService:
         shop_latitude: float,
         shop_longitude: float,
     ) -> float:
-        """
-        Calculate distance between user and shop using Haversine formula.
-        
-        Args:
-            user_latitude: User latitude
-            user_longitude: User longitude
-            shop_latitude: Shop latitude
-            shop_longitude: Shop longitude
-            
-        Returns:
-            Distance in kilometers
-        """
+        """Calculate distance between two GPS coordinates in km"""
         from math import radians, sin, cos, sqrt, atan2
         
-        R = 6371  # Earth radius in km
+        R = 6371  # Earth's radius
         
         lat1, lon1 = radians(user_latitude), radians(user_longitude)
         lat2, lon2 = radians(shop_latitude), radians(shop_longitude)
@@ -181,14 +123,5 @@ class DeliveriesService:
         distance_km: float,
         speed_kmh: float = 25,
     ) -> int:
-        """
-        Estimate delivery ETA based on distance and speed.
-        
-        Args:
-            distance_km: Distance in kilometers
-            speed_kmh: Average speed in km/h
-            
-        Returns:
-            Estimated time in minutes
-        """
+        """Estimate delivery time in minutes"""
         return int((distance_km / speed_kmh) * 60)
