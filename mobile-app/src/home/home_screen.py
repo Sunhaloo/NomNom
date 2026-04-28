@@ -11,7 +11,7 @@ from common.error_handler import get_user_friendly_message, NetworkError
 class HomeScreen:
     """Home screen with stats cards and reviews carousel."""
     
-    def __init__(self, home_service: HomeService, show_notification):
+    def __init__(self, home_service: HomeService, show_notification, router: any = None):
         """
         Initialize home screen.
         
@@ -20,6 +20,7 @@ class HomeScreen:
             show_notification: Function to show notifications
         """
         self.home_service = home_service
+        self.router = router
         self.show_notification = show_notification
         
         # Color scheme
@@ -43,7 +44,16 @@ class HomeScreen:
         # Content containers
         self.stats_column = ft.Column(visible=False)
         self.reviews_column = ft.Column(visible=False)
-        self.user_greeting = ft.Text(visible=False)
+        self.user_greeting = ft.Text(visible=False, color="#000000")
+        # Container for displaying user profile data in a card
+        self.user_profile_card = ft.Container(
+            visible=False,
+            bgcolor=self.lighter_brown,
+            border_radius=10,
+            padding=15,
+            content=ft.Column(spacing=5, controls=[]),
+        )
+
     
     def _create_stat_card(self, title: str, value: str, subtitle: str = "") -> ft.Container:
         """Create a stat card widget."""
@@ -96,7 +106,7 @@ class HomeScreen:
                                 size=16,
                             ),
                             ft.Text(
-                                "5 stars",
+                                f"{review.get('rating', 'No rating')} stars",
                                 size=12,
                                 color=self.text_light,
                             ),
@@ -124,15 +134,31 @@ class HomeScreen:
         try:
             self.stats = self.home_service.get_business_stats()
             self.reviews = self.home_service.get_top_reviews()
+            # Fetch user profile data from backend
+            self.user_profile = self.home_service.get_user_profile()
             self._update_ui()
         except NetworkError as e:
             self.show_notification(get_user_friendly_message(e), error=True)
     
     def _update_ui(self):
         """Update UI with loaded data."""
-        # User greeting (business-wide stats, no specific user name)
-        self.user_greeting.value = "Welcome to NomNom!"
+        profile = getattr(self, 'user_profile', {})
+        self.user_greeting.value = f"Welcome to NomNom, {profile.get('username', '')}!"
         self.user_greeting.visible = True
+        # Populate user profile card with data
+        profile = getattr(self, 'user_profile', {})
+        self.user_profile_card.content = ft.Column(
+            spacing=5,
+            controls=[
+                ft.Text("Your data", weight="bold", size=14, color=self.text_dark),
+                ft.Text(f"Username: {profile.get('username', '')}", size=12, color=self.text_dark),
+                ft.Text(f"First Name: {profile.get('first_name', '')}", size=12, color=self.text_dark),
+                ft.Text(f"Last Name: {profile.get('last_name', '')}", size=12, color=self.text_dark),
+                ft.Text(f"Address: {profile.get('street', '')}", size=12, color=self.text_dark),
+                ft.Text(f"Region: {profile.get('region', '')}", size=12, color=self.text_dark),
+            ],
+        )
+        self.user_profile_card.visible = True
         
         # Build stats cards - display business-wide statistics
         stats_cards = [
@@ -170,8 +196,8 @@ class HomeScreen:
                         str(self.stats.get("total_downloads", 0)),
                     ),
                     self._create_stat_card(
-                        "",
-                        "",
+                        "Top Reviews",
+                        str(self.stats.get("top_reviews", 0)),
                     ),
                 ],
             ),
@@ -271,35 +297,31 @@ class HomeScreen:
                         content=self.loading,
                     ),
                     
+                    # User profile section
+                    ft.Container(
+                        padding=ft.Padding(left=15, right=15, top=0, bottom=0),
+                        content=self.user_profile_card,
+                    ),
+                    ft.Container(height=15),  # Space between profile and stats
                     # Stats section
                     ft.Container(
                         padding=ft.Padding(left=15, right=15, top=0, bottom=0),
                         content=self.stats_column,
                     ),
-                    
-                    ft.Container(height=20),
-                    
-                    # Reviews section header
+                    ft.Container(height=15),  # Space before logout
+                    # Logout button
                     ft.Container(
-                        padding=ft.Padding(left=20, right=20, top=0, bottom=0),
-                        content=ft.Text(
-                            "Top Reviews",
-                            size=18,
-                            weight="bold",
-                            color=self.text_dark,
+                        alignment=ft.Alignment.CENTER,
+                        content=ft.ElevatedButton(
+                            "Logout",
+                            on_click=lambda e: self.router._navigate_to("login") if self.router else None,
+                            style=ft.ButtonStyle(
+                                bgcolor=self.primary_brown,
+                                color=self.white,
+                            ),
                         ),
                     ),
-                    
-                    ft.Container(height=10),
-                    
-                    # Reviews carousel
-                    ft.Container(
-                        padding=ft.Padding(left=15, right=15, top=0, bottom=0),
-                        content=self.reviews_column,
-                    ),
-                    
-                    ft.Container(height=40),  # Bottom padding
-                ],
+                    ],
                 spacing=0,
             ),
         )

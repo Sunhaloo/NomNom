@@ -91,6 +91,7 @@ class Router:
             return HomeScreen(
                 self.home_service,
                 self.show_notification,
+                router=self,
             ).build()
         
         elif self.current_screen == "orders":
