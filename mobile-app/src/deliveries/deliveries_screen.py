@@ -3,6 +3,7 @@ Deliveries page - shows your orders being delivered
 """
 
 import flet as ft
+import datetime
 from deliveries.deliveries_service import DeliveriesService
 from deliveries.screens.map_screen import MapScreen
 from common.error_handler import get_user_friendly_message, NetworkError
@@ -127,6 +128,12 @@ class DeliveriesScreen:
                         size=10,
                         color=self.text_light,
                     ),
+                    ft.Text(
+                        self._format_status_timestamp(delivery),
+                        size=9,
+                        color=self.text_light,
+                        italic=True,
+                    ),
                     
                     # Action buttons (only for pending)
                     ft.Container(
@@ -141,6 +148,14 @@ class DeliveriesScreen:
                                     height=36,
                                     expand=True,
                                     on_click=lambda e, did=delivery_id: self._on_confirm_click(did),
+                                ),
+                                ft.FilledButton(
+                                    content=ft.Text("Cancel", size=11),
+                                    bgcolor=self.red,
+                                    color=self.white,
+                                    height=36,
+                                    expand=True,
+                                    on_click=lambda e, did=delivery_id: self._on_cancel_click(did),
                                 ),
                                 ft.IconButton(
                                     icon=ft.Icons.MAP,
@@ -216,17 +231,72 @@ class DeliveriesScreen:
         self._safe_update(list_container)
     
     def _on_confirm_click(self, delivery_id):
-        """Handle clicking confirm delivery button"""
-        # Navigate to camera to take proof photo
-        pass
+        """Handle confirming a pending delivery without photo"""
+        # Record confirmation timestamp
+        now = datetime.datetime.now().isoformat()
+        # Update local data
+        for d in self.pending_deliveries:
+            if d.get("id") == delivery_id:
+                d["status"] = "Done"
+                d["confirmed_at"] = now
+                self.confirmed_deliveries.insert(0, d)
+                self.pending_deliveries.remove(d)
+                break
+        # Optionally call backend (placeholder)
+        try:
+            self.deliveries_service.update_delivery_status(delivery_id, "Done")
+        except Exception:
+            pass  # ignore if method not implemented
+        # Refresh UI lists
+        self._update_all_lists()
     
-    def _on_map_click(self, delivery_id):
-        """Handle map button click"""
-        # Map is already visible on the page
-        pass
+    def _on_cancel_click(self, delivery_id):
+        """Handle cancelling a pending delivery"""
+        now = datetime.datetime.now().isoformat()
+        for d in self.pending_deliveries:
+            if d.get("id") == delivery_id:
+                d["status"] = "Cancelled"
+                d["canceled_at"] = now
+                self.canceled_deliveries.insert(0, d)
+                self.pending_deliveries.remove(d)
+                break
+        try:
+            self.deliveries_service.update_delivery_status(delivery_id, "Cancelled")
+        except Exception:
+            pass
+        self._update_all_lists()
+
+    def _format_status_timestamp(self, delivery: dict) -> str:
+        """Return a formatted status timestamp string for a delivery.
+        Uses ISO format stored in `confirmed_at` or `canceled_at`.
+        Returns empty string if no timestamp is present.
+        """
+        ts = delivery.get("confirmed_at") or delivery.get("canceled_at")
+        if not ts:
+            return ""
+        try:
+            dt = datetime.datetime.fromisoformat(ts)
+        except Exception:
+            try:
+                dt = datetime.datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%f%z")
+            except Exception:
+                return ""
+        status = "confirmed" if "confirmed_at" in delivery else "cancelled"
+        formatted = dt.strftime("%d %B %Y at %H:%M")
+        return f"Delivery {status} on {formatted}"
+
     
     def build(self, page: ft.Page = None) -> ft.Container:
         """Create the deliveries screen UI"""
+        if page:
+            page.scrollbar_theme = ft.ScrollbarTheme(
+                thumb_color=self.primary_brown,
+                thickness=10,
+                radius=10,
+                main_axis_margin=2,
+                thumb_visibility=True,
+            )
+        
         self._load_deliveries()
         
         # Create map component with page reference
@@ -247,14 +317,12 @@ class DeliveriesScreen:
                             color=self.text_dark,
                         ),
                         ft.Container(height=8),
-                        ft.Container(
-                            expand=True,
-                            content=deliveries_list,
-                        ),
+                        deliveries_list,
                     ],
                     spacing=0,
                 ),
             )
+
         
         return ft.Container(
             expand=True,
