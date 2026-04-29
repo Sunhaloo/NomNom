@@ -19,6 +19,7 @@ class LoginScreen:
         self.text_dark = "#3E2723"
         self.btn_primary = "#000000"
         self.white = "#ffffff"
+        self.black = "#000000"
         
         # Form fields
         self.username_field = ft.TextField(
@@ -27,6 +28,7 @@ class LoginScreen:
             focused_border_color=self.primary_brown,
             text_size=14,
             height=50,
+            color=self.black,
         )
         
         self.password_field = ft.TextField(
@@ -36,6 +38,7 @@ class LoginScreen:
             focused_border_color=self.primary_brown,
             text_size=14,
             height=50,
+            color=self.black,
         )
         
         self.login_btn = ft.FilledButton(
@@ -75,7 +78,10 @@ class LoginScreen:
             result = self.auth_service.login(username, password)
             self.show_notification("Login successful!", error=False)
             self.on_login_success(result)
-        except (AuthenticationError, ValidationError, NetworkError) as e:
+        except AuthenticationError as e:
+            # Incorrect credentials
+            self.show_notification("Incorrect username or password.", error=True)
+        except (ValidationError, NetworkError) as e:
             self.show_notification(get_user_friendly_message(e), error=True)
         finally:
             self.login_btn.disabled = False
