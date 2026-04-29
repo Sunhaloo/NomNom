@@ -3,7 +3,6 @@ Deliveries page - shows your orders being delivered
 """
 
 import flet as ft
-import datetime
 from deliveries.deliveries_service import DeliveriesService
 from deliveries.screens.map_screen import MapScreen
 from common.error_handler import get_user_friendly_message, NetworkError
@@ -127,12 +126,6 @@ class DeliveriesScreen:
                         f"ETA: {estimated_eta}",
                         size=10,
                         color=self.text_light,
-                    ),
-                    ft.Text(
-                        self._format_status_timestamp(delivery),
-                        size=9,
-                        color=self.text_light,
-                        italic=True,
                     ),
                     
                     # Action buttons (only for pending)
@@ -294,15 +287,6 @@ class DeliveriesScreen:
 
     def build(self, page: ft.Page = None) -> ft.Container:
         """Create the deliveries screen UI"""
-        if page:
-            page.scrollbar_theme = ft.ScrollbarTheme(
-                thumb_color=self.primary_brown,
-                thickness=10,
-                radius=10,
-                main_axis_margin=2,
-                thumb_visibility=True,
-            )
-        
         self._load_deliveries()
         
         # Create map component with page reference
