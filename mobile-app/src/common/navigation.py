@@ -125,6 +125,16 @@ class Router:
         """Alias for _navigate_to for external calls."""
         self._navigate_to(screen)
     
+    def logout(self):
+        """Log out current user and navigate to login."""
+        try:
+            self.auth_service.logout()
+            self._navigate_to("login")
+        except Exception as e:
+            self.show_notification(f"Logout error: {str(e)}", error=True)
+            # Still navigate to login to be safe
+            self._navigate_to("login")
+    
     def _navigate_to_delivery_confirmation(self, delivery_id: int):
         """Navigate to delivery confirmation screen."""
         self.current_delivery_id = delivery_id

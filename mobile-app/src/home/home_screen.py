@@ -24,14 +24,20 @@ class HomeScreen:
         self.show_notification = show_notification
         
         # Color scheme
-        self.primary_brown = "#8D6E63"
-        self.light_brown = "#D7CCC8"
-        self.lighter_brown = "#EFEBE9"
-        self.cream_bg = "#FFF8E1"
-        self.text_dark = "#3E2723"
-        self.text_light = "#5D4037"
-        self.star_yellow = "#FFC107"
+        self.primary_brown = "#8B5E3C"
+        self.light_brown = "#E6D3C5"
+        self.lighter_brown = "#F3E5DC"
+        self.cream_bg = "#FAF3EE"
+        self.text_dark = "#3B2F2F"
+        self.text_light = "#7A5C58"
         self.white = "#ffffff"
+
+        self.card_shadow = ft.BoxShadow(
+            blur_radius=14,
+            spread_radius=0,
+            offset=ft.Offset(0, 3),
+            color="#00000026",
+        )
         
         # Data
         self.stats = {}
@@ -42,95 +48,44 @@ class HomeScreen:
         self.loading = ft.ProgressRing(color=self.primary_brown)
         
         # Content containers
-        self.stats_column = ft.Column(visible=False)
+        self.stats_column = ft.Column(visible=False, spacing=15)
         self.reviews_column = ft.Column(visible=False)
-        self.user_greeting = ft.Text(visible=False, color="#000000")
+        self.user_greeting = ft.Text(size=22, weight="bold", color=self.text_dark, visible=False)
         # Container for displaying user profile data in a card
         self.user_profile_card = ft.Container(
             visible=False,
-            bgcolor=self.lighter_brown,
-            border_radius=10,
-            padding=15,
-            content=ft.Column(spacing=5, controls=[]),
+            bgcolor=self.white,
+            border_radius=20,
+            padding=20,
+            shadow=self.card_shadow,
+            content=ft.Column(spacing=6, controls=[]),
         )
 
     
-    def _create_stat_card(self, title: str, value: str, subtitle: str = "") -> ft.Container:
+    def _create_stat_card(self, title: str, value: str, icon: str):
         """Create a stat card widget."""
         return ft.Container(
+            expand=True,
             bgcolor=self.lighter_brown,
-            border_radius=10,
+            border_radius=18,
             padding=15,
-            content=ft.Column(
-                spacing=5,
-                controls=[
-                    ft.Text(
-                        title,
-                        size=12,
-                        color=self.text_light,
-                        weight="w500",
-                    ),
-                    ft.Text(
-                        value,
-                        size=28,
-                        weight="bold",
-                        color=self.text_dark,
-                    ),
-                    ft.Text(
-                        subtitle,
-                        size=10,
-                        color=self.text_light,
-                    ) if subtitle else ft.Container(),
-                ],
-            ),
-        )
-    
-    def _create_review_card(self, review: dict) -> ft.Container:
-        """Create a review card widget."""
-        comment = review.get("comment", "No comment")
-        user_name = review.get("user_name", "Anonymous")
-        
-        return ft.Container(
-            bgcolor=self.white,
-            border=ft.border.all(1, self.light_brown),
-            border_radius=10,
-            padding=15,
+            shadow=self.card_shadow,
             content=ft.Column(
                 spacing=8,
                 controls=[
-                    ft.Row(
-                        controls=[
-                            ft.Icon(
-                                name=ft.Icons.STAR,
-                                color=self.star_yellow,
-                                size=16,
-                            ),
-                            ft.Text(
-                                f"{review.get('rating', 'No rating')} stars",
-                                size=12,
-                                color=self.text_light,
-                            ),
-                        ],
-                    ),
-                    ft.Text(
-                        comment,
-                        size=13,
-                        color=self.text_dark,
-                        max_lines=4,
-                        overflow=ft.TextOverflow.ELLIPSIS,
-                    ),
-                    ft.Text(
-                        f"— {user_name}",
-                        size=11,
-                        color=self.text_light,
-                        italic=True,
-                    ),
+                    ft.Row([
+                        ft.Icon(icon, color=self.primary_brown, size=20),
+                        ft.Text(title, size=13, color=self.text_light),
+                    ]),
+                    ft.Text(value, size=28, weight="bold", color=self.text_dark),
                 ],
             ),
         )
     
     def _load_data(self):
         """Load home screen data from service."""
+        self.loading.visible = True
+        self._safe_update(self.loading)
         try:
             self.stats = self.home_service.get_business_stats()
             self.reviews = self.home_service.get_top_reviews()
@@ -139,6 +94,16 @@ class HomeScreen:
             self._update_ui()
         except NetworkError as e:
             self.show_notification(get_user_friendly_message(e), error=True)
+        finally:
+            self.loading.visible = False
+            self._safe_update(self.loading)
+    
+    def _safe_update(self, control: ft.Control):
+        """Safely update a control if it's attached to a page."""
+        try:
+            control.update()
+        except Exception:
+            pass
     
     def _update_ui(self):
         """Update UI with loaded data."""
@@ -146,64 +111,35 @@ class HomeScreen:
         self.user_greeting.value = f"Welcome to NomNom, {profile.get('username', '')}!"
         self.user_greeting.visible = True
         # Populate user profile card with data
-        profile = getattr(self, 'user_profile', {})
+        
         self.user_profile_card.content = ft.Column(
-            spacing=5,
+            spacing=6,
             controls=[
-                ft.Text("Your data", weight="bold", size=14, color=self.text_dark),
-                ft.Text(f"Username: {profile.get('username', '')}", size=12, color=self.text_dark),
-                ft.Text(f"First Name: {profile.get('first_name', '')}", size=12, color=self.text_dark),
-                ft.Text(f"Last Name: {profile.get('last_name', '')}", size=12, color=self.text_dark),
-                ft.Text(f"Address: {profile.get('street', '')}", size=12, color=self.text_dark),
-                ft.Text(f"Region: {profile.get('region', '')}", size=12, color=self.text_dark),
+                ft.Text("Your da", weight="bold", size=16, color=self.text_dark),
+                ft.Text(f"Username: {profile.get('username', '')}"), 
+                ft.Text(f"First Name: {profile.get('first_name', '')}"), 
+                ft.Text(f"Last Name: {profile.get('last_name', '')}"), 
+                ft.Text(f"Address: {profile.get('street', '')}"), 
+                ft.Text(f"Region: {profile.get('region', '')}"), 
             ],
         )
         self.user_profile_card.visible = True
         
-        # Build stats cards - display business-wide statistics
-        stats_cards = [
-            ft.Row(
-                spacing=10,
-                controls=[
-                    self._create_stat_card(
-                        "Total Clients",
-                        str(self.stats.get("total_clients", 0)),
-                    ),
-                    self._create_stat_card(
-                        "Total Purchases",
-                        str(self.stats.get("total_purchases", 0)),
-                    ),
-                ],
-            ),
-            ft.Row(
-                spacing=10,
-                controls=[
-                    self._create_stat_card(
-                        "Satisfied Clients",
-                        str(self.stats.get("total_satisfied_clients", 0)),
-                    ),
-                    self._create_stat_card(
-                        "Successful Deliveries",
-                        str(self.stats.get("total_successful_deliveries", 0)),
-                    ),
-                ],
-            ),
-            ft.Row(
-                spacing=10,
-                controls=[
-                    self._create_stat_card(
-                        "App Downloads",
-                        str(self.stats.get("total_downloads", 0)),
-                    ),
-                    self._create_stat_card(
-                        "Top Reviews",
-                        str(self.stats.get("top_reviews", 0)),
-                    ),
-                ],
-            ),
+                # Build stats cards 
+        self.stats_column.controls = [
+            ft.Row([
+                self._create_stat_card("Total Clients", str(self.stats.get("total_clients", 0)), ft.Icons.PEOPLE_ALT_SHARP),
+                self._create_stat_card("Total Purchases", str(self.stats.get("total_purchases", 0)), ft.Icons.SHOPPING_CART),
+            ]),
+            ft.Row([
+                self._create_stat_card("Satisfied Clients", str(self.stats.get("total_satisfied_clients", 0)), ft.Icons.TAG_FACES_ROUNDED),
+                self._create_stat_card("Successful Deliveries", str(self.stats.get("total_successful_deliveries", 0)), ft.Icons.LOCAL_SHIPPING),
+            ]),
+            ft.Row([
+                self._create_stat_card("App Downloads", str(self.stats.get("total_downloads", 0)), ft.Icons.DOWNLOAD),
+                self._create_stat_card("Top Reviews", str(self.stats.get("top_reviews", 0)), ft.Icons.STAR),
+            ]),
         ]
-        
-        self.stats_column.controls = stats_cards
         self.stats_column.visible = True
         
         # Build review carousel
@@ -245,6 +181,42 @@ class HomeScreen:
             ]
             self.reviews_column.visible = True
     
+    def _create_review_card(self, review: dict):
+        """Create a review card widget."""
+        return ft.Container(
+            bgcolor=self.white,
+            border_radius=15,
+            padding=20,
+            shadow=self.card_shadow,
+            content=ft.Column(
+                spacing=10,
+                controls=[
+                    ft.Row(
+                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                        controls=[
+                            ft.Text(review.get("user_name", "Anonymous"), weight="bold", color=self.text_dark),
+                            ft.Row([
+                                ft.Icon(ft.Icons.STAR, color=self.primary_brown, size=16),
+                                ft.Text(str(review.get("rating", 5)), size=14, weight="bold", color=self.text_dark),
+                            ]),
+                        ],
+                    ),
+                    ft.Text(
+                        review.get("comment", ""),
+                        size=14,
+                        color=self.text_light,
+                        italic=True,
+                    ),
+                    ft.Text(
+                        review.get("date", ""),
+                        size=12,
+                        color=self.text_light,
+                        italic=False,
+                    ),
+                ],
+            ),
+        )
+    
     def _prev_review(self, e):
         """Show previous review."""
         if self.current_review_index > 0:
@@ -276,52 +248,61 @@ class HomeScreen:
         
         return ft.Container(
             expand=True,
-            bgcolor=self.white,
+            bgcolor=self.cream_bg,
             content=ft.Column(
-                expand=True,
                 scroll=ft.ScrollMode.AUTO,
                 controls=[
-                    ft.Container(height=20),  # Top padding
-                    
-                    # User greeting
-                    ft.Container(
-                        padding=ft.Padding(left=20, right=20, top=0, bottom=0),
-                        content=self.user_greeting,
-                    ),
-                    
-                    ft.Container(height=15),
-                    
+                    ft.Row([
+                        ft.Image(
+                            src="assets/logo.png",  # LOGO
+                            width=50,
+                            height=50,
+                        ),
+                        ft.Text("NomNom", size=22, weight="bold"),
+                    ]),
+
+                    ft.Container(height=10),
+
                     # Loading indicator
                     ft.Container(
                         alignment=ft.Alignment.CENTER,
                         content=self.loading,
                     ),
-                    
-                    # User profile section
-                    ft.Container(
-                        padding=ft.Padding(left=15, right=15, top=0, bottom=0),
-                        content=self.user_profile_card,
-                    ),
-                    ft.Container(height=15),  # Space between profile and stats
-                    # Stats section
-                    ft.Container(
-                        padding=ft.Padding(left=15, right=15, top=0, bottom=0),
-                        content=self.stats_column,
-                    ),
-                    ft.Container(height=15),  # Space before logout
+
+                    # Greeting
+                    self.user_greeting,
+                    ft.Container(height=15),
+
+                    # Profile
+                    self.user_profile_card,
+                    ft.Container(height=20),
+
+                    # Overview
+                    ft.Text("Overview", size=18, weight="bold"),
+                    ft.Container(height=10),
+                    self.stats_column,
+                    ft.Container(height=25),
+
+                    # Top Reviews
+                    ft.Text("Top Reviews", size=18, weight="bold"),
+                    ft.Container(height=10),
+                    self.reviews_column,
+                    ft.Container(height=25),
+
                     # Logout button
                     ft.Container(
                         alignment=ft.Alignment.CENTER,
                         content=ft.ElevatedButton(
                             "Logout",
-                            on_click=lambda e: self.router._navigate_to("login") if self.router else None,
+                            on_click=lambda e: self.router.logout() if self.router else None,
                             style=ft.ButtonStyle(
                                 bgcolor=self.primary_brown,
                                 color=self.white,
+                                shape=ft.RoundedRectangleBorder(radius=30),
+                                padding=20,
                             ),
                         ),
                     ),
-                    ],
-                spacing=0,
+                ],
             ),
         )
