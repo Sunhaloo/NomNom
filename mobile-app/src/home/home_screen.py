@@ -31,6 +31,8 @@ class HomeScreen:
         self.text_dark = "#3B2F2F"
         self.text_light = "#7A5C58"
         self.white = "#ffffff"
+        self.black = "#000000"
+        self.pale_grey = "#f5f5f5"
 
         self.card_shadow = ft.BoxShadow(
             blur_radius=14,
@@ -54,7 +56,7 @@ class HomeScreen:
         # Container for displaying user profile data in a card
         self.user_profile_card = ft.Container(
             visible=False,
-            bgcolor=self.white,
+            bgcolor=self.pale_grey,
             border_radius=20,
             padding=20,
             shadow=self.card_shadow,
@@ -102,8 +104,8 @@ class HomeScreen:
         """Safely update a control if it's attached to a page."""
         try:
             control.update()
-        except Exception:
-            pass
+        except Exception as e:
+            print(e)
     
     def _update_ui(self):
         """Update UI with loaded data."""
@@ -115,12 +117,12 @@ class HomeScreen:
         self.user_profile_card.content = ft.Column(
             spacing=6,
             controls=[
-                ft.Text("Your da", weight="bold", size=16, color=self.text_dark),
-                ft.Text(f"Username: {profile.get('username', '')}"), 
-                ft.Text(f"First Name: {profile.get('first_name', '')}"), 
-                ft.Text(f"Last Name: {profile.get('last_name', '')}"), 
-                ft.Text(f"Address: {profile.get('street', '')}"), 
-                ft.Text(f"Region: {profile.get('region', '')}"), 
+                ft.Text("Your data", weight="bold", size=16, color=self.black),
+                ft.Text(f"Username: {profile.get('username', '')}", color=self.black), 
+                ft.Text(f"First Name: {profile.get('first_name', '')}", color=self.black), 
+                ft.Text(f"Last Name: {profile.get('last_name', '')}", color=self.black), 
+                ft.Text(f"Address: {profile.get('street', '')}", color=self.black), 
+                ft.Text(f"Region: {profile.get('region', '')}", color=self.black), 
             ],
         )
         self.user_profile_card.visible = True
@@ -258,7 +260,7 @@ class HomeScreen:
                             width=50,
                             height=50,
                         ),
-                        ft.Text("NomNom", size=22, weight="bold"),
+                        ft.Text("NomNom", size=22, weight="bold", color=self.black),
                     ]),
 
                     ft.Container(height=10),
@@ -278,13 +280,13 @@ class HomeScreen:
                     ft.Container(height=20),
 
                     # Overview
-                    ft.Text("Overview", size=18, weight="bold"),
+                    ft.Text("Overview", size=18, weight="bold", color=self.black),
                     ft.Container(height=10),
                     self.stats_column,
                     ft.Container(height=25),
 
                     # Top Reviews
-                    ft.Text("Top Reviews", size=18, weight="bold"),
+                    ft.Text("Top Reviews", size=18, weight="bold", color=self.black),
                     ft.Container(height=10),
                     self.reviews_column,
                     ft.Container(height=25),
