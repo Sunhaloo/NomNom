@@ -231,61 +231,67 @@ class DeliveriesScreen:
         self._safe_update(list_container)
     
     def _on_confirm_click(self, delivery_id):
-        """Handle confirming a pending delivery without photo"""
-        # Record confirmation timestamp
-        now = datetime.datetime.now().isoformat()
-        # Update local data
-        for d in self.pending_deliveries:
-            if d.get("id") == delivery_id:
-                d["status"] = "Done"
-                d["confirmed_at"] = now
-                self.confirmed_deliveries.insert(0, d)
-                self.pending_deliveries.remove(d)
+        """Handle confirming a pending delivery and syncing with DB"""
+        # Update local data for immediate feedback
+        target_delivery = None
+        for i, d in enumerate(self.pending_deliveries):
+            if str(d.get("id")) == str(delivery_id):
+                target_delivery = self.pending_deliveries.pop(i)
                 break
-        # Optionally call backend (placeholder)
+        
+        if not target_delivery:
+            return
+
+        target_delivery["status"] = "Done"
+        self.confirmed_deliveries.insert(0, target_delivery)
+        self._update_all_lists()
+
+        # Sync with backend/database
         try:
             self.deliveries_service.update_delivery_status(delivery_id, "Done")
-        except Exception:
-            pass  # ignore if method not implemented
-        # Refresh UI lists
-        self._update_all_lists()
+            self.show_notification(f"Delivery #{delivery_id} confirmed successfully!")
+        except Exception as e:
+            # Revert local state if DB update fails
+            target_delivery["status"] = "Pending"
+            self.pending_deliveries.insert(0, target_delivery)
+            self.confirmed_deliveries.remove(target_delivery)
+            self._update_all_lists()
+            self.show_notification(f"Failed to sync with database: {str(e)}", error=True)
     
     def _on_cancel_click(self, delivery_id):
-        """Handle cancelling a pending delivery"""
-        now = datetime.datetime.now().isoformat()
-        for d in self.pending_deliveries:
-            if d.get("id") == delivery_id:
-                d["status"] = "Cancelled"
-                d["canceled_at"] = now
-                self.canceled_deliveries.insert(0, d)
-                self.pending_deliveries.remove(d)
+        """Handle cancelling a pending delivery and syncing with DB"""
+        target_delivery = None
+        for i, d in enumerate(self.pending_deliveries):
+            if str(d.get("id")) == str(delivery_id):
+                target_delivery = self.pending_deliveries.pop(i)
                 break
-        try:
-            self.deliveries_service.update_delivery_status(delivery_id, "Cancelled")
-        except Exception:
-            pass
+        
+        if not target_delivery:
+            return
+
+        # Local update for immediate feedback
+        target_delivery["status"] = "Cancelled"
+        self.canceled_deliveries.insert(0, target_delivery)
         self._update_all_lists()
 
-    def _format_status_timestamp(self, delivery: dict) -> str:
-        """Return a formatted status timestamp string for a delivery.
-        Uses ISO format stored in `confirmed_at` or `canceled_at`.
-        Returns empty string if no timestamp is present.
-        """
-        ts = delivery.get("confirmed_at") or delivery.get("canceled_at")
-        if not ts:
-            return ""
+        # Sync with backend
         try:
-            dt = datetime.datetime.fromisoformat(ts)
-        except Exception:
-            try:
-                dt = datetime.datetime.strptime(ts, "%Y-%m-%dT%H:%M:%S.%f%z")
-            except Exception:
-                return ""
-        status = "confirmed" if "confirmed_at" in delivery else "cancelled"
-        formatted = dt.strftime("%d %B %Y at %H:%M")
-        return f"Delivery {status} on {formatted}"
+            self.deliveries_service.update_delivery_status(delivery_id, "Cancelled")
+            self.show_notification(f"Delivery #{delivery_id} cancelled.")
+        except Exception as e:
+            # Revert
+            target_delivery["status"] = "Pending"
+            self.pending_deliveries.insert(0, target_delivery)
+            self.canceled_deliveries.remove(target_delivery)
+            self._update_all_lists()
+            self.show_notification(f"Failed to cancel in database: {str(e)}", error=True)
 
+    def _on_map_click(self, delivery_id):
+        """Handle map button click"""
+        # Map is already visible on the page
+        pass
     
+
     def build(self, page: ft.Page = None) -> ft.Container:
         """Create the deliveries screen UI"""
         if page:

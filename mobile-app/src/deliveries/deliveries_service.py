@@ -153,3 +153,31 @@ class DeliveriesService:
     ) -> int:
         """Estimate delivery time in minutes"""
         return int((distance_km / speed_kmh) * 60)
+
+    def update_delivery_status(self, delivery_id: int, status: str) -> dict:
+        """Update delivery status using specific action endpoints"""
+        # Determine the correct action endpoint
+        if status == "Done":
+            action = "confirm"
+        elif status == "Cancelled":
+            action = "cancel"
+        else:
+            raise ValidationError(f"Unsupported status transition: {status}")
+
+        endpoint = f"{ENDPOINTS['deliveries']}{delivery_id}/{action}/"
+        
+        try:
+            # Use POST for custom actions as required by the backend ViewSet
+            response = self.api_client.post(
+                endpoint,
+                json={}  # No payload needed for these specific actions
+            )
+            
+            # Check for success 
+            if isinstance(response, dict) and response.get("success"):
+                return response
+            
+            error_msg = response.get("error", "Unknown error")
+            raise NetworkError(f"Failed to {action} delivery: {error_msg}")
+        except Exception as e:
+            raise NetworkError(f"Database update failed: {str(e)}")
