@@ -138,18 +138,7 @@ class LoginScreen:
                                 
                                 self.login_btn,
                                 
-                                ft.Container(height=10),
-                                
-                                ft.Row(
-                                    alignment=ft.MainAxisAlignment.CENTER,
-                                    controls=[
-                                        ft.Text("Don't have an account? ", size=13),
-                                        ft.TextButton(
-                                            content=ft.Text("Sign Up"),
-                                            on_click=lambda e: self._navigate_to_signup(),
-                                        ),
-                                    ],
-                                ),
+ft.Container(height=10),
                                 
                                 self.loading_indicator,
                             ],
@@ -160,9 +149,3 @@ class LoginScreen:
                 spacing=10,
             ),
         )
-    
-    def _navigate_to_signup(self, e=None):
-        if self.router:
-            self.router.navigate("signup")
-        else:
-            self.show_notification("Navigation not available", error=True)
