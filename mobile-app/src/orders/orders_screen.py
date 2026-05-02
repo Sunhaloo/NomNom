@@ -39,7 +39,6 @@ class OrdersScreen:
         
         # Data
         self.orders = []
-        self.current_status_filter = None
 
         # Selected order detail state (inline details panel)
         self.selected_order_id: int | None = None
@@ -69,11 +68,6 @@ class OrdersScreen:
             on_click=self._on_order_id_load_click,
         )
         
-        # Filter buttons
-        self.filter_buttons = ft.Row(
-            spacing=8,
-            scroll=ft.ScrollMode.AUTO,
-        )
         
         # Orders list
         self.orders_list = ft.Column(
@@ -130,34 +124,6 @@ class OrdersScreen:
             # Control not yet added to page
             pass
     
-    def _create_filter_buttons(self):
-        """Create filter button row."""
-        statuses = [
-            ("All", None),
-            ("Pending", "pending"),
-            ("Paid", "paid"),
-            ("Cancelled", "cancelled"),
-        ]
-        
-        buttons = []
-        for label, status in statuses:
-            buttons.append(
-                ft.FilledButton(
-                    content=ft.Text(label),
-                    bgcolor=self.primary_brown if status == self.current_status_filter else self.lighter_brown,
-                    color=self.white if status == self.current_status_filter else self.text_dark,
-                    on_click=lambda e, s=status: self._apply_filter(s),
-                )
-            )
-        
-        self.filter_buttons.controls = buttons
-    
-    def _apply_filter(self, status: str | None):
-        """Apply status filter."""
-        self.current_status_filter = status
-        self._create_filter_buttons()
-        self._load_orders()
-        self.filter_buttons.update()
     
     def _create_order_item(self, order: dict) -> ft.Container:
         """Create an order list item."""
@@ -224,7 +190,6 @@ class OrdersScreen:
         
         try:
             result = self.orders_service.get_orders(
-                status=self.current_status_filter,
                 limit=50,
             )
             self.orders = result.get("results", [])
@@ -599,7 +564,6 @@ class OrdersScreen:
     
     def build(self) -> ft.Container:
         """Build and return orders screen UI."""
-        self._create_filter_buttons()
         self._load_orders()
         
         return ft.Container(
@@ -629,14 +593,6 @@ class OrdersScreen:
                         content=self.detail_container,
                     ),
                     
-                    ft.Container(height=10),
-                    
-                    # Filter buttons
-                    ft.Container(
-                        padding=ft.Padding(left=15, right=15, top=0, bottom=0),
-                        content=self.filter_buttons,
-                    ),
-                    
                     ft.Container(height=15),
                     
                     # Loading indicator
@@ -655,3 +611,4 @@ class OrdersScreen:
                 spacing=0,
             ),
         )
+    

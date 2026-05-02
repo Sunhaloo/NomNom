@@ -15,10 +15,11 @@ class Pastry(models.Model):
     pastry_price = models.DecimalField(max_digits=8, decimal_places=2)
     image = models.ImageField(upload_to='pastries/', blank=True, null=True)
     is_available = models.BooleanField(default=True)
+    is_bestseller = models.BooleanField(default=False)
 
     flavour = models.CharField(max_length=50, blank=True, null=True)
     filling = models.CharField(max_length=50, blank=True, null=True)
-    frosting = models.CharField(max_length=50, blank=True, null=True)
+    frosting = models.CharField(max_length=100, blank=True, null=True)
     decoration = models.CharField(max_length=100, blank=True, null=True)
     message = models.CharField(max_length=150, blank=True, null=True)
     size = models.CharField(

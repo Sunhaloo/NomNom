@@ -1,4 +1,5 @@
 import flet as ft
+from pathlib import Path
 from auth.auth_service import AuthService
 from common.error_handler import get_user_friendly_message, AuthenticationError, ValidationError, NetworkError
 
@@ -13,13 +14,16 @@ class LoginScreen:
         self.show_notification = show_notification
         self.router = router
         
-        # Color scheme from CSS
+        # Color scheme from web app CSS
         self.primary_brown = "#8D6E63"
         self.cream_bg = "#FFF8E1"
         self.text_dark = "#3E2723"
-        self.btn_primary = "#000000"
+        self.btn_primary = "#6f4e37"  # Web app accent-dark-brown
         self.white = "#ffffff"
         self.black = "#000000"
+        
+        # Logo path
+        self.logo_path = str(Path(__file__).parent.parent.parent / "assets" / "NomNom-Logo.png")
         
         # Form fields
         self.username_field = ft.TextField(
@@ -103,23 +107,25 @@ class LoginScreen:
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 alignment=ft.MainAxisAlignment.CENTER,
                 controls=[
-                    ft.Container(height=40),  # Spacer
+                    ft.Container(height=20),  # Spacer
                     
-                    # Title
-                    ft.Text(
-                        "NomNom",
-                        size=36,
-                        weight="bold",
-                        color=self.text_dark,
+                    # Logo
+                    ft.Image(
+                        src=self.logo_path,
+                        width=100,
+                        height=100,
                     ),
                     
+                    ft.Container(height=10),  # Spacer
+                    
+                    # Title
                     ft.Text(
                         "Welcome Back",
                         size=18,
                         color=self.primary_brown,
                     ),
                     
-                    ft.Container(height=30),  # Spacer
+                    ft.Container(height=20),  # Spacer
                     
                     # Form container
                     ft.Container(

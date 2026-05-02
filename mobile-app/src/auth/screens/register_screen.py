@@ -3,6 +3,7 @@ Registration/Signup screen for the NomNom mobile app.
 """
 
 import flet as ft
+from pathlib import Path
 from auth.auth_service import AuthService
 from common.error_handler import get_user_friendly_message, AuthenticationError, ValidationError, NetworkError
 
@@ -29,8 +30,11 @@ class RegisterScreen:
         self.primary_brown = "#8D6E63"
         self.cream_bg = "#FFF8E1"
         self.text_dark = "#3E2723"
-        self.btn_primary = "#000000"
+        self.btn_primary = "#6f4e37"  # Web app accent-dark-brown
         self.white = "#ffffff"
+        
+        # Logo path
+        self.logo_path = str(Path(__file__).parent.parent.parent / "assets" / "NomNom-Logo.png")
         
         # Form fields
         self.username_field = ft.TextField(
@@ -193,16 +197,18 @@ class RegisterScreen:
                 expand=True,
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 controls=[
-                    ft.Container(height=20),  # Spacer
+                    ft.Container(height=10),  # Spacer
                     
-                    # Title
-                    ft.Text(
-                        "NomNom",
-                        size=36,
-                        weight="bold",
-                        color=self.text_dark,
+                    # Logo
+                    ft.Image(
+                        src=self.logo_path,
+                        width=80,
+                        height=80,
                     ),
                     
+                    ft.Container(height=5),  # Spacer
+                    
+                    # Title
                     ft.Text(
                         "Create Account",
                         size=18,
@@ -215,7 +221,7 @@ class RegisterScreen:
                         content=ft.Column(
                             scroll=ft.ScrollMode.AUTO,
                             controls=[
-                                ft.Container(height=20),
+                                ft.Container(height=15),
                                 
                                 # Form fields
                                 ft.Container(

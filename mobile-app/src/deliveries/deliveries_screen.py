@@ -6,6 +6,8 @@ import flet as ft
 from deliveries.deliveries_service import DeliveriesService
 from deliveries.screens.map_screen import MapScreen
 from common.error_handler import get_user_friendly_message, NetworkError
+from common.formatters import calculate_distance_km, format_distance
+from config import SHOP_LATITUDE, SHOP_LONGITUDE
 
 
 class DeliveriesScreen:
@@ -35,19 +37,19 @@ class DeliveriesScreen:
         # UI containers for each status section
         self.pending_list = ft.Column(
             spacing=10,
-            scroll=ft.ScrollMode.AUTO,
+            scroll=ft.ScrollMode.ALWAYS,
             expand=True,
             controls=[],
         )
         self.confirmed_list = ft.Column(
             spacing=10,
-            scroll=ft.ScrollMode.AUTO,
+            scroll=ft.ScrollMode.ALWAYS,
             expand=True,
             controls=[],
         )
         self.canceled_list = ft.Column(
             spacing=10,
-            scroll=ft.ScrollMode.AUTO,
+            scroll=ft.ScrollMode.ALWAYS,
             expand=True,
             controls=[],
         )
@@ -67,7 +69,14 @@ class DeliveriesScreen:
         delivery_id = delivery.get("id", "N/A")
         status = delivery.get("status", "pending").replace("_", " ").title()
         address = delivery.get("address", "N/A")
-        estimated_eta = delivery.get("estimated_eta", "N/A")
+        
+        # Parse delivery date if available (format: "YYYY-MM-DD")
+        delivery_date = delivery.get("date", "N/A")
+        
+        # For now, show distance to shop location
+        # In a real scenario, this would be the distance to the delivery address
+        distance_km = 2.5  # Placeholder - would need actual address parsing
+        distance_display = format_distance(distance_km)
         
         # Card color based on status type
         card_color = {
@@ -123,7 +132,7 @@ class DeliveriesScreen:
                         overflow=ft.TextOverflow.ELLIPSIS,
                     ),
                     ft.Text(
-                        f"ETA: {estimated_eta}",
+                        f"Distance: {distance_display}",
                         size=10,
                         color=self.text_light,
                     ),
@@ -150,11 +159,12 @@ class DeliveriesScreen:
                                     expand=True,
                                     on_click=lambda e, did=delivery_id: self._on_cancel_click(did),
                                 ),
-                                ft.IconButton(
-                                    icon=ft.Icons.MAP,
-                                    icon_color=self.primary_brown,
-                                    icon_size=18,
-                                    on_click=lambda e, did=delivery_id: self._on_map_click(did),
+                                ft.FilledButton(
+                                    content=ft.Text("My", size=11),
+                                    bgcolor=self.primary_brown,
+                                    color=self.white,
+                                    height=36,
+                                    on_click=lambda e, addr=address: self._on_my_button_click(addr),
                                 ),
                             ],
                         ),
@@ -279,6 +289,10 @@ class DeliveriesScreen:
             self._update_all_lists()
             self.show_notification(f"Failed to cancel in database: {str(e)}", error=True)
 
+    def _on_my_button_click(self, delivery_address):
+        """Handle 'My' button click - shows delivery address"""
+        self.show_notification(f"Delivery to: {delivery_address}")
+    
     def _on_map_click(self, delivery_id):
         """Handle map button click"""
         # Map is already visible on the page

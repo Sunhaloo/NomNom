@@ -10,6 +10,7 @@ from .views import (
     BusinessStatsView,
     TopReviewsView,
     SignupView,
+    PastryBannerView,
 )
 
 router = DefaultRouter()
@@ -25,4 +26,5 @@ urlpatterns = [
     path("auth/signup/", SignupView.as_view(), name="api-signup"),
     path("stats/", BusinessStatsView.as_view(), name="business-stats"),
     path("reviews/top-rated/", TopReviewsView.as_view(), name="top-reviews"),
+    path("pastries/banner/", PastryBannerView.as_view(), name="pastry-banner"),
 ]

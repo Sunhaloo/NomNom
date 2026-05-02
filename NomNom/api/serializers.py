@@ -106,6 +106,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         # fields to be accessible through the API
         fields = [
             "id",
+            "username",
             "first_name",
             "last_name",
             "email",

@@ -479,3 +479,61 @@ class CustomTokenView(APIView):
 
 
  
+
+class PastryBannerView(APIView):
+    """Get pastries for mobile banner carousel - mix of best sellers and random
+    
+    - GET /api/v1/pastries/banner/:
+        Returns 10 pastries (mix of best sellers and random available pastries)
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        authentication.TokenAuthentication,
+    ]
+    
+    def get(self, request):
+        """Retrieve pastries for banner carousel"""
+        try:
+            from pastry.models import Pastry
+            import random
+            
+            # Get best sellers (50% of results)
+            bestsellers = Pastry.objects.filter(is_bestseller=True, is_available=True, is_custom=False)[:5]
+            
+            # Get random pastries (50% of results)
+            all_pastries = Pastry.objects.filter(is_available=True, is_custom=False)
+            random_pastries = list(all_pastries)
+            random.shuffle(random_pastries)
+            random_pastries = random_pastries[:5]
+            
+            # Combine and shuffle
+            pastries = list(bestsellers) + random_pastries
+            random.shuffle(pastries)
+            
+            # Serialize pastries
+            pastry_data = []
+            for pastry in pastries:
+                image_url = None
+                if pastry.image:
+                    image_url = request.build_absolute_uri(pastry.image.url)
+                
+                pastry_data.append({
+                    "id": pastry.id,
+                    "name": pastry.pastry_name,
+                    "category": pastry.get_pastry_category_display(),
+                    "price": str(pastry.pastry_price),
+                    "image": image_url,
+                    "is_bestseller": pastry.is_bestseller,
+                })
+            
+            return Response({
+                "success": True,
+                "data": pastry_data
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Failed to fetch pastries: {str(e)}")
+            return Response(
+                {"success": False, "message": "Failed to fetch pastries"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

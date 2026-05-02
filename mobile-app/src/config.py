@@ -19,12 +19,13 @@ ENDPOINTS = {
     "orders": f"{API_BASE_URL}/orders/",
     "deliveries": f"{API_BASE_URL}/deliveries/",
     "delivery_confirm": lambda delivery_id: f"{API_BASE_URL}/deliveries/{delivery_id}/confirm-with-photo/",
+    "pastries_banner": f"{API_BASE_URL}/pastries/banner/",
 }
 
 # Shop Coordinates (for distance/ETA calculations)
-SHOP_LATITUDE = 37.7749
-SHOP_LONGITUDE = -122.4194
-SHOP_ADDRESS = "123 Pastry Lane, San Francisco, CA"
+SHOP_LATITUDE = -20.2479694
+SHOP_LONGITUDE = 57.5937393
+SHOP_ADDRESS = "NomNom Pastry Shop, Mauritius"
 
 # Storage Keys
 STORAGE_KEYS = {

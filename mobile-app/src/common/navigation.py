@@ -160,17 +160,20 @@ class Router:
                 controls=[
                     ft.IconButton(
                         icon=ft.Icons.HOME,
-                        icon_color=self.primary_brown if self.current_screen == "home" else self.text_dark,
+                        icon_color=self.primary_brown if self.current_screen == "home" else "#8B7355",
+                        opacity=1.0 if self.current_screen == "home" else 0.85,
                         on_click=lambda e: self._navigate_to("home"),
                     ),
                     ft.IconButton(
                         icon=ft.Icons.SHOPPING_CART,
-                        icon_color=self.primary_brown if self.current_screen == "orders" else self.text_dark,
+                        icon_color=self.primary_brown if self.current_screen == "orders" else "#8B7355",
+                        opacity=1.0 if self.current_screen == "orders" else 0.85,
                         on_click=lambda e: self._navigate_to("orders"),
                     ),
                     ft.IconButton(
                         icon=ft.Icons.LOCAL_SHIPPING,
-                        icon_color=self.primary_brown if self.current_screen == "deliveries" else self.text_dark,
+                        icon_color=self.primary_brown if self.current_screen == "deliveries" else "#8B7355",
+                        opacity=1.0 if self.current_screen == "deliveries" else 0.85,
                         on_click=lambda e: self._navigate_to("deliveries"),
                     ),
                 ],

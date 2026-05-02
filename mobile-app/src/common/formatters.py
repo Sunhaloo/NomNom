@@ -5,6 +5,7 @@ Used by various screens to display data consistently.
 
 from datetime import datetime
 from typing import Union
+import math
 
 
 def format_currency(amount: Union[str, float, int], currency: str = "$") -> str:
@@ -138,3 +139,59 @@ def get_status_color(status: str, type_: str = "order") -> str:
     }
     
     return status_colors.get(status, "#757575")  # Default gray
+
+
+def calculate_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """
+    Calculate distance between two coordinates using Haversine formula.
+    
+    Args:
+        lat1: Latitude of first point
+        lon1: Longitude of first point
+        lat2: Latitude of second point
+        lon2: Longitude of second point
+        
+    Returns:
+        Distance in kilometers
+    """
+    try:
+        # Earth radius in kilometers
+        earth_radius_km = 6371
+        
+        # Convert to radians
+        lat1_rad = math.radians(lat1)
+        lon1_rad = math.radians(lon1)
+        lat2_rad = math.radians(lat2)
+        lon2_rad = math.radians(lon2)
+        
+        # Haversine formula
+        dlat = lat2_rad - lat1_rad
+        dlon = lon2_rad - lon1_rad
+        a = math.sin(dlat / 2) ** 2 + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon / 2) ** 2
+        c = 2 * math.asin(math.sqrt(a))
+        distance = earth_radius_km * c
+        
+        return round(distance, 2)
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def format_distance(distance_km: float) -> str:
+    """
+    Format distance in kilometers for display.
+    
+    Args:
+        distance_km: Distance in kilometers
+        
+    Returns:
+        Formatted distance string (e.g., "2.5 km")
+    """
+    try:
+        if distance_km < 1:
+            # Show in meters if less than 1 km
+            meters = distance_km * 1000
+            return f"{int(meters)} m"
+        else:
+            return f"{distance_km:.1f} km"
+    except (TypeError, ValueError):
+        return "N/A"
