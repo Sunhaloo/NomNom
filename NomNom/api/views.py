@@ -516,7 +516,11 @@ class PastryBannerView(APIView):
             for pastry in pastries:
                 image_url = None
                 if pastry.image:
-                    image_url = request.build_absolute_uri(pastry.image.url)
+                    # Get the image path from the model
+                    img_path = str(pastry.image)
+                    # Convert static path to correct URL format
+                    # Images are stored in pastry/static/images/ but served from /static/
+                    image_url = request.build_absolute_uri(f"/static/{img_path}")
                 
                 pastry_data.append({
                     "id": pastry.id,

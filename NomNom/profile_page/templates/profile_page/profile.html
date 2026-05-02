@@ -23,17 +23,13 @@
     </div>
 
 <div class="profile-container">
-    <div class="profile-card">
+        <div class="profile-card">
         <div class="profile-header">
-            {% if user.profile_pic %}
-                <img src="{{ user.profile_pic.url }}"
-                     class="profile-pic image-hover"
-                     alt="Profile picture">
-            {% else %}
-                <img src="{% static 'images/default_profile.png' %}"
-                     class="profile-pic"
-                     alt="Default profile picture">
-            {% endif %}
+            <img
+              src="{{ profile_pic_url }}"
+              class="profile-pic {% if has_profile_pic %}image-hover{% endif %}"
+              alt="Profile picture"
+            >
 
             <h2 class="profile-name">
                 {{ user.first_name }} {{ user.last_name }}

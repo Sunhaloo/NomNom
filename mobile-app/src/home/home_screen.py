@@ -4,11 +4,8 @@ Displays business stats, top reviews, and user greeting.
 """
 
 import flet as ft
-import threading
-import time
 from home.home_service import HomeService
 from common.error_handler import get_user_friendly_message, NetworkError
-from config import SERVER_BASE_URL
 
 
 class HomeScreen:
@@ -49,12 +46,14 @@ class HomeScreen:
         self.stats = {}
         self.reviews = []
         self.current_review_index = 0
-        self.pastries = []
-        self.current_pastry_index = 0
-        self.banner_stop_flag = False
         
         # Loading state
-        self.loading = ft.ProgressRing(color=self.primary_brown)
+        self.loading_spinner = ft.ProgressRing(color=self.primary_brown)
+        self.loading_container = ft.Container(
+            alignment=ft.Alignment.CENTER,
+            padding=20,
+            content=self.loading_spinner,
+        )
         
         # Content containers
         self.stats_column = ft.Column(visible=False, spacing=15)
@@ -68,22 +67,6 @@ class HomeScreen:
             padding=18,
             shadow=self.card_shadow,
             content=ft.Column(spacing=6, controls=[]),
-        )
-        
-        # Banner carousel container
-        self.banner_container = ft.Container(
-            visible=False,
-            bgcolor=self.lighter_brown,
-            border_radius=15,
-            padding=15,
-            shadow=self.card_shadow,
-            height=250,
-            width=self.content_width,
-            content=ft.Column(
-                alignment=ft.MainAxisAlignment.CENTER,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                controls=[],
-            ),
         )
 
     
@@ -109,43 +92,28 @@ class HomeScreen:
     
     def _load_data(self):
         """Load home screen data from service."""
-        self.loading.visible = True
+        self.loading_container.visible = True
         try:
-            if self.loading.page:
-                self.loading.update()
+            if self.loading_spinner.page:
+                self.loading_spinner.update()
         except Exception:
             pass
         
         try:
             self.stats = self.home_service.get_business_stats()
             self.reviews = self.home_service.get_top_reviews()
-            # Fetch user profile data from backend
             self.user_profile = self.home_service.get_user_profile()
-            # Fetch pastries for banner
-            self.pastries = self.home_service.get_pastries_banner()
             self._update_ui()
-            # Start banner rotation in background thread
-            if self.pastries:
-                self.banner_stop_flag = False
-                threading.Thread(target=self._rotate_banner, daemon=True).start()
         except NetworkError as e:
             self.show_notification(get_user_friendly_message(e), error=True)
         finally:
-            self.loading.visible = False
+            self.loading_container.visible = False
             try:
-                if self.loading.page:
-                    self.loading.update()
+                if self.loading_spinner.page:
+                    self.loading_spinner.update()
             except Exception:
                 pass
     
-    def _safe_update(self, control: ft.Control):
-        """Safely update a control if it's attached to a page."""
-        try:
-            if hasattr(control, 'page') and control.page:
-                control.update()
-        except Exception:
-            pass
-
     def _wrap(self, control: ft.Control) -> ft.Control:
         """Keep content centered with a consistent max width."""
         return ft.Container(
@@ -154,16 +122,6 @@ class HomeScreen:
             content=control,
         )
 
-    def _resolve_image_src(self, image_src: str) -> str:
-        """Resolve relative media paths into absolute URLs for Flet Image."""
-        if not image_src:
-            return ""
-        if image_src.startswith("http://") or image_src.startswith("https://"):
-            return image_src
-        if image_src.startswith("/"):
-            return f"{SERVER_BASE_URL}{image_src}"
-        return f"{SERVER_BASE_URL}/{image_src}"
-    
     def _update_ui(self):
         """Update UI with loaded data."""
         profile = getattr(self, 'user_profile', {})
@@ -218,11 +176,6 @@ class HomeScreen:
             ]),
         ]
         self.stats_column.visible = True
-        
-        # Build banner carousel
-        if self.pastries and len(self.pastries) > 0:
-            self._update_banner_display()
-            self.banner_container.visible = True
         
         # Build review carousel
         if self.reviews and len(self.reviews) > 0:
@@ -324,84 +277,6 @@ class HomeScreen:
         self.reviews_column.controls[1].controls[1] = counter
         self.reviews_column.update()
     
-    def _create_banner_card(self, pastry: dict):
-        """Create a pastry card for the banner carousel."""
-        image_src = self._resolve_image_src(pastry.get("image", "") or "")
-        
-        image_widget = ft.Image(
-            src=image_src,
-            width=180,
-            height=150,
-            fit=ft.BoxFit.COVER,
-            error_content=ft.Icon(ft.Icons.IMAGE_NOT_SUPPORTED, size=60, color=self.text_light),
-        ) if image_src else ft.Icon(ft.Icons.CAKE, size=60, color=self.primary_brown)
-        
-        return ft.Container(
-            bgcolor=self.white,
-            border_radius=12,
-            padding=12,
-            shadow=self.card_shadow,
-            content=ft.Column(
-                alignment=ft.MainAxisAlignment.CENTER,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                controls=[
-                    image_widget,
-                    ft.Container(height=8),
-                    ft.Text(
-                        pastry.get("name", "Unknown"),
-                        size=14,
-                        weight="bold",
-                        color=self.text_dark,
-                        text_align=ft.TextAlign.CENTER,
-                    ),
-                    ft.Text(
-                        f"${pastry.get('price', '0')}",
-                        size=12,
-                        color=self.primary_brown,
-                        text_align=ft.TextAlign.CENTER,
-                    ),
-                    ft.Text(
-                        pastry.get("category", ""),
-                        size=11,
-                        color=self.text_light,
-                        text_align=ft.TextAlign.CENTER,
-                    ),
-                ],
-                spacing=6,
-            ),
-        )
-    
-    def _rotate_banner(self):
-        """Background thread to rotate banner every 30 seconds."""
-        while not self.banner_stop_flag and self.pastries:
-            try:
-                time.sleep(30)
-                if not self.banner_stop_flag:
-                    self.current_pastry_index = (self.current_pastry_index + 1) % len(self.pastries)
-                    self._update_banner_display()
-            except Exception as e:
-                print(f"Banner rotation error: {e}")
-    
-    def _update_banner_display(self):
-        """Update banner to show current pastry."""
-        try:
-            if self.pastries and len(self.pastries) > 0:
-                pastry_card = self._create_banner_card(self.pastries[self.current_pastry_index])
-                indicator = ft.Text(
-                    f"{self.current_pastry_index + 1}/{len(self.pastries)}",
-                    size=11,
-                    color=self.text_light,
-                )
-                
-                self.banner_container.content.controls = [
-                    pastry_card,
-                    ft.Container(height=8),
-                    indicator,
-                ]
-                self._safe_update(self.banner_container)
-        except Exception as e:
-            print(f"Banner display error: {e}")
-    
     def build(self) -> ft.Container:
         """Build and return home screen UI."""
         self._load_data()
@@ -420,10 +295,11 @@ class HomeScreen:
                             vertical_alignment=ft.CrossAxisAlignment.CENTER,
                             controls=[
                                 ft.Image(
-                                    src="NomNom-Logo-mark.png",
+                                    src="NomNom-Logo.png",
                                     width=70,
                                     height=70,
                                     fit=ft.BoxFit.CONTAIN,
+                                    error_content=ft.Icon(ft.Icons.CAKE, size=60, color=self.primary_brown),
                                 ),
                                 ft.Container(width=10),
                                 ft.Text("NomNom", size=22, weight="bold", color=self.black),
@@ -433,23 +309,13 @@ class HomeScreen:
 
                     ft.Container(height=10),
 
-                    self._wrap(
-                        ft.Container(
-                            alignment=ft.Alignment.CENTER,
-                            content=self.loading,
-                        )
-                    ),
+                    self._wrap(self.loading_container),
 
                     self._wrap(self.user_greeting),
                     ft.Container(height=12),
 
                     self._wrap(self.user_profile_card),
                     ft.Container(height=18),
-                    
-                    self._wrap(ft.Text("Featured Pastries", size=18, weight="bold", color=self.black)),
-                    ft.Container(height=10),
-                    self.banner_container,
-                    ft.Container(height=20),
 
                     self._wrap(ft.Text("Overview", size=18, weight="bold", color=self.black)),
                     ft.Container(height=10),

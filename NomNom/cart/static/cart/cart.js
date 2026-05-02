@@ -91,7 +91,7 @@ $(function () {
     const subtotal = (item.price * qty).toFixed(2);
 
     // Handle image URL - the backend already provides the full URL via image.url
-    let imageUrl = item.image || "/static/images/placeholder.png";
+    let imageUrl = item.image || "/static/images/NomNom-Logo.png";
 
     // If image doesn't start with / or http, prepend /static/
     if (imageUrl && !imageUrl.startsWith("/") && !imageUrl.startsWith("http")) {

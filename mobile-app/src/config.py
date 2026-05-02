@@ -36,7 +36,6 @@ ENDPOINTS = {
     "orders": f"{API_BASE_URL}/orders/",
     "deliveries": f"{API_BASE_URL}/deliveries/",
     "delivery_confirm": lambda delivery_id: f"{API_BASE_URL}/deliveries/{delivery_id}/confirm-with-photo/",
-    "pastries_banner": f"{API_BASE_URL}/pastries/banner/",
 }
 
 # Shop Coordinates (for distance/ETA calculations)

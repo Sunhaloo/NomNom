@@ -54,23 +54,42 @@ class MapScreen:
     
     def _handle_position_change(self, e: ftg.GeolocatorPositionChangeEvent):
         """When location updates, refresh customer marker + route."""
-        if e.position:
-            self._set_customer_location(
-                latitude=e.position.latitude,
-                longitude=e.position.longitude,
-                move_map=False,
-                show_snackbar=False,
-            )
+        try:
+            # Safely check if position exists and has coordinates
+            if e.position and hasattr(e.position, 'latitude') and hasattr(e.position, 'longitude'):
+                if e.position.latitude is not None and e.position.longitude is not None:
+                    self._set_customer_location(
+                        latitude=e.position.latitude,
+                        longitude=e.position.longitude,
+                        move_map=False,
+                        show_snackbar=False,
+                    )
+        except Exception as ex:
+            print(f"[GEOLOCATION] Error in position change handler: {ex}")
     
     def _handle_error(self, e):
-        """Show location error to user"""
+        """Handle location error - show graceful fallback."""
+        error_data = getattr(e, 'data', None)
+        error_msg = str(error_data) if error_data else str(e)
+        print(f"[GEOLOCATION] Handler error: {error_msg}")
+        
         if self.page:
-            self.page.snack_bar = ft.SnackBar(
-                ft.Text(f"Location Error: {e.data}", color=self.white),
-                bgcolor="#F44336",
-            )
-            self.page.snack_bar.open = True
-            self.page.update()
+            try:
+                # Show informative message without crashing
+                self.page.snack_bar = ft.SnackBar(
+                    ft.Text(
+                        "Location service unavailable. Using shop location.",
+                        color=self.white,
+                        size=12,
+                    ),
+                    bgcolor="#FF9800",
+                    duration=3000,
+                )
+                self.page.snack_bar.open = True
+                self.page.update()
+            except RuntimeError:
+                # Page might not be ready yet
+                pass
 
     def _safe_update(self, control: ft.Control) -> None:
         """Update a control if it is attached to the page."""
@@ -298,59 +317,92 @@ class MapScreen:
                 pass
     
     def _on_location_click(self, e):
-        """Non-async wrapper for getting current position."""
-        # This will be called from on_click, which doesn't support async
-        # The actual async work will be handled by the page's async context
-        if self.geo and self.page:
-            print("[GEOLOCATION] Location button clicked")
-            # Schedule the async operation on the page's event loop
+        """Get current GPS position and show on map."""
+        if not self.geo:
+            print("[GEOLOCATION] Geolocator not available")
+            self._show_snackbar("GPS service not available on this device.", error=False)
+            return
+        
+        if not self.page:
+            print("[GEOLOCATION] Page not available")
+            return
+        
+        print("[GEOLOCATION] Location button clicked")
+        # Schedule the async operation on the page's event loop
+        try:
             self.page.run_task(self._get_current_position_async)
+        except Exception as ex:
+            print(f"[GEOLOCATION] Failed to run task: {ex}")
+            self._show_snackbar("Could not request location.", error=True)
     
     async def _get_current_position_async(self):
         """Async method to fetch and show customer (device) GPS location."""
-        if self.geo and self.page:
+        if not self.geo or not self.page:
+            return
+        
+        try:
+            print("[GEOLOCATION] Requesting current position...")
+            p = await self.geo.get_current_position()
+            print(f"[GEOLOCATION] Position received: {p}")
+            
+            # Safely check if position exists and has valid coordinates
+            if p is None:
+                print("[GEOLOCATION] No position returned (None)")
+                self._show_snackbar(
+                    "Unable to get current location. Showing shop location instead.",
+                    error=False,
+                )
+                return
+            
+            # Verify position has latitude and longitude attributes
             try:
-                print("[GEOLOCATION] Requesting current position...")
-                p = await self.geo.get_current_position()
-                print(f"[GEOLOCATION] Position received: {p}")
-                if p:
-                    print(f"[GEOLOCATION] Lat: {p.latitude}, Lon: {p.longitude}")
-                    self._set_customer_location(
-                        latitude=p.latitude,
-                        longitude=p.longitude,
-                        move_map=True,
-                        show_snackbar=True,
-                    )
-                    print("[GEOLOCATION] Success!")
-                else:
-                    print("[GEOLOCATION] No position returned")
-            except PermissionError:
-                print("[GEOLOCATION] Permission denied to access location")
-                if self.page:
-                    try:
-                        self.page.snack_bar = ft.SnackBar(
-                            ft.Text(
-                                "Location permission denied. Please enable in settings.",
-                                color=self.white,
-                            ),
-                            bgcolor="#F44336",
-                        )
-                        self.page.snack_bar.open = True
-                        self.page.update()
-                    except RuntimeError:
-                        pass
-            except Exception as ex:
-                print(f"[GEOLOCATION] Error: {str(ex)}")
-                if self.page:
-                    try:
-                        self.page.snack_bar = ft.SnackBar(
-                            ft.Text(f"Error getting location: {str(ex)}", color=self.white),
-                            bgcolor="#F44336",
-                        )
-                        self.page.snack_bar.open = True
-                        self.page.update()
-                    except RuntimeError:
-                        pass
+                latitude = p.latitude
+                longitude = p.longitude
+                print(f"[GEOLOCATION] Lat: {latitude}, Lon: {longitude}")
+                
+                if latitude is None or longitude is None:
+                    print("[GEOLOCATION] Position has None coordinates")
+                    return
+                
+                self._set_customer_location(
+                    latitude=latitude,
+                    longitude=longitude,
+                    move_map=True,
+                    show_snackbar=True,
+                )
+                print("[GEOLOCATION] Success!")
+                
+            except AttributeError as ae:
+                print(f"[GEOLOCATION] Position object missing attributes: {ae}")
+                self._show_snackbar("Could not access location data.", error=True)
+                
+        except PermissionError:
+            print("[GEOLOCATION] Permission denied to access location")
+            self._show_snackbar(
+                "Location permission denied. Please enable in device settings.",
+                error=False,
+            )
+        except Exception as ex:
+            print(f"[GEOLOCATION] Error: {type(ex).__name__}: {str(ex)}")
+            # Don't show error for minor issues, just log them
+            # This prevents flooding the user with notifications
+    
+    def _show_snackbar(self, message: str, error: bool = False):
+        """Helper method to show snackbar notification."""
+        if not self.page:
+            return
+        
+        try:
+            self.page.snack_bar = ft.SnackBar(
+                ft.Text(message, color=self.white, size=12),
+                bgcolor="#F44336" if error else self.primary_brown,
+                duration=3000,
+            )
+            self.page.snack_bar.open = True
+            self.page.update()
+        except RuntimeError:
+            # SnackBar might not be added to page yet
+            print(f"[SNACKBAR] Could not show: {message}")
     
     def _handle_tile_error(self, e):
         """Handle tile loading errors with user notification"""
@@ -380,15 +432,21 @@ class MapScreen:
             if self.page:
                 self.page.launch_url("https://www.openstreetmap.org/copyright")
         
-        # Set up location tracking
-        if self.page:
-            self.geo = ftg.Geolocator(
-                configuration=ftg.GeolocatorConfiguration(
-                    accuracy=ftg.GeolocatorPositionAccuracy.LOW
-                ),
-                on_position_change=self._handle_position_change,
-                on_error=self._handle_error,
-            )
+         # Set up location tracking (with graceful fallback)
+        try:
+            if self.page:
+                self.geo = ftg.Geolocator(
+                    configuration=ftg.GeolocatorConfiguration(
+                        accuracy=ftg.GeolocatorPositionAccuracy.LOW
+                    ),
+                    on_position_change=self._handle_position_change,
+                    on_error=self._handle_error,
+                )
+                print("[GEOLOCATION] Geolocator initialized")
+        except Exception as ex:
+            print(f"[GEOLOCATION] Failed to initialize Geolocator: {ex}")
+            print("[GEOLOCATION] App will work without GPS tracking")
+            self.geo = None
 
         shop_marker = ftm.Marker(
             coordinates=ftm.MapLatitudeLongitude(SHOP_LATITUDE, SHOP_LONGITUDE),

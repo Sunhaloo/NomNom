@@ -1,13 +1,31 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.templatetags.static import static
 from .forms import EditProfileForm
 
 # Create your views here.
 @login_required
 def profile_view(request):
-    # profile page just needs request.user in template
-    return render(request, "profile_page/profile.html")
+    user = request.user
+
+    has_profile_pic = False
+    profile_pic_url = static("images/default_profile.png")
+
+    if user.profile_pic and getattr(user.profile_pic, "name", ""):
+        try:
+            if user.profile_pic.storage.exists(user.profile_pic.name):
+                has_profile_pic = True
+                profile_pic_url = user.profile_pic.url
+        except Exception:
+            # Treat any storage error as "missing" and fall back to default.
+            pass
+
+    return render(
+        request,
+        "profile_page/profile.html",
+        {"profile_pic_url": profile_pic_url, "has_profile_pic": has_profile_pic},
+    )
 
 @login_required
 def edit_profile(request):

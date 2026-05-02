@@ -12,7 +12,7 @@ class ContactForm(forms.ModelForm):
                     "class": "form-input",
                     "id": "first-name",
                     "name": "first-name",
-                    "placeholder": "Aisha",
+                    "placeholder": "First name",
                 }
             ),
             "last_name": forms.TextInput(
@@ -20,7 +20,7 @@ class ContactForm(forms.ModelForm):
                     "class": "form-input",
                     "id": "last-name",
                     "name": "last-name",
-                    "placeholder": "Ramjahn",
+                    "placeholder": "Last name",
                 }
             ),
             "email": forms.EmailInput(
@@ -28,7 +28,7 @@ class ContactForm(forms.ModelForm):
                     "class": "form-input",
                     "id": "email",
                     "name": "email",
-                    "placeholder": "aisha@gmail.com",
+                    "placeholder": "you@example.com",
                 }
             ),
             "message": forms.Textarea(
@@ -37,7 +37,7 @@ class ContactForm(forms.ModelForm):
                     "id": "message",
                     "name": "message",
                     "rows": 4,
-                    "placeholder": "Enter your question or message",
+                    "placeholder": "How can we help?",
                 }
             ),
         }

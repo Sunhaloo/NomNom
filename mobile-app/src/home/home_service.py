@@ -102,23 +102,3 @@ class HomeService:
             raise NetworkError("Failed to fetch profile.")
         except Exception as e:
             raise NetworkError(f"Failed to fetch profile: {str(e)}")
-    
-    def get_pastries_banner(self) -> list:
-        """
-        Get pastries for banner carousel (mix of best sellers and random).
-        
-        Returns:
-            List of pastry dictionaries
-            
-        Raises:
-            NetworkError: If request fails
-        """
-        try:
-            response = self.api_client.get(ENDPOINTS["pastries_banner"])
-            
-            if response.get("success"):
-                return response.get("data", [])
-            
-            raise NetworkError("Failed to fetch pastries.")
-        except Exception as e:
-            raise NetworkError(f"Failed to fetch pastries: {str(e)}")
