@@ -8,7 +8,6 @@ An e-commerce web application built with Django for a pastry shop. The applicati
 > - Official Django documentation: <https://docs.djangoproject.com/>
 > - Django tutorial series and community examples for e-commerce patterns
 > - HTML/CSS/JavaScript best practices for responsive UI design
-> - All development notes and learning process are documented in `learning.md`
 
 # Features
 
@@ -19,10 +18,12 @@ An e-commerce web application built with Django for a pastry shop. The applicati
 - Order management system with history tracking
 - Responsive web design for desktop and mobile devices
 - Admin panel for managing products and orders
+- REST API (Django REST Framework) for mobile/external clients
+- Mobile app client (Flet) under `mobile-app/`
 
 # Usage
 
-## Setting Up the Development Environment
+## Setting Up the Development Environment ( Web and App )
 
 1. Clone the repository:
 
@@ -60,23 +61,23 @@ pip install -r requirements.txt
 5. Create and apply database migrations:
 
 ```bash
-python manage.py makemigrations
-python manage.py migrate
+python NomNom/manage.py makemigrations
+python NomNom/manage.py migrate
 ```
 
 6. Populate the database with initial products:
 
 ```bash
-python sync_products.py
+python NomNom/sync_products.py
 ```
 
 7. Create a superuser account:
 
 ```bash
-python manage.py createsuperuser
+python NomNom/manage.py createsuperuser
 ```
 
-8. Configure environment variables by creating a `.env` file in the project root with:
+8. Configure environment variables by creating a `.env` file in the project root ( next to `README.md` file ) with:
 
 ```
 EMAIL_HOST_USER=your_gmail_address
@@ -84,18 +85,19 @@ EMAIL_HOST_PASSWORD=your_gmail_app_password
 DEFAULT_FROM_EMAIL=your_gmail_address
 ```
 
+> [!WARNING]
 > Create your 'App Password' using the following link: <https://myaccount.google.com/apppasswords>
 
-9. Load data regarding pastries
+9. Load data regarding pastries using Python script
 
 ```bash
-python manage.py loaddata pastry/fixtures/pastries.json
+python NomNom/sync_products.py
 ```
 
 10. Start the development server:
 
 ```bash
-python manage.py runserver
+python NomNom/manage.py runserver
 ```
 
 The application will be accessible at `http://127.0.0.1:8000/`
@@ -107,6 +109,9 @@ Access the Django admin panel at `http://127.0.0.1:8000/admin/` using the superu
 ## User Registration and Login
 
 New customers can register by clicking on the "Register" link in the navigation bar. Existing users can log in using their credentials.
+
+> [!TIP]
+> As of now, you can also simply run the Django development server and simply login like a regular user but using administrator credentials.
 
 ## Browsing Products
 
@@ -121,6 +126,7 @@ The cake customization feature allows customers to create personalized cakes by 
 - Frosting type
 - Decorations
 - Size and number of layers
+- And more!
 
 ## Shopping Cart
 
@@ -149,46 +155,149 @@ After adding items to the cart, customers can proceed to checkout, enter their s
 - User Profile:
   ![User Profile](./screenshots/profile.png)
 
+# Mobile Application with Flet
+
+The mobile app lives under `mobile-app/` and uses the Django REST API under `/api/v1/`.
+
+## Running the Mobile App
+
+1. Make sure the Django server is running (keep this terminal open):
+
+```bash
+python NomNom/manage.py runserver
+```
+
+2. (Optional) Set the API base URL used by the mobile app
+
+The mobile app defaults to:
+
+- `http://localhost:8000/api/v1`
+
+You can override it with `NOMNOM_API_URL`:
+
+- On Linux/Mac:
+
+```bash
+export NOMNOM_API_URL="http://127.0.0.1:8000/api/v1"
+```
+
+- On Windows (PowerShell):
+
+```powershell
+setx NOMNOM_API_URL "http://127.0.0.1:8000/api/v1"
+```
+
+3. Run the Flet app (in a second terminal, same venv activated):
+
+```bash
+cd mobile-app
+flet run
+```
+
+Other run modes:
+
+- Desktop app:
+
+```bash
+flet run
+```
+
+- Web app:
+
+```bash
+flet run --web
+```
+
+- Android testing:
+
+```bash
+flet run --android
+```
+
+- iOS testing:
+
+```bash
+flet run --ios
+```
+
+> [!NOTE]
+> If `flet` is not found, run:
+>
+> `python -m flet run`
+>
+> (and similarly: `python -m flet run --android`, `python -m flet run --web`, etc.)
+
 # Project Structure
 
 ```
 NomNom/
-├── about_us/           # About us page application
-├── cart/               # Shopping cart functionality
-├── contact/            # Contact page application
-├── landing/            # Main landing page application
-├── login/              # User authentication and login application
-├── media/              # Uploaded media files (images)
-├── NomNom/             # Main Django project settings
-├── orders/             # Order management application
-├── pastry/             # Pastry catalog and customization
-│   ├── fixtures/       # Data fixtures (JSON files)
-│   ├── migrations/     # Database migration files
-│   ├── static/         # Static files for pastry app
-│   ├── templates/      # Templates for pastry app
-│   ├── models.py       # Pastry data models
-│   └── views.py        # Pastry application views
-├── payments/           # Payment processing application
-├── profile_page/       # User profile management
-├── static/             # Static files (CSS, JS, images)
-├── templates/          # Global HTML templates
-├── .env                # Environment variables
-├── .gitignore          # Git ignore configuration
-├── db.sqlite3          # SQLite database
-├── manage.py           # Django management script
-├── requirements.txt    # Python dependencies
-├── sync_products.py    # Script to populate initial products
+├── README.md
+├── requirements.txt
+├── .env                # Environment variables (user-created)
+├── screenshots/
+├── mobile-app/         # Flet mobile client
+│   ├── pyproject.toml
+│   ├── src/
+│   │   ├── main.py
+│   │   ├── config.py
+│   │   ├── assets/
+│   │   ├── auth/
+│   │   │   ├── auth_service.py
+│   │   │   └── screens/
+│   │   │       ├── login_screen.py
+│   │   │       └── register_screen.py
+│   │   ├── home/
+│   │   │   ├── home_service.py
+│   │   │   └── home_screen.py
+│   │   ├── orders/
+│   │   │   ├── orders_service.py
+│   │   │   ├── orders_screen.py
+│   │   │   └── screens/
+│   │   │       └── order_detail_screen.py
+│   │   ├── deliveries/
+│   │   │   ├── deliveries_service.py
+│   │   │   ├── deliveries_screen.py
+│   │   │   ├── delivery_confirmation_screen.py
+│   │   │   └── screens/
+│   │   │       └── map_screen.py
+│   │   └── common/
+│   │       ├── api_client.py
+│   │       ├── navigation.py
+│   │       ├── storage.py
+│   │       ├── error_handler.py
+│   │       ├── formatters.py
+│   │       └── logger.py
+│   └── test_map.py
+└── NomNom/             # Django project folder (apps, settings, scripts)
+    ├── manage.py
+    ├── sync_products.py
+    ├── db.sqlite3      # SQLite database (created after migrate)
+    ├── NomNom/         # Main Django project settings package
+    ├── about_us/       # About us page application
+    ├── cart/           # Shopping cart functionality
+    ├── common/         # Shared utilities (business stats, etc.)
+    ├── contact/        # Contact page application
+    ├── delivery/       # Delivery tracking application
+    ├── landing/        # Main landing page application
+    ├── login/          # User authentication and login application
+    ├── orders/         # Order management application
+    ├── pastry/         # Pastry catalog and customization
+    ├── payments/       # Payment processing application
+    ├── profile_page/   # User profile management
+    └── review/         # Reviews application
 ```
 
 # Technologies Used
 
 - Python
 - Django
+- Django REST Framework (API)
 - HTML5
 - CSS3
 - JavaScript
 - SQLite (default)
 - Bootstrap (for responsive design)
+- Flet (mobile app)
 
 # Configuration
 
