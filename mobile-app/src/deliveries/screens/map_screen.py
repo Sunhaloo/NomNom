@@ -5,6 +5,7 @@ Delivery map screen with live location tracking
 import flet as ft
 import flet_map as ftm
 import flet_geolocator as ftg
+from config import SHOP_LATITUDE, SHOP_LONGITUDE
 
 
 class MapScreen:
@@ -178,6 +179,17 @@ class MapScreen:
                     url_template="https://tile.memomaps.de/tilegen/{z}/{x}/{y}.png",
                     fallback_url="https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                     on_image_error=self._handle_tile_error,
+                ),
+                # Shop location marker
+                ftm.MarkerLayer(
+                    markers=[
+                        ftm.Marker(
+                            coordinate=ftm.MapLatitudeLongitude(SHOP_LATITUDE, SHOP_LONGITUDE),
+                            content=ft.Container(
+                                content=ft.Icon(ft.Icons.STORE, color="#6f4e37", size=30),
+                            ),
+                        ),
+                    ]
                 ),
                 ftm.SimpleAttribution(
                     text="OpenStreetMap contributors",

@@ -99,7 +99,7 @@ class DeliveriesScreen:
             bgcolor=card_bg_color,
             border_radius=10,
             padding=12,
-            border=ft.border.all(2, card_color),
+            border=ft.Border.all(2, card_color),
             content=ft.Column(
                 spacing=6,
                 controls=[
@@ -115,7 +115,7 @@ class DeliveriesScreen:
                             ft.Container(
                                 bgcolor=card_color,
                                 border_radius=5,
-                                padding=ft.padding.symmetric(horizontal=8, vertical=3),
+                                padding=ft.Padding.symmetric(horizontal=8, vertical=3),
                                 content=ft.Text(
                                     status_type.title(),
                                     size=10,
@@ -176,7 +176,12 @@ class DeliveriesScreen:
     def _load_deliveries(self):
         """Fetch all deliveries from service"""
         self.loading.visible = True
-        self._safe_update(self.loading)
+        try:
+            if self.loading.page:
+                self.loading.update()
+        except Exception:
+            pass
+        
         try:
             # Fetch pending deliveries
             pending_result = self.deliveries_service.get_deliveries(
@@ -204,7 +209,11 @@ class DeliveriesScreen:
             self.show_notification(get_user_friendly_message(e), error=True)
         finally:
             self.loading.visible = False
-            self._safe_update(self.loading)
+            try:
+                if self.loading.page:
+                    self.loading.update()
+            except Exception:
+                pass
     
     def _update_all_lists(self):
         """Refresh all delivery list displays"""
@@ -311,7 +320,7 @@ class DeliveriesScreen:
             return ft.Container(
                 height=250,
                 bgcolor=self.white,
-                padding=ft.padding.symmetric(horizontal=15),
+                padding=ft.Padding.symmetric(horizontal=15),
                 content=ft.Column(
                     controls=[
                         ft.Text(
@@ -337,7 +346,7 @@ class DeliveriesScreen:
                     # Fixed Header - NOT scrollable
                     ft.Container(
                         height=60,
-                        padding=ft.padding.symmetric(horizontal=20, vertical=15),
+                        padding=ft.Padding.symmetric(horizontal=20, vertical=15),
                         content=ft.Text(
                             "Deliveries",
                             size=24,
@@ -359,7 +368,7 @@ class DeliveriesScreen:
                                 # Map section
                                 ft.Container(
                                     height=250,
-                                    padding=ft.padding.symmetric(horizontal=15),
+                                    padding=ft.Padding.symmetric(horizontal=15),
                                     content=map_screen.build(page=page),
                                 ),
                                 

@@ -107,7 +107,12 @@ class HomeScreen:
     def _load_data(self):
         """Load home screen data from service."""
         self.loading.visible = True
-        self._safe_update(self.loading)
+        try:
+            if self.loading.page:
+                self.loading.update()
+        except Exception:
+            pass
+        
         try:
             self.stats = self.home_service.get_business_stats()
             self.reviews = self.home_service.get_top_reviews()
@@ -124,14 +129,19 @@ class HomeScreen:
             self.show_notification(get_user_friendly_message(e), error=True)
         finally:
             self.loading.visible = False
-            self._safe_update(self.loading)
+            try:
+                if self.loading.page:
+                    self.loading.update()
+            except Exception:
+                pass
     
     def _safe_update(self, control: ft.Control):
         """Safely update a control if it's attached to a page."""
         try:
-            control.update()
-        except Exception as e:
-            print(e)
+            if hasattr(control, 'page') and control.page:
+                control.update()
+        except Exception:
+            pass
     
     def _update_ui(self):
         """Update UI with loaded data."""
@@ -281,7 +291,7 @@ class HomeScreen:
             src=pastry.get("image", ""),
             width=180,
             height=150,
-            fit=ft.ImageFit.COVER,
+            fit=ft.BoxFit.COVER,
             error_content=ft.Icon(ft.Icons.IMAGE_NOT_SUPPORTED, size=60, color=self.text_light),
         ) if pastry.get("image") else ft.Icon(ft.Icons.CAKE, size=60, color=self.primary_brown)
         
@@ -363,7 +373,7 @@ class HomeScreen:
                 controls=[
                     ft.Row([
                         ft.Image(
-                            src="assets/logo.png",  # LOGO
+                            src="assets/NomNom-Logo.png",  # LOGO
                             width=50,
                             height=50,
                         ),
@@ -407,7 +417,7 @@ class HomeScreen:
                     # Logout button
                     ft.Container(
                         alignment=ft.Alignment.CENTER,
-                        content=ft.ElevatedButton(
+                        content=ft.Button(
                             "Logout",
                             on_click=lambda e: self.router.logout() if self.router else None,
                             style=ft.ButtonStyle(

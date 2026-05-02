@@ -156,7 +156,7 @@ class OrdersScreen:
                             ft.Container(
                                 bgcolor=status_color,
                                 border_radius=5,
-                                padding=ft.padding.symmetric(horizontal=10, vertical=5),
+                                padding=ft.Padding.symmetric(horizontal=10, vertical=5),
                                 content=ft.Text(
                                     status_display,
                                     size=11,
@@ -183,9 +183,9 @@ class OrdersScreen:
         """Load orders from service."""
         self.loading.visible = True
         try:
-            self.loading.update()
-        except RuntimeError:
-            # Control not yet added to page
+            if self.loading.page:
+                self.loading.update()
+        except Exception:
             pass
         
         try:
@@ -199,9 +199,9 @@ class OrdersScreen:
         finally:
             self.loading.visible = False
             try:
-                self.loading.update()
-            except RuntimeError:
-                # Control not yet added to page
+                if self.loading.page:
+                    self.loading.update()
+            except Exception:
                 pass
     
     def _update_orders_list(self):
@@ -568,7 +568,7 @@ class OrdersScreen:
         
         return ft.Container(
             expand=True,
-            bgcolor=self.white,
+            bgcolor="#E8DBC7",
             content=ft.Column(
                 expand=True,
                 controls=[
