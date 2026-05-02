@@ -31,14 +31,14 @@ An e-commerce web application built with Django for a pastry shop. The applicati
 git clone <repository-url>
 ```
 
-2. Navigate to the project directory and create a virtual environment:
+1. Navigate to the project directory and create a virtual environment:
 
 ```bash
 cd NomNom
 python -m venv venv
 ```
 
-3. Activate the virtual environment:
+1. Activate the virtual environment:
 
 - On Linux/Mac:
 
@@ -52,32 +52,32 @@ source venv/bin/activate
 venv\Scripts\activate
 ```
 
-4. Install the required dependencies:
+1. Install the required dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-5. Create and apply database migrations:
+1. Create and apply database migrations:
 
 ```bash
 python NomNom/manage.py makemigrations
 python NomNom/manage.py migrate
 ```
 
-6. Populate the database with initial products:
+1. Populate the database with initial products:
 
 ```bash
 python NomNom/sync_products.py
 ```
 
-7. Create a superuser account:
+1. Create a superuser account:
 
 ```bash
 python NomNom/manage.py createsuperuser
 ```
 
-8. Configure environment variables by creating a `.env` file in the project root ( next to `README.md` file ) with:
+1. Configure environment variables by creating a `.env` file in the project root ( next to `README.md` file ) with:
 
 ```
 EMAIL_HOST_USER=your_gmail_address
@@ -88,13 +88,13 @@ DEFAULT_FROM_EMAIL=your_gmail_address
 > [!WARNING]
 > Create your 'App Password' using the following link: <https://myaccount.google.com/apppasswords>
 
-9. Load data regarding pastries using Python script
+1. Load data regarding pastries using Python script
 
 ```bash
 python NomNom/sync_products.py
 ```
 
-10. Start the development server:
+1. Start the development server:
 
 ```bash
 python NomNom/manage.py runserver
@@ -136,25 +136,6 @@ Customers can add items to their shopping cart, update quantities, and remove it
 
 After adding items to the cart, customers can proceed to checkout, enter their shipping information, and complete their order.
 
-## Screenshots
-
-### Frontend
-
-- Landing Page:
-  ![Landing Page](./screenshots/landing_page.png)
-
-- Pastry Categories:
-  ![Pastry Categories](./screenshots/categories.png)
-
-- Custom Cake Builder:
-  ![Custom Cake Builder](./screenshots/cake_builder.png)
-
-- Shopping Cart:
-  ![Shopping Cart](./screenshots/cart.png)
-
-- User Profile:
-  ![User Profile](./screenshots/profile.png)
-
 # Mobile Application with Flet
 
 The mobile app lives under `mobile-app/` and uses the Django REST API under `/api/v1/`.
@@ -167,7 +148,7 @@ The mobile app lives under `mobile-app/` and uses the Django REST API under `/ap
 python NomNom/manage.py runserver
 ```
 
-2. (Optional) Set the API base URL used by the mobile app
+1. (Optional) Set the API base URL used by the mobile app
 
 The mobile app defaults to:
 
@@ -187,7 +168,7 @@ export NOMNOM_API_URL="http://127.0.0.1:8000/api/v1"
 setx NOMNOM_API_URL "http://127.0.0.1:8000/api/v1"
 ```
 
-3. Run the Flet app (in a second terminal, same venv activated):
+1. Run the Flet app (in a second terminal, same venv activated):
 
 ```bash
 cd mobile-app
@@ -286,6 +267,42 @@ NomNom/
     ├── profile_page/   # User profile management
     └── review/         # Reviews application
 ```
+
+## Screenshots
+
+## Web Application
+
+- Landing Page:
+  ![Landing Page](./screenshots/landing_page.png)
+
+- Pastry Categories:
+  ![Pastry Categories](./screenshots/categories.png)
+
+- Custom Cake Builder:
+  ![Custom Cake Builder](./screenshots/cake_builder.png)
+
+- User Profile:
+  ![User Profile](./screenshots/profile_page.png)
+
+- Shopping Cart and Payment:
+  ![Shopping Cart](./screenshots/cart_and_order_summary.png)
+  ![Cart - User Information](./screenshots/user_information.png)
+  ![Cart - Payment](./screenshots/payment.png)
+  ![Cart - Order Confirmed](./screenshots/order_confirmed.png)
+
+## Mobile Application
+
+- Start Page:
+  ![Start Page - Login/Signup Page](./screenshots/mobile_login_signup.jpeg)
+
+- Homepage:
+  ![Homepage - User Profile](./screenshots/mobile_user_profile.png)
+
+- Order Search:
+  ![Order Search - ID](./screenshots/mobile_order_search.png)
+
+- Geolocation:
+  ![Geolocation - Flet Map](./screenshots/mobile_flet_map.png)
 
 # Technologies Used
 
