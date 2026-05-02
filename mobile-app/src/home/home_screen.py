@@ -293,12 +293,7 @@ class HomeScreen:
         """Create a pastry card for the banner carousel."""
         image_src = pastry.get("image", "")
         
-        # Convert relative image paths to full URLs for API
-        if image_src and not image_src.startswith("http"):
-            # Image is a relative path from API, prepend the API base URL
-            from config import API_BASE_URL
-            image_src = f"{API_BASE_URL.rsplit('/api', 1)[0]}{image_src}"
-        
+        # API already returns absolute URLs, use them directly
         image_widget = ft.Image(
             src=image_src,
             width=180,
@@ -385,7 +380,7 @@ class HomeScreen:
                 controls=[
                     ft.Row([
                         ft.Image(
-                            src=self.logo_path,  # LOGO - absolute path
+                            src="NomNom-Logo.png",  # Will be served from assets_dir
                             width=50,
                             height=50,
                         ),

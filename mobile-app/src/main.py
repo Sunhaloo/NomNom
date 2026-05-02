@@ -130,4 +130,6 @@ def main(page: ft.Page):
 
 
 if __name__ == "__main__":
-    ft.run(main)
+    assets_dir = str(Path(__file__).parent / "assets")
+    ft.run(main, assets_dir=assets_dir)
+
