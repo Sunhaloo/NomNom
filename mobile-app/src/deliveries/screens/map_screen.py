@@ -184,7 +184,7 @@ class MapScreen:
                 ftm.MarkerLayer(
                     markers=[
                         ftm.Marker(
-                            coordinate=ftm.MapLatitudeLongitude(SHOP_LATITUDE, SHOP_LONGITUDE),
+                            coordinates=ftm.MapLatitudeLongitude(SHOP_LATITUDE, SHOP_LONGITUDE),
                             content=ft.Container(
                                 content=ft.Icon(ft.Icons.STORE, color="#6f4e37", size=30),
                             ),

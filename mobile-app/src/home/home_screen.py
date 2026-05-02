@@ -6,6 +6,7 @@ Displays business stats, top reviews, and user greeting.
 import flet as ft
 import threading
 import time
+from pathlib import Path
 from home.home_service import HomeService
 from common.error_handler import get_user_friendly_message, NetworkError
 
@@ -24,6 +25,9 @@ class HomeScreen:
         self.home_service = home_service
         self.router = router
         self.show_notification = show_notification
+        
+        # Logo path - absolute path for web compatibility
+        self.logo_path = str(Path(__file__).parent.parent / "assets" / "NomNom-Logo.png")
         
         # Color scheme
         self.primary_brown = "#8B5E3C"
@@ -287,13 +291,21 @@ class HomeScreen:
     
     def _create_banner_card(self, pastry: dict):
         """Create a pastry card for the banner carousel."""
+        image_src = pastry.get("image", "")
+        
+        # Convert relative image paths to full URLs for API
+        if image_src and not image_src.startswith("http"):
+            # Image is a relative path from API, prepend the API base URL
+            from config import API_BASE_URL
+            image_src = f"{API_BASE_URL.rsplit('/api', 1)[0]}{image_src}"
+        
         image_widget = ft.Image(
-            src=pastry.get("image", ""),
+            src=image_src,
             width=180,
             height=150,
             fit=ft.BoxFit.COVER,
             error_content=ft.Icon(ft.Icons.IMAGE_NOT_SUPPORTED, size=60, color=self.text_light),
-        ) if pastry.get("image") else ft.Icon(ft.Icons.CAKE, size=60, color=self.primary_brown)
+        ) if image_src else ft.Icon(ft.Icons.CAKE, size=60, color=self.primary_brown)
         
         return ft.Container(
             bgcolor=self.white,
@@ -373,7 +385,7 @@ class HomeScreen:
                 controls=[
                     ft.Row([
                         ft.Image(
-                            src="assets/NomNom-Logo.png",  # LOGO
+                            src=self.logo_path,  # LOGO - absolute path
                             width=50,
                             height=50,
                         ),

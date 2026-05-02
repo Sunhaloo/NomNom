@@ -121,6 +121,14 @@ class Router:
         """Navigate to a screen."""
         self.current_screen = screen
     
+    def _safe_navigate(self, screen: str):
+        """Safely navigate to a screen with error handling."""
+        try:
+            self._navigate_to(screen)
+        except Exception as e:
+            print(f"Navigation error: {e}")
+            self.show_notification(f"Navigation error: {str(e)}", error=True)
+    
     def navigate(self, screen: str):
         """Alias for _navigate_to for external calls."""
         self._navigate_to(screen)
@@ -162,19 +170,19 @@ class Router:
                         icon=ft.Icons.HOME,
                         icon_color=self.primary_brown if self.current_screen == "home" else "#8B7355",
                         opacity=1.0 if self.current_screen == "home" else 0.85,
-                        on_click=lambda e: self._navigate_to("home"),
+                        on_click=lambda e: self._safe_navigate("home"),
                     ),
                     ft.IconButton(
                         icon=ft.Icons.SHOPPING_CART,
                         icon_color=self.primary_brown if self.current_screen == "orders" else "#8B7355",
                         opacity=1.0 if self.current_screen == "orders" else 0.85,
-                        on_click=lambda e: self._navigate_to("orders"),
+                        on_click=lambda e: self._safe_navigate("orders"),
                     ),
                     ft.IconButton(
                         icon=ft.Icons.LOCAL_SHIPPING,
                         icon_color=self.primary_brown if self.current_screen == "deliveries" else "#8B7355",
                         opacity=1.0 if self.current_screen == "deliveries" else 0.85,
-                        on_click=lambda e: self._navigate_to("deliveries"),
+                        on_click=lambda e: self._safe_navigate("deliveries"),
                     ),
                 ],
             ),
