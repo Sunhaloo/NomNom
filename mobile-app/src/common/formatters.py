@@ -130,12 +130,13 @@ def get_status_color(status: str, type_: str = "order") -> str:
     status = format_order_status(status) if type_ == "order" else format_delivery_status(status)
     
     status_colors = {
-        "Pending": "#FF9800",      # Orange
-        "Paid": "#2196F3",          # Blue
-        "Processing": "#2196F3",    # Blue
-        "Delivered": "#4CAF50",     # Green
-        "Cancelled": "#F44336",     # Red
-        "Failed": "#F44336",        # Red
+        # Brown-tone palette to match the NomNom theme
+        "Pending": "#C8B6A6",      # Light brown
+        "Paid": "#8D6E63",         # Primary brown
+        "Processing": "#A1887F",   # Muted brown
+        "Delivered": "#6F4E37",    # Dark brown
+        "Cancelled": "#BCAAA4",    # Soft gray-brown
+        "Failed": "#4E342E",       # Very dark brown
     }
     
     return status_colors.get(status, "#757575")  # Default gray

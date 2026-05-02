@@ -2,14 +2,19 @@
 Delivery map screen with live location tracking
 """
 
+import asyncio
+import math
+
 import flet as ft
 import flet_map as ftm
 import flet_geolocator as ftg
-from config import SHOP_LATITUDE, SHOP_LONGITUDE
+import requests
+
+from config import OSRM_BASE_URL, OSRM_PROFILE, SHOP_LATITUDE, SHOP_LONGITUDE
 
 
 class MapScreen:
-    """Shows an interactive map with your current location"""
+    """Shows an interactive map with shop + customer location and a simple path."""
     
     def __init__(self, on_back=None):
         """Set up the map"""
@@ -28,23 +33,34 @@ class MapScreen:
         self.initial_longitude = 57.5
         self.initial_zoom = 12
         
-        self.current_latitude = self.initial_latitude
-        self.current_longitude = self.initial_longitude
+        # Customer (device) location - unknown until retrieved
+        self.customer_latitude = None
+        self.customer_longitude = None
         
         self.geo = None
         self.page = None
         self.map_instance = None
+        self.customer_marker = None
+        self.marker_layer = None
+        self.route_polyline = None
+        self.route_layer = None
+        self._route_cache = {}
+        self._route_fetch_in_flight = False
+
+    def request_customer_location(self) -> None:
+        """Fetch the customer's (device) GPS location and update the map."""
+        if self.geo and self.page:
+            self.page.run_task(self._get_current_position_async)
     
     def _handle_position_change(self, e: ftg.GeolocatorPositionChangeEvent):
-        """When location updates, move map to follow"""
+        """When location updates, refresh customer marker + route."""
         if e.position:
-            self.current_latitude = e.position.latitude
-            self.current_longitude = e.position.longitude
-            if self.map_instance:
-                self.map_instance.center = ftm.MapLatitudeLongitude(
-                    self.current_latitude,
-                    self.current_longitude
-                )
+            self._set_customer_location(
+                latitude=e.position.latitude,
+                longitude=e.position.longitude,
+                move_map=False,
+                show_snackbar=False,
+            )
     
     def _handle_error(self, e):
         """Show location error to user"""
@@ -55,9 +71,234 @@ class MapScreen:
             )
             self.page.snack_bar.open = True
             self.page.update()
+
+    def _safe_update(self, control: ft.Control) -> None:
+        """Update a control if it is attached to the page."""
+        try:
+            control.update()
+        except RuntimeError:
+            pass
+
+    def _calculate_distance_km(
+        self,
+        lat1: float,
+        lon1: float,
+        lat2: float,
+        lon2: float,
+    ) -> float:
+        """Haversine distance (km) between two coordinates."""
+        earth_radius_km = 6371.0
+
+        lat1_rad = math.radians(lat1)
+        lon1_rad = math.radians(lon1)
+        lat2_rad = math.radians(lat2)
+        lon2_rad = math.radians(lon2)
+
+        dlat = lat2_rad - lat1_rad
+        dlon = lon2_rad - lon1_rad
+
+        a = (
+            math.sin(dlat / 2) ** 2
+            + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(dlon / 2) ** 2
+        )
+        c = 2 * math.asin(math.sqrt(a))
+        return earth_radius_km * c
+
+    async def _move_map_async(
+        self,
+        *,
+        destination: ftm.MapLatitudeLongitude,
+        zoom: float | None = None,
+    ) -> None:
+        """Move map camera; supports both sync and async `move_to()` implementations."""
+        if not self.map_instance:
+            return
+
+        result = self.map_instance.move_to(
+            destination=destination,
+            zoom=zoom,
+            cancel_ongoing_animations=True,
+        )
+        if asyncio.iscoroutine(result):
+            await result
+        self._safe_update(self.map_instance)
+
+    def _route_cache_key(self, dest_latitude: float, dest_longitude: float) -> str:
+        """Cache key for a route (rounded to reduce churn)."""
+        return f"{SHOP_LATITUDE:.5f},{SHOP_LONGITUDE:.5f}->{dest_latitude:.5f},{dest_longitude:.5f}"
+
+    def _fetch_osrm_route_geojson(
+        self,
+        dest_latitude: float,
+        dest_longitude: float,
+    ) -> tuple[list[ftm.MapLatitudeLongitude] | None, float | None]:
+        """
+        Fetch a road route from OSRM and return (route_points, distance_km).
+
+        Uses OSRM `geometries=geojson`, so we get an ordered list of [lon, lat].
+        """
+        url = (
+            f"{OSRM_BASE_URL.rstrip('/')}/route/v1/{OSRM_PROFILE}/"
+            f"{SHOP_LONGITUDE},{SHOP_LATITUDE};{dest_longitude},{dest_latitude}"
+        )
+        params = {
+            "overview": "full",
+            "geometries": "geojson",
+            "alternatives": "false",
+            "steps": "false",
+        }
+
+        response = requests.get(url, params=params, timeout=12)
+        response.raise_for_status()
+        payload = response.json()
+
+        routes = payload.get("routes") if isinstance(payload, dict) else None
+        if not routes:
+            return None, None
+
+        route0 = routes[0]
+        geometry = route0.get("geometry", {})
+        coords = geometry.get("coordinates") if isinstance(geometry, dict) else None
+        if not isinstance(coords, list) or len(coords) < 2:
+            return None, None
+
+        points = []
+        for item in coords:
+            if (
+                isinstance(item, list)
+                and len(item) >= 2
+                and isinstance(item[0], (int, float))
+                and isinstance(item[1], (int, float))
+            ):
+                lon, lat = item[0], item[1]
+                points.append(ftm.MapLatitudeLongitude(lat, lon))
+
+        distance_m = route0.get("distance")
+        distance_km = (float(distance_m) / 1000.0) if isinstance(distance_m, (int, float)) else None
+
+        return (points if len(points) >= 2 else None), distance_km
+
+    async def _update_route_async(self, dest_latitude: float, dest_longitude: float) -> None:
+        """Update the displayed polyline to follow roads (fallback: straight line)."""
+        if not self.page or not self.route_polyline or not self.route_layer:
+            return
+        if self._route_fetch_in_flight:
+            return
+
+        cache_key = self._route_cache_key(dest_latitude, dest_longitude)
+        cached = self._route_cache.get(cache_key)
+        if cached:
+            points, distance_km = cached
+        else:
+            self._route_fetch_in_flight = True
+            try:
+                points, distance_km = await asyncio.to_thread(
+                    self._fetch_osrm_route_geojson,
+                    dest_latitude,
+                    dest_longitude,
+                )
+                if points:
+                    self._route_cache[cache_key] = (points, distance_km)
+            except Exception as ex:
+                print(f"[ROUTING] OSRM route fetch failed: {ex}")
+                return
+            finally:
+                self._route_fetch_in_flight = False
+
+        if not points:
+            return
+
+        # Replace straight line with road-following geometry.
+        self.route_polyline.coordinates = points
+        self._safe_update(self.route_polyline)
+
+        # Recenter to the midpoint and zoom for the route distance.
+        if isinstance(distance_km, (int, float)):
+            zoom = self._zoom_for_route_distance(float(distance_km))
+            # Midpoint heuristic still works reasonably for small routes.
+            mid_index = len(points) // 2
+            mid = points[mid_index]
+            await self._move_map_async(destination=mid, zoom=zoom)
+
+    def _zoom_for_route_distance(self, distance_km: float) -> float:
+        """Heuristic zoom so both ends of the route are likely visible."""
+        # Note: larger zoom value => more zoomed in. We bias toward zooming out so
+        # both endpoints of the polyline are visible on smaller map viewports.
+        if distance_km < 0.5:
+            return 15
+        if distance_km < 2:
+            return 14
+        if distance_km < 6:
+            return 13
+        if distance_km < 15:
+            return 12
+        if distance_km < 35:
+            return 11
+        return 10
+
+    def _set_customer_location(
+        self,
+        *,
+        latitude: float,
+        longitude: float,
+        move_map: bool = True,
+        show_snackbar: bool = True,
+    ) -> None:
+        """Set customer (device) GPS location, update marker + route, optionally recenter map."""
+        self.customer_latitude = latitude
+        self.customer_longitude = longitude
+
+        if self.customer_marker:
+            self.customer_marker.visible = True
+            self.customer_marker.coordinates = ftm.MapLatitudeLongitude(latitude, longitude)
+            self._safe_update(self.customer_marker)
+        if self.marker_layer:
+            self._safe_update(self.marker_layer)
+
+        if self.route_polyline:
+            self.route_polyline.coordinates = [
+                ftm.MapLatitudeLongitude(SHOP_LATITUDE, SHOP_LONGITUDE),
+                ftm.MapLatitudeLongitude(latitude, longitude),
+            ]
+            self._safe_update(self.route_polyline)
+
+        if self.route_layer:
+            self.route_layer.visible = True
+            self._safe_update(self.route_layer)
+
+        if self.map_instance and move_map:
+            distance_km = self._calculate_distance_km(
+                SHOP_LATITUDE,
+                SHOP_LONGITUDE,
+                latitude,
+                longitude,
+            )
+            zoom = self._zoom_for_route_distance(distance_km)
+            mid_latitude = (SHOP_LATITUDE + latitude) / 2
+            mid_longitude = (SHOP_LONGITUDE + longitude) / 2
+            self.page.run_task(
+                self._move_map_async,
+                destination=ftm.MapLatitudeLongitude(mid_latitude, mid_longitude),
+                zoom=zoom,
+            )
+            self.page.run_task(self._update_route_async, latitude, longitude)
+
+        if self.page and show_snackbar:
+            try:
+                self.page.snack_bar = ft.SnackBar(
+                    ft.Text(
+                        f"Customer location: ({latitude:.4f}, {longitude:.4f})",
+                        color=self.white,
+                    ),
+                    bgcolor=self.primary_brown,
+                )
+                self.page.snack_bar.open = True
+                self.page.update()
+            except RuntimeError:
+                pass
     
     def _on_location_click(self, e):
-        """Non-async wrapper for getting current position"""
+        """Non-async wrapper for getting current position."""
         # This will be called from on_click, which doesn't support async
         # The actual async work will be handled by the page's async context
         if self.geo and self.page:
@@ -66,7 +307,7 @@ class MapScreen:
             self.page.run_task(self._get_current_position_async)
     
     async def _get_current_position_async(self):
-        """Async method to fetch and show current GPS location"""
+        """Async method to fetch and show customer (device) GPS location."""
         if self.geo and self.page:
             try:
                 print("[GEOLOCATION] Requesting current position...")
@@ -74,23 +315,12 @@ class MapScreen:
                 print(f"[GEOLOCATION] Position received: {p}")
                 if p:
                     print(f"[GEOLOCATION] Lat: {p.latitude}, Lon: {p.longitude}")
-                    self.current_latitude = p.latitude
-                    self.current_longitude = p.longitude
-                    if self.map_instance:
-                        print(f"[GEOLOCATION] Updating map center...")
-                        self.map_instance.center = ftm.MapLatitudeLongitude(
-                            self.current_latitude,
-                            self.current_longitude
-                        )
-                    try:
-                        self.page.snack_bar = ft.SnackBar(
-                            ft.Text(f"Location: ({p.latitude:.4f}, {p.longitude:.4f})", color=self.white),
-                            bgcolor=self.primary_brown,
-                        )
-                        self.page.snack_bar.open = True
-                        self.page.update()
-                    except RuntimeError:
-                        pass
+                    self._set_customer_location(
+                        latitude=p.latitude,
+                        longitude=p.longitude,
+                        move_map=True,
+                        show_snackbar=True,
+                    )
                     print("[GEOLOCATION] Success!")
                 else:
                     print("[GEOLOCATION] No position returned")
@@ -145,16 +375,10 @@ class MapScreen:
     def build(self, page: ft.Page = None) -> ft.Container:
         """Create the map view"""
         self.page = page
-        url_launcher = ft.UrlLauncher()
-        
+
         def on_attribution_click(e):
-            """Handle attribution click - non-async wrapper"""
             if self.page:
-                self.page.run_task(self._launch_url_async, "https://www.openstreetmap.org/copyright")
-        
-        async def _launch_url_async(url):
-            """Async function to launch URL"""
-            await url_launcher.launch_url(url)
+                self.page.launch_url("https://www.openstreetmap.org/copyright")
         
         # Set up location tracking
         if self.page:
@@ -165,6 +389,38 @@ class MapScreen:
                 on_position_change=self._handle_position_change,
                 on_error=self._handle_error,
             )
+
+        shop_marker = ftm.Marker(
+            coordinates=ftm.MapLatitudeLongitude(SHOP_LATITUDE, SHOP_LONGITUDE),
+            content=ft.Container(
+                content=ft.Icon(ft.Icons.STORE, color="#6f4e37", size=30),
+            ),
+        )
+
+        self.customer_marker = ftm.Marker(
+            coordinates=ftm.MapLatitudeLongitude(self.initial_latitude, self.initial_longitude),
+            content=ft.Container(
+                content=ft.Icon(ft.Icons.PERSON_PIN_CIRCLE, color="#1E88E5", size=30),
+            ),
+            visible=False,
+        )
+
+        self.marker_layer = ftm.MarkerLayer(
+            markers=[shop_marker, self.customer_marker],
+        )
+
+        self.route_polyline = ftm.PolylineMarker(
+            coordinates=[
+                ftm.MapLatitudeLongitude(SHOP_LATITUDE, SHOP_LONGITUDE),
+                ftm.MapLatitudeLongitude(self.initial_latitude, self.initial_longitude),
+            ],
+            color="#1E88E5",
+            stroke_width=4,
+        )
+        self.route_layer = ftm.PolylineLayer(
+            polylines=[self.route_polyline],
+            visible=False,
+        )
         
         # Create the map
         self.map_instance = ftm.Map(
@@ -180,17 +436,8 @@ class MapScreen:
                     fallback_url="https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                     on_image_error=self._handle_tile_error,
                 ),
-                # Shop location marker
-                ftm.MarkerLayer(
-                    markers=[
-                        ftm.Marker(
-                            coordinates=ftm.MapLatitudeLongitude(SHOP_LATITUDE, SHOP_LONGITUDE),
-                            content=ft.Container(
-                                content=ft.Icon(ft.Icons.STORE, color="#6f4e37", size=30),
-                            ),
-                        ),
-                    ]
-                ),
+                self.route_layer,
+                self.marker_layer,
                 ftm.SimpleAttribution(
                     text="OpenStreetMap contributors",
                     on_click=on_attribution_click
@@ -200,7 +447,7 @@ class MapScreen:
         
         # Button to find your location
         my_location_btn = ft.FilledButton(
-            content=ft.Text("📍 My Location", size=12),
+            content=ft.Text("📍 Customer Location", size=12),
             bgcolor=self.primary_brown,
             color=self.white,
             on_click=self._on_location_click,

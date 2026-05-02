@@ -36,12 +36,22 @@ class OrderDetailScreen:
         self.success_green = "#4CAF50"
         self.warning_orange = "#FF9800"
         self.error_red = "#F44336"
+        self.content_width = 380
         
         # Loading state
         self.loading = ft.ProgressRing(color=self.primary_brown)
         
         # Content container
         self.content_column = ft.Column(visible=False)
+
+    def _wrap(self, control: ft.Control, *, expand: bool = False) -> ft.Container:
+        """Keep content centered with a consistent max width."""
+        return ft.Container(
+            width=self.content_width,
+            alignment=ft.Alignment.TOP_CENTER,
+            expand=expand,
+            content=control,
+        )
     
     def _create_pastry_item(self, item: dict) -> ft.Container:
         """Create a pastry item row for the receipt."""
@@ -51,7 +61,7 @@ class OrderDetailScreen:
         subtotal = item.get("subtotal", "0.00")
         
         return ft.Container(
-            padding=ft.padding.symmetric(horizontal=15, vertical=10),
+            padding=ft.Padding.symmetric(horizontal=15, vertical=10),
             content=ft.Column(
                 spacing=5,
                 controls=[
@@ -98,7 +108,7 @@ class OrderDetailScreen:
             controls=[
                 # Subtotal
                 ft.Container(
-                    padding=ft.padding.symmetric(horizontal=15, vertical=8),
+                    padding=ft.Padding.symmetric(horizontal=15, vertical=8),
                     content=ft.Row(
                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                         controls=[
@@ -109,7 +119,7 @@ class OrderDetailScreen:
                 ),
                 # Tax
                 ft.Container(
-                    padding=ft.padding.symmetric(horizontal=15, vertical=8),
+                    padding=ft.Padding.symmetric(horizontal=15, vertical=8),
                     content=ft.Row(
                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                         controls=[
@@ -120,7 +130,7 @@ class OrderDetailScreen:
                 ),
                 # Delivery Fee
                 ft.Container(
-                    padding=ft.padding.symmetric(horizontal=15, vertical=8),
+                    padding=ft.Padding.symmetric(horizontal=15, vertical=8),
                     content=ft.Row(
                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                         controls=[
@@ -133,7 +143,7 @@ class OrderDetailScreen:
                 ft.Divider(height=1, color=self.lighter_brown),
                 # Total
                 ft.Container(
-                    padding=ft.padding.symmetric(horizontal=15, vertical=12),
+                    padding=ft.Padding.symmetric(horizontal=15, vertical=12),
                     content=ft.Row(
                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                         controls=[
@@ -205,7 +215,7 @@ class OrderDetailScreen:
                             ft.Container(
                                 bgcolor=status_color,
                                 border_radius=5,
-                                padding=ft.padding.symmetric(horizontal=10, vertical=5),
+                                padding=ft.Padding.symmetric(horizontal=10, vertical=5),
                                 content=ft.Text(
                                     status_display,
                                     size=11,
@@ -276,7 +286,7 @@ class OrderDetailScreen:
         # Build items list
         items_controls = [
             ft.Container(
-                padding=ft.padding.symmetric(horizontal=15, vertical=10),
+                padding=ft.Padding.symmetric(horizontal=15, vertical=10),
                 content=ft.Text(
                     "Order Items",
                     size=14,
@@ -322,7 +332,7 @@ class OrderDetailScreen:
                                 ft.Container(
                                     bgcolor=status_color,
                                     border_radius=5,
-                                    padding=ft.padding.symmetric(horizontal=12, vertical=6),
+                                    padding=ft.Padding.symmetric(horizontal=12, vertical=6),
                                     content=ft.Text(
                                         status_display,
                                         size=12,
@@ -388,35 +398,41 @@ class OrderDetailScreen:
         return ft.Container(
             expand=True,
             bgcolor=self.white,
+            alignment=ft.Alignment.TOP_CENTER,
             content=ft.Column(
                 expand=True,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 controls=[
                     # Header with back button
-                    ft.Container(
-                        padding=ft.padding.symmetric(horizontal=15, vertical=10),
-                        content=ft.Row(
-                            alignment=ft.MainAxisAlignment.START,
-                            controls=[
-                                ft.IconButton(
-                                    icon=ft.Icons.ARROW_BACK,
-                                    icon_color=self.primary_brown,
-                                    on_click=lambda e: self._on_back_click(),
-                                ),
-                                ft.Text(
-                                    "Order Details",
-                                    size=18,
-                                    weight="bold",
-                                    color=self.text_dark,
-                                    expand=True,
-                                ),
-                            ],
-                        ),
+                    self._wrap(
+                        ft.Container(
+                            padding=ft.Padding.symmetric(horizontal=10, vertical=10),
+                            content=ft.Row(
+                                alignment=ft.MainAxisAlignment.START,
+                                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                                controls=[
+                                    ft.IconButton(
+                                        icon=ft.Icons.ARROW_BACK,
+                                        icon_color=self.primary_brown,
+                                        on_click=lambda e: self._on_back_click(),
+                                    ),
+                                    ft.Text(
+                                        "Order Details",
+                                        size=18,
+                                        weight="bold",
+                                        color=self.text_dark,
+                                    ),
+                                ],
+                            ),
+                        )
                     ),
                     
                     # Loading indicator
-                    ft.Container(
-                        alignment=ft.Alignment.CENTER,
-                        content=self.loading,
+                    self._wrap(
+                        ft.Container(
+                            alignment=ft.Alignment.CENTER,
+                            content=self.loading,
+                        )
                     ),
                     
                     # Scrollable content
@@ -425,7 +441,8 @@ class OrderDetailScreen:
                         content=ft.Column(
                             expand=True,
                             scroll=ft.ScrollMode.AUTO,
-                            controls=[self.content_column],
+                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                            controls=[self._wrap(self.content_column), ft.Container(height=90)],
                         ),
                     ),
                 ],

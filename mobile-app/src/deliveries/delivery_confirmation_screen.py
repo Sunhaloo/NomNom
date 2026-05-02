@@ -172,12 +172,23 @@ class DeliveryConfirmationScreen:
                     
                     # Header
                     ft.Container(
-                        padding=ft.padding.symmetric(horizontal=20),
-                        content=ft.Text(
-                            "Confirm Delivery",
-                            size=24,
-                            weight="bold",
-                            color=self.text_dark,
+                        padding=ft.Padding.symmetric(horizontal=20),
+                        content=ft.Row(
+                            spacing=10,
+                            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                            controls=[
+                                ft.Image(
+                                    src="NomNom-Logo.png",
+                                    width=30,
+                                    height=30,
+                                ),
+                                ft.Text(
+                                    "Confirm Delivery",
+                                    size=24,
+                                    weight="bold",
+                                    color=self.text_dark,
+                                ),
+                            ],
                         ),
                     ),
                     
@@ -185,7 +196,7 @@ class DeliveryConfirmationScreen:
                     
                     # Instructions
                     ft.Container(
-                        padding=ft.padding.symmetric(horizontal=20),
+                        padding=ft.Padding.symmetric(horizontal=20),
                         content=ft.Text(
                             "Take a photo of the delivery with QR code visible for validation.",
                             size=13,
@@ -198,7 +209,7 @@ class DeliveryConfirmationScreen:
                     # Show camera or preview
                     ft.Container(
                         alignment=ft.Alignment.CENTER,
-                        padding=ft.padding.symmetric(horizontal=15),
+                        padding=ft.Padding.symmetric(horizontal=15),
                         content=ft.Column(
                             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                             controls=[
@@ -220,7 +231,7 @@ class DeliveryConfirmationScreen:
                     
                     # Bottom action buttons
                     ft.Container(
-                        padding=ft.padding.symmetric(horizontal=15),
+                        padding=ft.Padding.symmetric(horizontal=15),
                         content=ft.Column(
                             controls=[
                                 self.retake_btn,

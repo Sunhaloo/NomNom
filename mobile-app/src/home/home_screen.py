@@ -6,9 +6,9 @@ Displays business stats, top reviews, and user greeting.
 import flet as ft
 import threading
 import time
-from pathlib import Path
 from home.home_service import HomeService
 from common.error_handler import get_user_friendly_message, NetworkError
+from config import SERVER_BASE_URL
 
 
 class HomeScreen:
@@ -26,9 +26,6 @@ class HomeScreen:
         self.router = router
         self.show_notification = show_notification
         
-        # Logo path - absolute path for web compatibility
-        self.logo_path = str(Path(__file__).parent.parent / "assets" / "NomNom-Logo.png")
-        
         # Color scheme
         self.primary_brown = "#8B5E3C"
         self.light_brown = "#E6D3C5"
@@ -39,6 +36,7 @@ class HomeScreen:
         self.white = "#ffffff"
         self.black = "#000000"
         self.pale_grey = "#f5f5f5"
+        self.content_width = 380
 
         self.card_shadow = ft.BoxShadow(
             blur_radius=14,
@@ -65,9 +63,9 @@ class HomeScreen:
         # Container for displaying user profile data in a card
         self.user_profile_card = ft.Container(
             visible=False,
-            bgcolor=self.pale_grey,
-            border_radius=20,
-            padding=20,
+            bgcolor=self.white,
+            border_radius=15,
+            padding=18,
             shadow=self.card_shadow,
             content=ft.Column(spacing=6, controls=[]),
         )
@@ -80,6 +78,7 @@ class HomeScreen:
             padding=15,
             shadow=self.card_shadow,
             height=250,
+            width=self.content_width,
             content=ft.Column(
                 alignment=ft.MainAxisAlignment.CENTER,
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -146,23 +145,59 @@ class HomeScreen:
                 control.update()
         except Exception:
             pass
+
+    def _wrap(self, control: ft.Control) -> ft.Control:
+        """Keep content centered with a consistent max width."""
+        return ft.Container(
+            width=self.content_width,
+            alignment=ft.Alignment.TOP_CENTER,
+            content=control,
+        )
+
+    def _resolve_image_src(self, image_src: str) -> str:
+        """Resolve relative media paths into absolute URLs for Flet Image."""
+        if not image_src:
+            return ""
+        if image_src.startswith("http://") or image_src.startswith("https://"):
+            return image_src
+        if image_src.startswith("/"):
+            return f"{SERVER_BASE_URL}{image_src}"
+        return f"{SERVER_BASE_URL}/{image_src}"
     
     def _update_ui(self):
         """Update UI with loaded data."""
         profile = getattr(self, 'user_profile', {})
-        self.user_greeting.value = f"Welcome to NomNom, {profile.get('username', '')}!"
+        first_name = (profile.get("first_name") or "").strip()
+        last_name = (profile.get("last_name") or "").strip()
+        display_name = " ".join(part for part in [first_name, last_name] if part) or "Customer"
+
+        # Avoid repeating "NomNom" since the header already shows the brand.
+        self.user_greeting.value = f"Welcome,\n{display_name}!"
         self.user_greeting.visible = True
         # Populate user profile card with data
         
         self.user_profile_card.content = ft.Column(
-            spacing=6,
+            spacing=8,
             controls=[
-                ft.Text("Your data", weight="bold", size=16, color=self.black),
-                ft.Text(f"Username: {profile.get('username', '')}", color=self.black), 
-                ft.Text(f"First Name: {profile.get('first_name', '')}", color=self.black), 
-                ft.Text(f"Last Name: {profile.get('last_name', '')}", color=self.black), 
-                ft.Text(f"Address: {profile.get('street', '')}", color=self.black), 
-                ft.Text(f"Region: {profile.get('region', '')}", color=self.black), 
+                ft.Row(
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                    controls=[
+                        ft.Row(
+                            spacing=8,
+                            controls=[
+                                ft.Icon(ft.Icons.PERSON, color=self.primary_brown, size=18),
+                                ft.Text("Customer Info", weight="bold", size=16, color=self.text_dark),
+                            ],
+                        ),
+                        ft.Icon(ft.Icons.BADGE, color=self.primary_brown, size=18),
+                    ],
+                ),
+                ft.Divider(height=1, color=self.light_brown),
+                ft.Text("Name:", color=self.text_light, weight="bold"),
+                ft.Text(first_name or "—", color=self.text_light),
+                ft.Text(last_name or "—", color=self.text_light),
+                ft.Text(f"Address: {profile.get('street', '')}", color=self.text_light),
+                ft.Text(f"Region: {profile.get('region', '')}", color=self.text_light),
             ],
         )
         self.user_profile_card.visible = True
@@ -291,9 +326,8 @@ class HomeScreen:
     
     def _create_banner_card(self, pastry: dict):
         """Create a pastry card for the banner carousel."""
-        image_src = pastry.get("image", "")
+        image_src = self._resolve_image_src(pastry.get("image", "") or "")
         
-        # API already returns absolute URLs, use them directly
         image_widget = ft.Image(
             src=image_src,
             width=180,
@@ -375,66 +409,68 @@ class HomeScreen:
         return ft.Container(
             expand=True,
             bgcolor=self.cream_bg,
+            alignment=ft.Alignment.TOP_CENTER,
             content=ft.Column(
                 scroll=ft.ScrollMode.AUTO,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 controls=[
-                    ft.Row([
-                        ft.Image(
-                            src="NomNom-Logo.png",  # Will be served from assets_dir
-                            width=50,
-                            height=50,
-                        ),
-                        ft.Text("NomNom", size=22, weight="bold", color=self.black),
-                    ]),
+                    self._wrap(
+                        ft.Row(
+                            alignment=ft.MainAxisAlignment.CENTER,
+                            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                            controls=[
+                                ft.Image(
+                                    src="NomNom-Logo-mark.png",
+                                    width=70,
+                                    height=70,
+                                    fit=ft.BoxFit.CONTAIN,
+                                ),
+                                ft.Container(width=10),
+                                ft.Text("NomNom", size=22, weight="bold", color=self.black),
+                            ],
+                        )
+                    ),
 
                     ft.Container(height=10),
 
-                    # Loading indicator
-                    ft.Container(
-                        alignment=ft.Alignment.CENTER,
-                        content=self.loading,
+                    self._wrap(
+                        ft.Container(
+                            alignment=ft.Alignment.CENTER,
+                            content=self.loading,
+                        )
                     ),
 
-                    # Greeting
-                    self.user_greeting,
-                    ft.Container(height=15),
+                    self._wrap(self.user_greeting),
+                    ft.Container(height=12),
 
-                    # Profile
-                    self.user_profile_card,
-                    ft.Container(height=20),
+                    self._wrap(self.user_profile_card),
+                    ft.Container(height=18),
                     
-                    # Pastry Banner
-                    ft.Text("Featured Pastries", size=18, weight="bold", color=self.black),
+                    self._wrap(ft.Text("Featured Pastries", size=18, weight="bold", color=self.black)),
                     ft.Container(height=10),
                     self.banner_container,
                     ft.Container(height=20),
 
-                    # Overview
-                    ft.Text("Overview", size=18, weight="bold", color=self.black),
+                    self._wrap(ft.Text("Overview", size=18, weight="bold", color=self.black)),
                     ft.Container(height=10),
-                    self.stats_column,
-                    ft.Container(height=25),
+                    self._wrap(self.stats_column),
+                    ft.Container(height=22),
 
-                    # Top Reviews
-                    ft.Text("Top Reviews", size=18, weight="bold", color=self.black),
+                    self._wrap(ft.Text("Top Reviews", size=18, weight="bold", color=self.black)),
                     ft.Container(height=10),
-                    self.reviews_column,
-                    ft.Container(height=25),
+                    self._wrap(self.reviews_column),
+                    ft.Container(height=22),
 
-                    # Logout button
-                    ft.Container(
-                        alignment=ft.Alignment.CENTER,
-                        content=ft.Button(
-                            "Logout",
+                    self._wrap(
+                        ft.FilledButton(
+                            content=ft.Text("Logout"),
+                            bgcolor=self.primary_brown,
+                            color=self.white,
+                            height=48,
                             on_click=lambda e: self.router.logout() if self.router else None,
-                            style=ft.ButtonStyle(
-                                bgcolor=self.primary_brown,
-                                color=self.white,
-                                shape=ft.RoundedRectangleBorder(radius=30),
-                                padding=20,
-                            ),
-                        ),
+                        )
                     ),
+                    ft.Container(height=10),
                 ],
             ),
         )

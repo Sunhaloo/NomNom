@@ -36,6 +36,10 @@ class OrdersScreen:
         self.text_dark = "#3E2723"
         self.text_light = "#5D4037"
         self.white = "#ffffff"
+        self.black = "#000000"
+        # Match the web app accent brown used on login/signup screens
+        self.btn_primary = "#6f4e37"
+        self.content_width = 380
         
         # Data
         self.orders = []
@@ -56,6 +60,12 @@ class OrdersScreen:
             focused_border_color=self.primary_brown,
             text_size=14,
             height=45,
+            color=self.black,
+            filled=True,
+            fill_color=self.white,
+            cursor_color=self.primary_brown,
+            label_style=ft.TextStyle(color=self.text_light),
+            hint_style=ft.TextStyle(color=self.text_light),
             keyboard_type=ft.KeyboardType.NUMBER,
             on_submit=self._on_order_id_submit,
         )
@@ -63,7 +73,7 @@ class OrdersScreen:
         self.order_id_load_btn = ft.IconButton(
             icon=ft.Icons.SEARCH,
             icon_color=self.white,
-            bgcolor=self.primary_brown,
+            bgcolor=self.btn_primary,
             tooltip="Load order",
             on_click=self._on_order_id_load_click,
         )
@@ -72,8 +82,7 @@ class OrdersScreen:
         # Orders list
         self.orders_list = ft.Column(
             spacing=10,
-            scroll=ft.ScrollMode.AUTO,
-            expand=True,
+            expand=False,
             controls=[],
         )
 
@@ -123,6 +132,19 @@ class OrdersScreen:
         except RuntimeError:
             # Control not yet added to page
             pass
+
+    def _wrap(self, control: ft.Control, *, expand: bool = False) -> ft.Row:
+        """Keep content centered with a consistent max width."""
+        return ft.Row(
+            expand=expand,
+            alignment=ft.MainAxisAlignment.CENTER,
+            controls=[
+                ft.Container(
+                    width=self.content_width,
+                    content=control,
+                )
+            ],
+        )
     
     
     def _create_order_item(self, order: dict) -> ft.Container:
@@ -381,10 +403,12 @@ class OrdersScreen:
 
         # Items list (scrollable)
         item_controls: list[ft.Control] = []
+        items_count = 0
         if items:
             for item in items:
                 if not isinstance(item, dict):
                     continue
+                items_count += 1
                 pastry_name = item.get("pastry_name", "Unknown")
                 quantity = item.get("quantity", 0)
                 price = item.get("price", "0.00")
@@ -425,6 +449,7 @@ class OrdersScreen:
                     )
                 )
         else:
+            items_count = 1
             item_controls.append(
                 ft.Text(
                     "No items in this order.",
@@ -432,6 +457,10 @@ class OrdersScreen:
                     color=self.text_light,
                 )
             )
+
+        # Keep the items section compact for small orders, but still scrollable for larger ones.
+        # Approx 72px per item card; cap so the rest of the receipt stays visible.
+        items_section_height = min(90 + (max(items_count, 1) * 72), 185)
 
         delivery = order.get("delivery")
         delivery_controls: list[ft.Control]
@@ -452,7 +481,7 @@ class OrdersScreen:
                         ft.Container(
                             bgcolor=get_status_color(delivery_status, "delivery"),
                             border_radius=5,
-                            padding=ft.padding.symmetric(horizontal=10, vertical=5),
+                            padding=ft.Padding.symmetric(horizontal=10, vertical=5),
                             content=ft.Text(
                                 format_delivery_status(delivery_status),
                                 size=11,
@@ -497,7 +526,7 @@ class OrdersScreen:
                                 ft.Container(
                                     bgcolor=status_color,
                                     border_radius=5,
-                                    padding=ft.padding.symmetric(horizontal=10, vertical=5),
+                                    padding=ft.Padding.symmetric(horizontal=10, vertical=5),
                                     content=ft.Text(
                                         status_display,
                                         size=11,
@@ -529,7 +558,7 @@ class OrdersScreen:
                 "Items",
                 ft.Icons.RECEIPT_LONG,
                 ft.Container(
-                    height=185,
+                    height=items_section_height,
                     content=ft.Column(
                         scroll=ft.ScrollMode.AUTO,
                         spacing=10,
@@ -569,44 +598,55 @@ class OrdersScreen:
         return ft.Container(
             expand=True,
             bgcolor="#E8DBC7",
+            alignment=ft.Alignment.TOP_CENTER,
             content=ft.Column(
                 expand=True,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                scroll=ft.ScrollMode.AUTO,
                 controls=[
                     ft.Container(height=15),
                     
                     # Header
-                    ft.Container(
-                        padding=ft.Padding(left=20, right=20, top=0, bottom=0),
-                        content=ft.Text(
-                            "Orders",
-                            size=24,
-                            weight="bold",
-                            color=self.text_dark,
-                        ),
+                    self._wrap(
+                        ft.Row(
+                            alignment=ft.MainAxisAlignment.CENTER,
+                            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                            controls=[
+                                ft.Image(
+                                    src="NomNom-Logo-mark.png",
+                                    width=60,
+                                    height=60,
+                                    fit=ft.BoxFit.CONTAIN,
+                                ),
+                                ft.Container(width=10),
+                                ft.Text(
+                                    "Orders",
+                                    size=24,
+                                    weight="bold",
+                                    color=self.text_dark,
+                                ),
+                            ],
+                        )
                     ),
                     
                     ft.Container(height=15),
                     
                     # Details About Order (inline)
-                    ft.Container(
-                        padding=ft.Padding(left=15, right=15, top=0, bottom=0),
-                        content=self.detail_container,
-                    ),
+                    self._wrap(self.detail_container),
                     
                     ft.Container(height=15),
                     
                     # Loading indicator
-                    ft.Container(
-                        alignment=ft.Alignment.CENTER,
-                        content=self.loading,
+                    self._wrap(
+                        ft.Container(
+                            alignment=ft.Alignment.CENTER,
+                            content=self.loading,
+                        )
                     ),
                     
                     # Orders - Receipts
-                    ft.Container(
-                        expand=True,
-                        padding=ft.Padding(left=15, right=15, top=0, bottom=0),
-                        content=self.orders_list,
-                    ),
+                    self._wrap(self.orders_list),
+                    ft.Container(height=90),
                 ],
                 spacing=0,
             ),

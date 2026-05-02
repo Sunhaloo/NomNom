@@ -6,7 +6,7 @@ import flet as ft
 from deliveries.deliveries_service import DeliveriesService
 from deliveries.screens.map_screen import MapScreen
 from common.error_handler import get_user_friendly_message, NetworkError
-from common.formatters import calculate_distance_km, format_distance
+from common.formatters import calculate_distance_km, format_distance, get_status_color
 from config import SHOP_LATITUDE, SHOP_LONGITUDE
 
 
@@ -25,14 +25,18 @@ class DeliveriesScreen:
         self.text_dark = "#3E2723"
         self.text_light = "#5D4037"
         self.white = "#ffffff"
+        self.page_bg = "#E8DBC7"
         self.orange = "#FF9800"
         self.green = "#4CAF50"
         self.red = "#F44336"
+        self.content_width = 380
         
         # Delivery lists by status
         self.pending_deliveries = []
         self.confirmed_deliveries = []
         self.canceled_deliveries = []
+
+        self.map_screen = None
         
         # UI containers for each status section
         self.pending_list = ft.Column(
@@ -63,6 +67,19 @@ class DeliveriesScreen:
         except RuntimeError:
             # Control not yet added to page
             pass
+
+    def _wrap(self, control: ft.Control, *, expand: bool = False) -> ft.Row:
+        """Keep content centered with a consistent max width."""
+        return ft.Row(
+            expand=expand,
+            alignment=ft.MainAxisAlignment.CENTER,
+            controls=[
+                ft.Container(
+                    width=self.content_width,
+                    content=control,
+                )
+            ],
+        )
     
     def _create_delivery_item(self, delivery: dict, status_type: str) -> ft.Container:
         """Build a single delivery card for the list"""
@@ -78,18 +95,14 @@ class DeliveriesScreen:
         distance_km = 2.5  # Placeholder - would need actual address parsing
         distance_display = format_distance(distance_km)
         
-        # Card color based on status type
-        card_color = {
-            "Pending": self.orange,
-            "Done": self.green,
-            "Cancelled": self.red,
-        }.get(status_type, self.lighter_brown)
-        
-        # Light version of the card color for background
+        # Brown-tone status color (theme-aligned)
+        card_color = get_status_color(status_type, "delivery")
+
+        # Light backgrounds to keep contrast while staying on-theme
         card_bg_color = {
-            "Pending": "#FFF3E0",
-            "Done": "#E8F5E9",
-            "Cancelled": "#FFEBEE",
+            "Pending": "#F3E5DC",
+            "Done": "#EFEBE9",
+            "Cancelled": "#F5F0EE",
         }.get(status_type, self.lighter_brown)
         
         # Only show confirm button for pending deliveries
@@ -299,13 +312,11 @@ class DeliveriesScreen:
             self.show_notification(f"Failed to cancel in database: {str(e)}", error=True)
 
     def _on_my_button_click(self, delivery_address):
-        """Handle 'My' button click - scroll to map and show delivery address"""
-        # Show a notification with the address
-        self.show_notification(f"Delivery to: {delivery_address}")
-        
-        # Scroll to top to show the map
-        # Note: In a full implementation, this would scroll the page programmatically
-        # For now, we just notify the user
+        """Handle 'My' button click - focus map on customer location."""
+        if delivery_address:
+            self.show_notification(f"Delivery to: {delivery_address}")
+        if self.map_screen:
+            self.map_screen.request_customer_location()
     
     def _on_map_click(self, delivery_id):
         """Handle map button click"""
@@ -318,45 +329,64 @@ class DeliveriesScreen:
         self._load_deliveries()
         
         # Create map component with page reference
-        map_screen = MapScreen(on_back=None)
+        self.map_screen = MapScreen(on_back=None)
         
         def create_status_section(title: str, deliveries_list) -> ft.Container:
             """Create a scrollable section for a delivery status"""
-            return ft.Container(
-                height=250,
-                bgcolor=self.white,
-                padding=ft.Padding.symmetric(horizontal=15),
-                content=ft.Column(
-                    controls=[
-                        ft.Text(
-                            title,
-                            size=16,
-                            weight="bold",
-                            color=self.text_dark,
-                        ),
-                        ft.Container(height=8),
-                        deliveries_list,
-                    ],
-                    spacing=0,
-                ),
+            return self._wrap(
+                ft.Container(
+                    height=250,
+                    bgcolor=self.white,
+                    border_radius=12,
+                    padding=ft.Padding.symmetric(horizontal=15),
+                    content=ft.Column(
+                        controls=[
+                            ft.Text(
+                                title,
+                                size=16,
+                                weight="bold",
+                                color=self.text_dark,
+                            ),
+                            ft.Container(height=8),
+                            deliveries_list,
+                        ],
+                        spacing=0,
+                    ),
+                )
             )
 
         
         return ft.Container(
             expand=True,
-            bgcolor=self.white,
+            bgcolor=self.page_bg,
+            alignment=ft.Alignment.TOP_CENTER,
             content=ft.Column(
                 expand=True,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 controls=[
                     # Fixed Header - NOT scrollable
                     ft.Container(
                         height=60,
                         padding=ft.Padding.symmetric(horizontal=20, vertical=15),
-                        content=ft.Text(
-                            "Deliveries",
-                            size=24,
-                            weight="bold",
-                            color=self.text_dark,
+                        content=self._wrap(
+                            ft.Row(
+                                spacing=10,
+                                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                                controls=[
+                                    ft.Image(
+                                        src="NomNom-Logo-mark.png",
+                                        width=56,
+                                        height=56,
+                                        fit=ft.BoxFit.CONTAIN,
+                                    ),
+                                    ft.Text(
+                                        "Deliveries",
+                                        size=24,
+                                        weight="bold",
+                                        color=self.text_dark,
+                                    ),
+                                ],
+                            )
                         ),
                     ),
                     
@@ -371,34 +401,26 @@ class DeliveriesScreen:
                                 ft.Container(height=15),
                                 
                                 # Map section
-                                ft.Container(
-                                    height=250,
-                                    padding=ft.Padding.symmetric(horizontal=15),
-                                    content=map_screen.build(page=page),
+                                self._wrap(
+                                    ft.Container(
+                                        height=250,
+                                        content=self.map_screen.build(page=page),
+                                    )
                                 ),
                                 
                                 ft.Container(height=15),
                                 
                                 # Pending Deliveries
-                                create_status_section(
-                                    "Pending Deliveries",
-                                    self.pending_list
-                                ),
+                                create_status_section("Pending Deliveries", self.pending_list),
                                 ft.Container(height=15),
                                 
                                 # Confirmed Deliveries
-                                create_status_section(
-                                    "Confirmed Deliveries",
-                                    self.confirmed_list
-                                ),
+                                create_status_section("Confirmed Deliveries", self.confirmed_list),
                                 ft.Container(height=15),
                                 
                                 # Canceled Deliveries
-                                create_status_section(
-                                    "Canceled Deliveries",
-                                    self.canceled_list
-                                ),
-                                ft.Container(height=20),
+                                create_status_section("Canceled Deliveries", self.canceled_list),
+                                ft.Container(height=90),
                             ],
                         ),
                     ),

@@ -3,7 +3,6 @@ Registration/Signup screen for the NomNom mobile app.
 """
 
 import flet as ft
-from pathlib import Path
 from auth.auth_service import AuthService
 from common.error_handler import get_user_friendly_message, AuthenticationError, ValidationError, NetworkError
 
@@ -33,8 +32,8 @@ class RegisterScreen:
         self.btn_primary = "#6f4e37"  # Web app accent-dark-brown
         self.white = "#ffffff"
         
-        # Logo path
-        self.logo_path = str(Path(__file__).parent.parent.parent / "assets" / "NomNom-Logo.png")
+        # Logo served from `assets_dir` (see `mobile-app/src/main.py`)
+        self.logo_src = "NomNom-Logo.png"
         
         # Form fields
         self.username_field = ft.TextField(
@@ -201,7 +200,7 @@ class RegisterScreen:
                     
                     # Logo
                     ft.Image(
-                        src=self.logo_path,
+                        src=self.logo_src,
                         width=80,
                         height=80,
                     ),
