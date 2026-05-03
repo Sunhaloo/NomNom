@@ -292,17 +292,11 @@ NomNom/
 
 ## Mobile Application
 
-- Start Page:
-  ![Start Page - Login/Signup Page](./screenshots/mobile_login_signup.jpeg)
-
-- Homepage:
-  ![Homepage - User Profile](./screenshots/mobile_user_profile.png)
-
-- Order Search:
-  ![Order Search - ID](./screenshots/mobile_order_search.png)
-
-- Geolocation:
-  ![Geolocation - Flet Map](./screenshots/mobile_flet_map.png)
+> [!NOTE]
+> The mobile Flet application screenshot's aspect ratio is too large.
+>
+> This means that is taking a lot of space in this `README.md` file.
+> Therefore, I suggest you to simply head over to <https://github.com/Sunhaloo/NomNom/tree/main/screenshots> to be able to check out the related mobile app's screenshots
 
 # Technologies Used
 
